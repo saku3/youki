@@ -1,5 +1,6 @@
 use std::env;
-use std::fs::{self, read_dir};
+use std::ffi::OsStr;
+use std::fs::{self, read_dir, File};
 use std::os::linux::fs::MetadataExt;
 use std::os::unix::fs::{FileTypeExt, PermissionsExt};
 use std::path::Path;
@@ -7,6 +8,7 @@ use std::path::Path;
 use anyhow::{bail, Result};
 use nix::errno::Errno;
 use nix::libc;
+use nix::mount::{mount, MsFlags};
 use nix::sys::resource::{getrlimit, Resource};
 use nix::sys::stat::{umask, Mode};
 use nix::sys::utsname;
@@ -15,6 +17,7 @@ use oci_spec::runtime::IOPriorityClass::{self, IoprioClassBe, IoprioClassIdle, I
 use oci_spec::runtime::{
     LinuxDevice, LinuxDeviceType, LinuxSchedulerPolicy, PosixRlimit, PosixRlimitType, Spec,
 };
+use tempfile::Builder;
 
 use crate::utils::{
     self, test_dir_read_access, test_dir_write_access, test_read_access, test_write_access,
@@ -773,5 +776,153 @@ pub fn validate_process_oom_score_adj(spec: &Spec) {
 
     if actual_value.trim() != expected_value.to_string() {
         eprintln!("Unexpected oom_score_adj, expected: {expected_value} found: {actual_value}");
+    }
+}
+
+pub fn validate_fd_control(_spec: &Spec) {
+    // --preserve-fds does not get passed via the spec so we have to communicate information
+    // via the root filesystem
+    let expected_num_fds: usize = fs::read_to_string("/num-fds").unwrap().parse().unwrap();
+
+    let mut entries = vec![];
+    let stdio: &[&OsStr] = &["0".as_ref(), "1".as_ref(), "2".as_ref()];
+    for entry in fs::read_dir("/proc/self/fd").unwrap() {
+        let entry = entry.unwrap();
+        let name = entry.file_name();
+        if stdio.contains(&name.as_os_str()) {
+            // Ignore stdio
+            continue;
+        }
+        entries.push((entry.path(), fs::read_link(entry.path())))
+    }
+
+    // NOTE: we do this in a separate loop so we can filter out the dirfd used behind
+    // the scenes in 'fs::read_dir'. It is important to *not* store the full DirEntry
+    // type, as that keeps the dirfd open.
+    let mut fd_details = vec![];
+    let mut found_dirfd = false;
+    for (path, linkpath) in &entries {
+        println!("found fd in container {} {:?}", path.display(), linkpath);
+        // The difference between metadata.unwrap() and fs::metadata is that the latter
+        // will now try to follow the symlink
+        match fs::metadata(path) {
+            Ok(m) => fd_details.push((path, linkpath, m)),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound && !found_dirfd => {
+                // Expected for the dirfd
+                println!("(ignoring dirfd)");
+                found_dirfd = true
+            }
+            Err(e) => {
+                eprintln!("unexpected error reading metadata: {}", e)
+            }
+        }
+    }
+
+    if fd_details.len() != expected_num_fds {
+        eprintln!("mismatched fds inside container! {:?}", fd_details);
+    }
+}
+
+pub fn validate_rootfs_propagation(spec: &Spec) {
+    let linux = spec.linux().as_ref().unwrap();
+    let propagation = linux.rootfs_propagation().as_ref().unwrap();
+
+    let target_dir = Builder::new()
+        .prefix("target")
+        .tempdir()
+        .expect("Failed to create target directory");
+    let target_path = target_dir.path();
+
+    match propagation.as_str() {
+        "shared" | "slave" | "private" => {
+            if let Err(e) = mount(
+                Some("/"),
+                target_dir.path(),
+                None::<&str>,
+                MsFlags::MS_BIND | MsFlags::MS_REC,
+                None::<&str>,
+            ) {
+                eprintln!("bind-mount / {}: {}", target_dir.path().display(), e);
+            }
+
+            let mount_dir = Builder::new()
+                .prefix("mount")
+                .tempdir()
+                .expect("Failed to create mount directory");
+            let test_dir = Builder::new()
+                .prefix("test")
+                .tempdir()
+                .expect("Failed to create mount directory");
+            let tmpfile_path = test_dir.path().join("example");
+            let _file = File::create(&tmpfile_path)
+                .map_err(|e| format!("Failed to create temp file: {}", e));
+
+            mount(
+                Some(test_dir.path()),
+                mount_dir.path(),
+                None::<&str>,
+                MsFlags::MS_BIND | MsFlags::MS_REC,
+                None::<&str>,
+            )
+            .map_err(|e| {
+                format!(
+                    "Failed to bind-mount {} to {}: {}",
+                    test_dir.path().display(),
+                    mount_dir.path().display(),
+                    e
+                )
+            })
+            .unwrap();
+
+            let target_file = target_path
+                .join(mount_dir.path().strip_prefix("/").unwrap())
+                .join(tmpfile_path.file_name().unwrap());
+            let file_visible = target_file.exists();
+
+            match propagation.as_str() {
+                "shared" => {
+                    if file_visible {
+                        println!("shared root propagation exposes {:?}", target_file);
+                    } else {
+                        eprintln!(
+                            "Error: shared root propagation failed to expose {:?}",
+                            target_file
+                        );
+                    }
+                }
+                "slave" | "private" => {
+                    if !file_visible {
+                        println!(
+                            "{} root propagation does not expose {:?}",
+                            propagation, target_file
+                        );
+                    } else {
+                        eprintln!(
+                            "Error: {} root propagation unexpectedly exposed {:?}",
+                            propagation, target_file
+                        );
+                    }
+                }
+                _ => unreachable!(),
+            }
+        }
+        "unbindable" => {
+            if let Err(e) = mount(
+                Some("/"),
+                target_dir.path(),
+                None::<&str>,
+                MsFlags::MS_BIND | MsFlags::MS_REC,
+                None::<&str>,
+            ) {
+                if e == nix::errno::Errno::EINVAL {
+                    println!("root propagation is unbindable");
+                } else {
+                    eprintln!("Error occurred during mount: {}", e);
+                }
+            }
+        }
+        _ => {
+            eprintln!("Unrecognized rootfsPropagation: {}", propagation);
+        }
     }
 }
