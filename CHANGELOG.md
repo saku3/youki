@@ -1,5 +1,7 @@
 # Changelog
 
+## [v0.0.1](https://github.com/saku3/youki/commits/v0.0.1) - 2025-01-08
+
 ## [v0.5.0](https://github.com/youki-dev/youki/compare/v0.4.1...v0.5.0) - 2025-01-02
 ### 💪 Improvements
 - libcontainer: support set stdios for container by @abel-von in https://github.com/youki-dev/youki/pull/2961
