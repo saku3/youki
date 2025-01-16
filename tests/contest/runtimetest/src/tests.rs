@@ -882,14 +882,13 @@ pub fn validate_rootfs_propagation(spec: &Spec) {
             let file_visible = target_file.exists();
 
             let output = Command::new("ls")
-            .arg("-l")
-            .arg(target_path.join(mount_dir.path().strip_prefix("/").unwrap()))
-            .output()
-            .expect("Failed to execute ls command");
-    
+                .arg("-l")
+                .arg(target_path.join(mount_dir.path().strip_prefix("/").unwrap()))
+                .output()
+                .expect("Failed to execute ls command");
+
             println!("Output: {}", String::from_utf8_lossy(&output.stdout));
             println!("Output");
-
 
             // Test
             let pid = std::process::id();
