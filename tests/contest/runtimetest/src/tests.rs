@@ -835,14 +835,6 @@ pub fn validate_rootfs_propagation(spec: &Spec) {
         .expect("Failed to create target directory");
     let target_path = target_dir.path();
 
-    let output = Command::new("ls")
-        .arg("-l")
-        .output()
-        .expect("Failed to execute ls command");
-
-    println!("Output: {}", String::from_utf8_lossy(&output.stdout));
-    println!("Output");
-
     match propagation.as_str() {
         "shared" | "slave" | "private" => {
             if let Err(e) = mount(
@@ -889,6 +881,16 @@ pub fn validate_rootfs_propagation(spec: &Spec) {
                 .join(tmpfile_path.file_name().unwrap());
             let file_visible = target_file.exists();
 
+            let output = Command::new("ls")
+            .arg("-l")
+            .arg(target_path.join(mount_dir.path().strip_prefix("/").unwrap()))
+            .output()
+            .expect("Failed to execute ls command");
+    
+            println!("Output: {}", String::from_utf8_lossy(&output.stdout));
+            println!("Output");
+
+
             // Test
             let pid = std::process::id();
 
@@ -899,7 +901,6 @@ pub fn validate_rootfs_propagation(spec: &Spec) {
                 Ok(f) => {
                     let reader = BufReader::new(f);
 
-                    // 行を1つずつ読み取る
                     for line in reader.lines() {
                         match line {
                             Ok(l) => println!("{}", l),
