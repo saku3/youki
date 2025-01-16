@@ -18,6 +18,9 @@ use oci_spec::runtime::IOPriorityClass::{self, IoprioClassBe, IoprioClassIdle, I
 use oci_spec::runtime::{
     LinuxDevice, LinuxDeviceType, LinuxSchedulerPolicy, PosixRlimit, PosixRlimitType, Spec,
 };
+use std::fs;
+use std::io::{self, BufRead};
+use std::path::PathBuf;
 use tempfile::Builder;
 
 use crate::utils::{
@@ -888,7 +891,6 @@ pub fn validate_rootfs_propagation(spec: &Spec) {
                 .join(tmpfile_path.file_name().unwrap());
             let file_visible = target_file.exists();
 
-
             // Test
             let pid = std::process::id();
 
@@ -901,7 +903,6 @@ pub fn validate_rootfs_propagation(spec: &Spec) {
                 let line = line?;
                 println!("{}", line);
             }
-
 
             match propagation.as_str() {
                 "shared" => {
