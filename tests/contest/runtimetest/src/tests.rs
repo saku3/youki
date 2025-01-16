@@ -1,7 +1,7 @@
 use std::env;
 use std::ffi::OsStr;
 use std::fs::{self, read_dir, File};
-use std::io::{self, BufRead, BufReader};
+use std::io::{BufRead, BufReader};
 use std::os::linux::fs::MetadataExt;
 use std::os::unix::fs::{FileTypeExt, PermissionsExt};
 use std::path::{Path, PathBuf};
@@ -894,7 +894,7 @@ pub fn validate_rootfs_propagation(spec: &Spec) {
 
             let mountinfo_path = PathBuf::from(format!("/proc/{}/mountinfo", pid));
 
-            let file = File::open("/proc/self/mountinfo");
+            let file = File::open(mountinfo_path);
             match file {
                 Ok(f) => {
                     let reader = BufReader::new(f);
