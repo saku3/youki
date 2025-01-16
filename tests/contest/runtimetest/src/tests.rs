@@ -1,11 +1,11 @@
+use std::env;
 use std::ffi::OsStr;
 use std::fs::{self, read_dir, File};
-use std::io::{self, BufRead};
+use std::io::BufReader;
 use std::os::linux::fs::MetadataExt;
 use std::os::unix::fs::{FileTypeExt, PermissionsExt};
 use std::path::{Path, PathBuf};
 use std::process::Command;
-use std::{env, fs};
 
 use anyhow::{bail, Result};
 use nix::errno::Errno;
@@ -894,12 +894,20 @@ pub fn validate_rootfs_propagation(spec: &Spec) {
 
             let mountinfo_path = PathBuf::from(format!("/proc/{}/mountinfo", pid));
 
-            let file = fs::File::open(&mountinfo_path)?;
-            let reader = io::BufReader::new(file);
+            let file = File::open("/proc/self/mountinfo");
+            match file {
+                Ok(f) => {
+                    let reader = BufReader::new(f);
 
-            for line in reader.lines() {
-                let line = line?;
-                println!("{}", line);
+                    // 行を1つずつ読み取る
+                    for line in reader.lines() {
+                        match line {
+                            Ok(l) => println!("{}", l),
+                            Err(e) => eprintln!("Failed to read a line: {}", e),
+                        }
+                    }
+                }
+                Err(e) => eprintln!("Failed to open file: {}", e),
             }
 
             match propagation.as_str() {
