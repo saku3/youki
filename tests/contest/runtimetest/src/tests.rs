@@ -1,10 +1,11 @@
-use std::env;
 use std::ffi::OsStr;
 use std::fs::{self, read_dir, File};
+use std::io::{self, BufRead};
 use std::os::linux::fs::MetadataExt;
 use std::os::unix::fs::{FileTypeExt, PermissionsExt};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::{env, fs};
 
 use anyhow::{bail, Result};
 use nix::errno::Errno;
@@ -18,9 +19,6 @@ use oci_spec::runtime::IOPriorityClass::{self, IoprioClassBe, IoprioClassIdle, I
 use oci_spec::runtime::{
     LinuxDevice, LinuxDeviceType, LinuxSchedulerPolicy, PosixRlimit, PosixRlimitType, Spec,
 };
-use std::fs;
-use std::io::{self, BufRead};
-use std::path::PathBuf;
 use tempfile::Builder;
 
 use crate::utils::{
