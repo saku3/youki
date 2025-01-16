@@ -1,8 +1,7 @@
-use std::io::BufRead;
 use std::env;
 use std::ffi::OsStr;
 use std::fs::{self, read_dir, File};
-use std::io::BufReader;
+use std::io::{self, BufRead, BufReader};
 use std::os::linux::fs::MetadataExt;
 use std::os::unix::fs::{FileTypeExt, PermissionsExt};
 use std::path::{Path, PathBuf};
