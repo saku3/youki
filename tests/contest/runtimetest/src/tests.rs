@@ -836,7 +836,7 @@ pub fn validate_rootfs_propagation(spec: &Spec) {
 
     let output = Command::new("ls")
         .arg("-l")
-        .output() 
+        .output()
         .expect("Failed to execute ls command");
 
     println!("Output: {}", String::from_utf8_lossy(&output.stdout));
