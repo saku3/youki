@@ -4,6 +4,7 @@ use std::fs::{self, read_dir, File};
 use std::os::linux::fs::MetadataExt;
 use std::os::unix::fs::{FileTypeExt, PermissionsExt};
 use std::path::Path;
+use std::process::Command;
 
 use anyhow::{bail, Result};
 use nix::errno::Errno;
@@ -832,6 +833,14 @@ pub fn validate_rootfs_propagation(spec: &Spec) {
         .tempdir()
         .expect("Failed to create target directory");
     let target_path = target_dir.path();
+
+    let output = Command::new("ls")
+        .arg("-l")
+        .output() 
+        .expect("Failed to execute ls command");
+
+    println!("Output: {}", String::from_utf8_lossy(&output.stdout));
+    println!("Output");
 
     match propagation.as_str() {
         "shared" | "slave" | "private" => {

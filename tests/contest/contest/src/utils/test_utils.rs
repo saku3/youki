@@ -196,6 +196,11 @@ pub fn test_inside_container(
         .join("config.json");
     spec.save(path).unwrap();
 
+    println!(
+        "Spec contents as JSON: {}",
+        serde_json::to_string_pretty(&spec).unwrap()
+    );
+
     let runtimetest_path = get_runtimetest_path();
     // The config will directly use runtime as the command to be run, so we have to
     // save the runtimetest binary at its /bin
