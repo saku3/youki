@@ -888,6 +888,21 @@ pub fn validate_rootfs_propagation(spec: &Spec) {
                 .join(tmpfile_path.file_name().unwrap());
             let file_visible = target_file.exists();
 
+
+            // Test
+            let pid = std::process::id();
+
+            let mountinfo_path = PathBuf::from(format!("/proc/{}/mountinfo", pid));
+
+            let file = fs::File::open(&mountinfo_path)?;
+            let reader = io::BufReader::new(file);
+
+            for line in reader.lines() {
+                let line = line?;
+                println!("{}", line);
+            }
+
+
             match propagation.as_str() {
                 "shared" => {
                     if file_visible {
