@@ -68,7 +68,7 @@ fn rootfs_propagation_private_test() -> TestResult {
 }
 
 fn rootfs_propagation_unbindable_test() -> TestResult {
-    let spec = test_result!(create_spec("unbindabl".to_string()));
+    let spec = test_result!(create_spec("unbindable".to_string()));
     test_inside_container(spec, &CreateOptions::default(), &|_| Ok(()))
 }
 
