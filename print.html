@@ -25,17 +25,18 @@
         <link rel="stylesheet" href="fonts/fonts.css">
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" href="highlight.css">
-        <link rel="stylesheet" href="tomorrow-night.css">
-        <link rel="stylesheet" href="ayu-highlight.css">
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
 
 
-        <!-- Provide site root to javascript -->
+        <!-- Provide site root and default themes to javascript -->
         <script>
-            var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc.js"></script>
@@ -45,8 +46,8 @@
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
         <script>
             try {
-                var theme = localStorage.getItem('mdbook-theme');
-                var sidebar = localStorage.getItem('mdbook-sidebar');
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
 
                 if (theme.startsWith('"') && theme.endsWith('"')) {
                     localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
@@ -60,7 +61,8 @@
 
         <!-- Set the theme before any content is loaded, prevents flash -->
         <script>
-            var theme;
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
             const html = document.documentElement;
@@ -73,8 +75,8 @@
 
         <!-- Hide / unhide sidebar before it is displayed -->
         <script>
-            var sidebar = null;
-            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
@@ -110,6 +112,7 @@
                             <i class="fa fa-paint-brush"></i>
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
@@ -264,7 +267,7 @@ If you installed it using rustup, the correct compiler version will be setup aut
 <h2 id="quick-install"><a class="header" href="#quick-install">Quick install</a></h2>
 <p>Install from the GitHub release as root:</p>
 <!--youki release begin-->
-<pre><code class="language-console"># curl -sSfL https://github.com/containers/youki/releases/download/v0.5.0/youki-0.5.0-$(uname -m)-musl.tar.gz | tar -xzvC /usr/bin/ youki
+<pre><code class="language-console"># curl -sSfL https://github.com/containers/youki/releases/download/v0.5.3/youki-0.5.3-$(uname -m)-musl.tar.gz | tar -xzvC /usr/bin/ youki
 </code></pre>
 <!--youki release end-->
 <h2 id="getting-the-source"><a class="header" href="#getting-the-source">Getting the source</a></h2>
@@ -685,17 +688,18 @@ vi src/main.rs
 COPY target/wasm32-wasi/debug/wasm-module.wasm /
 ENTRYPOINT ["wasm-module.wasm"]
 </code></pre>
-<p>Then build a container image with <code>module.wasm.image/variant=compat</code> annotation. <sup class="footnote-reference"><a href="#1">1</a></sup></p>
+<p>Then build a container image with <code>module.wasm.image/variant=compat</code> annotation. <sup class="footnote-reference" id="fr-1-1"><a href="#footnote-1">1</a></sup></p>
 <pre><code class="language-console">sudo buildah build --annotation "module.wasm.image/variant=compat" -t wasm-module .
 </code></pre>
 <h2 id="run-the-wasm-module-with-youki-and-podman"><a class="header" href="#run-the-wasm-module-with-youki-and-podman">Run the wasm module with youki and podman</a></h2>
-<p>Run podman with youki as runtime. <sup class="footnote-reference"><a href="#1">1</a></sup></p>
+<p>Run podman with youki as runtime. <sup class="footnote-reference" id="fr-1-2"><a href="#footnote-1">1</a></sup></p>
 <pre><code class="language-bash">sudo podman --runtime /PATH/WHARE/YOU/BUILT/WITH/WASM-WASMER/youki run localhost/wasm-module 1 2 3
 </code></pre>
-<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
-<p>You might need <code>sudo</code> because of <a href="https://github.com/containers/youki/issues/719">#719</a>.</p>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="community"><a class="header" href="#community">Community</a></h1>
+<hr>
+<ol class="footnote-definition"><li id="footnote-1">
+<p>You might need <code>sudo</code> because of <a href="https://github.com/containers/youki/issues/719">#719</a>. <a href="#fr-1-1">↩</a> <a href="#fr-1-2">↩2</a></p>
+</li>
+</ol><div style="break-before: page; page-break-before: always;"></div><h1 id="community"><a class="header" href="#community">Community</a></h1>
 <ul>
 <li><a href="community/./maintainer.html">Maintainer</a></li>
 <li><a href="community/./goversance.html">Governance</a></li>
@@ -1134,7 +1138,7 @@ fn create_spec() -&gt; Result&lt;Spec&gt; {
 ////////// ANCHOR: example_test
 fn example_test() -&gt; TestResult {
     let spec = test_result!(create_spec());
-    test_inside_container(spec, &amp;CreateOptions::default(), &amp;|_| Ok(()))
+    test_inside_container(&amp;spec, &amp;CreateOptions::default(), &amp;|_| Ok(()))
 }
 ////////// ANCHOR_END: example_test
 
@@ -1177,7 +1181,7 @@ Therefore, it is common practice here to write an OCI Runtime Spec that executes
 </ol>
 <pre><code class="language-rust no_run noplayground">fn example_test() -&gt; TestResult {
     let spec = test_result!(create_spec());
-    test_inside_container(spec, &amp;CreateOptions::default(), &amp;|_| Ok(()))
+    test_inside_container(&amp;spec, &amp;CreateOptions::default(), &amp;|_| Ok(()))
 }</code></pre>
 <ol start="3">
 <li>Create a <code>TestGroup</code> and register a test case you created</li>
