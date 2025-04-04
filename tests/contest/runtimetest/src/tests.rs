@@ -869,7 +869,7 @@ pub fn validate_rootfs_propagation(spec: &Spec) {
     let target_dir = Builder::new()
         .prefix("target")
         .tempdir()
-        .expect("Failed to create target directory");
+        .expect("create target directory");
     let target_path = target_dir.path();
 
     match propagation.as_str() {
@@ -887,14 +887,14 @@ pub fn validate_rootfs_propagation(spec: &Spec) {
             let mount_dir = Builder::new()
                 .prefix("mount")
                 .tempdir()
-                .expect("Failed to create mount directory");
+                .expect("create mount directory");
             let test_dir = Builder::new()
                 .prefix("test")
                 .tempdir()
-                .expect("Failed to create mount directory");
+                .expect("create mount directory");
             let tmpfile_path = test_dir.path().join("example");
             let _file = File::create(&tmpfile_path)
-                .map_err(|e| format!("Failed to create temp file: {}", e));
+                .expect("create temp file");
 
             mount(
                 Some(test_dir.path()),
