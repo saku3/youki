@@ -893,8 +893,7 @@ pub fn validate_rootfs_propagation(spec: &Spec) {
                 .tempdir()
                 .expect("create mount directory");
             let tmpfile_path = test_dir.path().join("example");
-            let _file = File::create(&tmpfile_path)
-                .expect("create temp file");
+            let _file = File::create(&tmpfile_path).expect("create temp file");
 
             mount(
                 Some(test_dir.path()),
