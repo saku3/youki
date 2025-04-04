@@ -894,7 +894,7 @@ pub fn validate_rootfs_propagation(spec: &Spec) {
                 .expect("Failed to create mount directory");
             let tmpfile_path = test_dir.path().join("example");
             let _file = File::create(&tmpfile_path)
-                .with_context(|| format!("Failed to create temp file: {:?}", tmpfile_path))?;
+                .map_err(|e| format!("Failed to create temp file: {}", e));
 
             mount(
                 Some(test_dir.path()),
