@@ -5,8 +5,8 @@ use oci_spec::runtime::{
 };
 use test_framework::{test_result, ConditionalTest, TestGroup, TestResult};
 
+use crate::utils::test_inside_container;
 use crate::utils::test_utils::CreateOptions;
-use crate::utils::{is_runtime_runc, test_inside_container};
 
 fn create_spec(propagation: String) -> Result<Spec> {
     let root = RootBuilder::default()
@@ -77,7 +77,7 @@ pub fn get_rootfs_propagation_test() -> TestGroup {
 
     let rootfs_propagation_shared_test = ConditionalTest::new(
         "rootfs_propagation_shared_test",
-        Box::new(|| !is_runtime_runc()),
+        Box::new(|| true),
         Box::new(rootfs_propagation_shared_test),
     );
     let rootfs_propagation_slave_test = ConditionalTest::new(
@@ -92,7 +92,7 @@ pub fn get_rootfs_propagation_test() -> TestGroup {
     );
     let rootfs_propagation_unbindable_test = ConditionalTest::new(
         "rootfs_propagation_unbindable_test",
-        Box::new(|| !is_runtime_runc()),
+        Box::new(|| true),
         Box::new(rootfs_propagation_unbindable_test),
     );
     rootfs_propagation_test_group.add(vec![
