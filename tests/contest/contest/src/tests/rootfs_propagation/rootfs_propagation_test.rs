@@ -77,7 +77,7 @@ pub fn get_rootfs_propagation_test() -> TestGroup {
 
     let rootfs_propagation_shared_test = ConditionalTest::new(
         "rootfs_propagation_shared_test",
-        Box::new(|| !is_runtime_runc()),
+        Box::new(|| true),
         Box::new(rootfs_propagation_shared_test),
     );
     let rootfs_propagation_slave_test = ConditionalTest::new(
@@ -92,7 +92,7 @@ pub fn get_rootfs_propagation_test() -> TestGroup {
     );
     let rootfs_propagation_unbindable_test = ConditionalTest::new(
         "rootfs_propagation_unbindable_test",
-        Box::new(|| !is_runtime_runc()),
+        Box::new(|| true),
         Box::new(rootfs_propagation_unbindable_test),
     );
     rootfs_propagation_test_group.add(vec![
