@@ -5,8 +5,8 @@ use oci_spec::runtime::{
 };
 use test_framework::{test_result, ConditionalTest, TestGroup, TestResult};
 
+use crate::utils::test_inside_container;
 use crate::utils::test_utils::CreateOptions;
-use crate::utils::{is_runtime_runc, test_inside_container};
 
 fn create_spec(propagation: String) -> Result<Spec> {
     let root = RootBuilder::default()
