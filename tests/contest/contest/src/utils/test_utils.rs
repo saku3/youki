@@ -41,6 +41,7 @@ pub struct ContainerData {
     pub state: Option<State>,
     pub state_err: String,
     pub create_result: std::io::Result<ExitStatus>,
+    pub bundle: PathBuf,
 }
 
 #[derive(Debug, Default)]
@@ -164,6 +165,7 @@ pub fn test_outside_container(
         state,
         state_err: err,
         create_result,
+        bundle: bundle.path().to_path_buf(),
     };
     let test_result = execute_test(data);
     kill_container(&id_str, &bundle).unwrap().wait().unwrap();
@@ -311,4 +313,32 @@ pub fn check_container_created(data: &ContainerData) -> Result<()> {
         }
         Err(e) => Err(anyhow!("{}", e)),
     }
+}
+
+pub fn exec_in_container<P: AsRef<Path>>(
+    id: &str,
+    dir: P,
+    args: &[impl AsRef<OsStr>],
+) -> Result<(String, String)> {
+    let output = Command::new(get_runtime_path())
+        .arg("--root")
+        .arg(dir.as_ref().join("runtime"))
+        .arg("exec")
+        .arg(id)
+        .args(args)
+        .output()
+        .context("failed to run exec")?;
+
+    let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+    let stderr = String::from_utf8_lossy(&output.stderr).to_string();
+
+    if !output.status.success() {
+        bail!(
+            "exec failed with status: {:?}, stderr: {}",
+            output.status,
+            stderr
+        );
+    }
+
+    Ok((stdout, stderr))
 }

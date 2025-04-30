@@ -9,6 +9,7 @@ use anyhow::{bail, Result};
 use nix::errno::Errno;
 use nix::libc;
 use nix::mount::{mount, MsFlags};
+// use nix::sched::{sched_getaffinity, CpuSet};
 use nix::sys::resource::{getrlimit, Resource};
 use nix::sys::stat::{umask, Mode};
 use nix::sys::utsname;
@@ -964,3 +965,72 @@ pub fn validate_rootfs_propagation(spec: &Spec) {
         }
     }
 }
+
+// pub fn validate_exec_cpu_affinity(spec: &Spec) {
+//     let process = match spec.process().as_ref() {
+//         Some(p) => p,
+//         None => {
+//             eprintln!("Spec does not contain a process section.");
+//             return;
+//         }
+//     };
+
+//     let affinity = match process.exec_cpu_affinity().as_ref() {
+//         Some(a) => a,
+//         None => {
+//             println!("No exec_cpu_affinity section found.");
+//             return;
+//         }
+//     };
+
+//     let pid = nix::unistd::Pid::this();
+
+//     match sched_getaffinity(pid) {
+//         Ok(actual_cpuset) => {
+//             if let Some(cpu_affinity_final_str) = affinity.cpu_affinity_final() {
+//                 match parse_cpuset_string(cpu_affinity_final_str) {
+//                     Ok(expected_cpuset) => {
+//                         if actual_cpuset != expected_cpuset {
+//                             eprintln!(
+//                                 "Final CPU affinity mismatch. Expected: {:?}, Actual: {:?}",
+//                                 expected_cpuset, actual_cpuset
+//                             );
+//                         } else {
+//                             println!(
+//                                 "Final CPU affinity matches expected: {}",
+//                                 cpu_affinity_final_str
+//                             );
+//                         }
+//                     }
+//                     Err(e) => {
+//                         eprintln!("Failed to parse final CPU affinity string: {e}");
+//                     }
+//                 }
+//             }
+
+//             // if let Some(final_str) = affinity.cpu_affinity_final() {
+//             //     println!("Final CPU affinity is set in spec as: {}", final_str);
+//             // }
+//         }
+//         Err(e) => {
+//             eprintln!("Failed to get current CPU affinity: {}", e);
+//         }
+//     }
+// }
+
+// fn parse_cpuset_string(s: &str) -> Result<CpuSet> {
+//     let mut cpuset = CpuSet::new();
+//     for part in s.split(',') {
+//         if let Some((start, end)) = part.split_once('-') {
+//             let start: usize = start.trim().parse()?;
+//             let end: usize = end.trim().parse()?;
+//             for cpu in start..=end {
+//                 cpuset.set(cpu)?;
+//             }
+//         } else {
+//             let cpu: usize = part.trim().parse()?;
+//             cpuset.set(cpu)?;
+//         }
+//     }
+//     Ok(cpuset)
+// }

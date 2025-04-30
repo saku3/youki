@@ -319,13 +319,22 @@ impl TenantContainerBuilder {
 
     fn load_init_spec(&self, container: &Container) -> Result<Spec, LibcontainerError> {
         let spec_path = container.bundle().join("config.json");
-
+        tracing::debug!(path = ?spec_path, "spec path resolved");
         let mut spec = Spec::load(&spec_path).map_err(|err| {
             tracing::error!(path = ?spec_path, ?err, "failed to load spec");
             err
         })?;
 
         Self::validate_spec(&spec)?;
+
+        match serde_json::to_string_pretty(&spec) {
+            Ok(spec_json) => {
+                tracing::debug!(spec_content = %spec_json, "loaded spec content validate_spec after");
+            }
+            Err(err) => {
+                tracing::error!(?err, "failed to serialize spec to JSON");
+            }
+        }
 
         spec.canonicalize_rootfs(container.bundle())?;
         Ok(spec)
@@ -445,6 +454,13 @@ impl TenantContainerBuilder {
                 .env(self.get_environment(original_path_env));
             if let Some(cwd) = self.get_working_dir()? {
                 process_builder = process_builder.cwd(cwd);
+            }
+
+            if let Some(process) = spec.process() {
+                if let Some(cpu_affinity) = process.exec_cpu_affinity() {
+                    tracing::debug!("{:#?}", cpu_affinity);
+                    process_builder = process_builder.exec_cpu_affinity(cpu_affinity.clone());
+                }
             }
 
             if let Some(no_new_priv) = self.get_no_new_privileges() {

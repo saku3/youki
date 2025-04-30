@@ -8,6 +8,7 @@ use procfs::process::Process;
 use super::args::{ContainerArgs, ContainerType};
 use super::channel::{IntermediateReceiver, MainSender};
 use super::container_init_process::container_init_process;
+use super::cpu_affinity::{parse_cpuset_string, set_cpuset_affinity};
 use super::fork::CloneCb;
 use crate::error::MissingSpecError;
 use crate::namespaces::Namespaces;
@@ -52,6 +53,34 @@ pub fn container_intermediate_process(
     let cgroup_manager = libcgroups::common::create_cgroup_manager(args.cgroup_config.to_owned())
         .map_err(|e| IntermediateProcessError::Cgroup(e.to_string()))?;
 
+    let current_pid = Pid::from_raw(Process::myself()?.pid());
+    // tracing::debug!("intermediate_process pid = {:?}", current_pid);
+    // match args.container_type {
+    //     ContainerType::InitContainer => {
+    //         tracing::debug!("runコマンドが実行される予定");
+    //     }
+    //     ContainerType::TenantContainer { .. } => {
+    //         tracing::debug!("execコマンドが実行される予定");
+    //     }
+    // }
+    if matches!(args.container_type, ContainerType::TenantContainer { .. }) {
+        if let Some(exec_cpu_affinity) = spec
+            .process()
+            .as_ref()
+            .and_then(|p| p.exec_cpu_affinity().as_ref())
+        {
+            if let Some(initial) = exec_cpu_affinity.initial() {
+                tracing::debug!(
+                    ?initial,
+                    "setting initial CPU affinity for tenant container before cgroup move"
+                );
+
+                let cpuset = parse_cpuset_string(initial)?;
+                set_cpuset_affinity(current_pid, cpuset)?;
+            }
+        }
+    }
+
     // this needs to be done before we create the init process, so that the init
     // process will already be captured by the cgroup. It also needs to be done
     // before we enter the user namespace because if a privileged user starts a
@@ -67,6 +96,24 @@ pub fn container_intermediate_process(
         linux.resources().as_ref(),
         matches!(args.container_type, ContainerType::InitContainer),
     )?;
+
+    if matches!(args.container_type, ContainerType::TenantContainer { .. }) {
+        if let Some(exec_cpu_affinity) = spec
+            .process()
+            .as_ref()
+            .and_then(|p| p.exec_cpu_affinity().as_ref())
+        {
+            if let Some(cpu_affinity_final) = exec_cpu_affinity.cpu_affinity_final() {
+                tracing::debug!(
+                    ?cpu_affinity_final,
+                    "setting CPU affinity for tenant container after cgroup move"
+                );
+
+                let cpuset = parse_cpuset_string(cpu_affinity_final)?;
+                set_cpuset_affinity(current_pid, cpuset)?;
+            }
+        }
+    }
 
     // if new user is specified in specification, this will be true and new
     // namespace will be created, check
@@ -235,6 +282,18 @@ fn apply_cgroups<
     init: bool,
 ) -> Result<()> {
     let pid = Pid::from_raw(Process::myself()?.pid());
+    tracing::debug!(?pid, "applying cgroup to this pid");
+
+    // すでに pid があるなら
+    // let process = Process::new(pid.as_raw())?;
+    // let cmdline = process.cmdline()?;
+
+    // // cmdline は Vec<String> 型です
+    // if !cmdline.is_empty() {
+    //     println!("Command: {:?}", cmdline.join(" "));
+    // } else {
+    //     println!("Command line is empty");
+    // }
     cmanager.add_task(pid).map_err(|err| {
         tracing::error!(?pid, ?err, ?init, "failed to add task to cgroup");
         IntermediateProcessError::Cgroup(err.to_string())
