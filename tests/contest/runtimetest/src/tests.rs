@@ -661,7 +661,7 @@ pub fn validate_process_user(spec: &Spec) {
 fn validate_additional_gids(expected_gids: &Vec<u32>) -> Result<()> {
     let current_gids = getgroups().unwrap();
 
-    if expected_gids.len() != current_gids.len() {
+    if expected_gids.len() == current_gids.len() {
         bail!(
             "error : additional group mismatch, want {:?}, got {:?}",
             expected_gids,
