@@ -2,6 +2,12 @@ use std::borrow::Cow;
 use std::fs::OpenOptions;
 use std::path::PathBuf;
 use std::str::FromStr;
+use opentelemetry::global;
+use opentelemetry::trace::{Tracer, TracerProvider, Span};
+use opentelemetry_sdk::{trace::TracerProvider as SdkTracerProvider, Resource};
+use opentelemetry_sdk::trace::config;
+use opentelemetry_semantic_conventions::resource::SERVICE_NAME;
+use opentelemetry_stdout::SpanExporter;
 
 use anyhow::{bail, Context, Result};
 use tracing::Level;
@@ -160,6 +166,25 @@ where
                 .map_err(|e| anyhow::anyhow!("failed to init logger: {}", e))?;
         }
     }
+
+    let exporter = SpanExporter::default();
+
+    let resource = Resource::new(vec![SERVICE_NAME.string("my-service")]);
+
+    let provider = SdkTracerProvider::builder()
+        .with_simple_exporter(exporter)
+        .with_config(config().with_resource(resource))
+        .build();
+    global::set_tracer_provider(provider.clone());
+
+    let otel_layer = OpenTelemetryLayer::new(provider.versioned_tracer(
+        "youki", Some(env!("CARGO_PKG_VERSION"))
+    ));
+    let subscriber = subscriber_builder.with(otel_layer);
+
+    subscriber
+        .try_init()
+        .map_err(|e| anyhow::anyhow!("failed to init tracing subscriber: {}", e))?;
 
     Ok(())
 }

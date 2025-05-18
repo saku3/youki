@@ -13,7 +13,7 @@ VERSION=debug
 CRATE="youki"
 TARGET=${TARGET:-$HOST_TARGET}
 CARGO=${CARGO:-}
-features=""
+features="otel-tracing"
 
 while getopts f:ro:c:t:xh OPT; do
     case $OPT in
