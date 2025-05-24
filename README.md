@@ -47,7 +47,7 @@ Here is why we are writing a new container runtime in Rust.
   - A command used for the benchmark
 
     ```bash
-    hyperfine --prepare 'sudo sync; echo 3 | sudo tee /proc/sys/vm/drop_caches' --warmup 10 --min-runs 100 'sudo ./youki create -b tutorial a && sudo ./youki start a && sudo ./youki delete -f a'
+    hyperfine --prepare 'sudo sync; echo 3 | sudo tee /proc/sys/vm/drop_caches' --warmup 10 --min-runs 100 'sudo runc create -b tutorial a && sudo runc start a && sudo runc delete -f a'
     ```
 
   - Environment

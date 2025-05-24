@@ -457,6 +457,9 @@ impl TenantContainerBuilder {
             let mut user_builder = UserBuilder::default();
 
             if !self.additional_gids.is_empty() {
+                println!("additional_gids = {:?}", self.additional_gids);
+                tracing::debug!(?self.additional_gids, "Setting additional_gids");
+            
                 user_builder = user_builder.additional_gids(self.additional_gids.clone());
             }
 

@@ -149,6 +149,10 @@ impl InitContainerBuilder {
     fn load_spec(&self) -> Result<Spec, LibcontainerError> {
         let source_spec_path = self.bundle.join("config.json");
         let mut spec = Spec::load(source_spec_path)?;
+        match serde_json::to_string_pretty(&spec) {
+            Ok(json) => println!("{}", json),
+            Err(e) => tracing::warn!("Failed to serialize spec for debug: {}", e),
+        }
         Self::validate_spec(&spec)?;
 
         spec.canonicalize_rootfs(&self.bundle).map_err(|err| {

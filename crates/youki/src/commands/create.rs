@@ -1,4 +1,9 @@
 //! Handles the creation of a new container
+// use opentelemetry::global;
+// use opentelemetry::trace::{Span, Tracer, TraceContextExt};
+// use opentelemetry::Context;
+// use opentelemetry::trace::SpanBuilder;
+
 use std::path::PathBuf;
 
 use anyhow::Result;
@@ -14,6 +19,13 @@ use crate::workload::executor::default_executor;
 // it is running, it is just another process, and has attributes such as pid, file descriptors, etc.
 // associated with it like any other process.
 pub fn create(args: Create, root_path: PathBuf, systemd_cgroup: bool) -> Result<()> {
+    // let tracer = global::tracer("youki::create");
+
+    // let span_builder = SpanBuilder::from_name("create-container");
+    // let mut span = tracer.build(span_builder);
+    // let ctx = Context::current_with_span(span);
+
+    // let container_builder = 
     ContainerBuilder::new(args.container_id.clone(), SyscallType::default())
         .with_executor(default_executor())
         .with_pid_file(args.pid_file.as_ref())?
@@ -26,6 +38,16 @@ pub fn create(args: Create, root_path: PathBuf, systemd_cgroup: bool) -> Result<
         .with_detach(true)
         .with_no_pivot(args.no_pivot)
         .build()?;
+
+    // let _guard = ctx.span().in_scope();
+    // tracing::debug!("Building container");
+    // let result = container_builder.build();
+    // let result = ctx.clone().attach(|| {
+    //     tracing::debug!("Building container");
+    //     container_builder.build()
+    // });
+
+    // ctx.span().end();
 
     Ok(())
 }
