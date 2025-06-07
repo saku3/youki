@@ -31,7 +31,7 @@ find "$RUNC_TEST_DIR" -name "*.bats" | while read -r test_case; do
     logfile="./log/$(basename "$test_case").log"
     mkdir -p "$(dirname "$logfile")"
 
-    if ! sudo -E bats "$test_case" >"$logfile" 2>&1; then
+    if ! sudo -E PATH="$PATH" bats "$test_case" >"$logfile" 2>&1; then
         echo "Test failed: $test_case"
         cat "$logfile"
         FAILED=1
