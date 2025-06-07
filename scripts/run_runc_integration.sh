@@ -13,7 +13,9 @@ fi
 cp ./youki "$RUNC_DIR/runc"
 chmod +x "$RUNC_DIR/runc"
 
-cd "$RUNC_TEST_DIR"
+cd "$RUNC_DIR"
+
+make test-binaries
 
 # Ensure bats is installed
 if ! command -v bats >/dev/null 2>&1; then
