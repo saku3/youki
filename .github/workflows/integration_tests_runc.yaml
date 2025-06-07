@@ -77,7 +77,7 @@ jobs:
       - name: runc integration tests
         run: |
           make test-binaries
-          sudo -E bats -t tests/integration
+          sudo -E PATH="$PATH" script -e -c 'bats -t tests/integration'
         env:
           BATS_LIB_PATH: ${{ steps.setup-bats.outputs.lib-path }}
           TERM: xterm
