@@ -77,4 +77,4 @@ jobs:
       - name: runc integration tests
         run: |
           make test-binaries
-          sudo bats -t tests/integration
+          sudo -E bats -t tests/integration
