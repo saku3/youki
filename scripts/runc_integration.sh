@@ -26,7 +26,7 @@ fi
 mkdir -p log
 FAILED=0
 
-find "$RUNC_TEST_DIR" -name "*.bats" | while read -r test_case; do
+while IFS= read -r test_case; do
     echo "Running $test_case"
     logfile="./log/$(basename "$test_case").log"
     mkdir -p "$(dirname "$logfile")"
@@ -38,6 +38,7 @@ find "$RUNC_TEST_DIR" -name "*.bats" | while read -r test_case; do
     else
         echo "Test passed: $test_case"
     fi
-done
+done < <(find "$RUNC_TEST_DIR" -name "*.bats")
 
 exit $FAILED
+
