@@ -78,3 +78,6 @@ jobs:
         run: |
           make test-binaries
           sudo -E bats -t tests/integration
+        env:
+          BATS_LIB_PATH: ${{ steps.setup-bats.outputs.lib-path }}
+          TERM: xterm
