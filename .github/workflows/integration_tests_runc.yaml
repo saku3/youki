@@ -67,5 +67,17 @@ jobs:
           sudo chmod 755 youki
           sudo mv youki runc
           ./runc --version
+      - name: Setup Bats and bats libs
+        uses: bats-core/bats-action@3.0.1
+        with:
+          bats-version: 1.9.0
+          support-install: false
+          assert-install: false
+          detik-install: false
+          file-install: false
+      - name: runc integration tests
+        run: |
+          make test-binaries
+          bats -t tests/integration
       # - name: Integration Test
       #   run: sudo make 
