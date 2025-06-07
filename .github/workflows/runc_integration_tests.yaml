@@ -49,6 +49,8 @@ jobs:
         libc: [ "gnu", "musl" ]
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - uses: actions/setup-go@v5
         with:
           go-version: '1.23.5'
@@ -71,7 +73,7 @@ jobs:
           detik-install: false
           file-install: false
       - name: runc integration tests
-        run: sh scripts/run_runc_integration.sh
+        run: scripts/run_runc_integration.sh
         #   sudo -E PATH="$PATH" script -e -c 'bats -t tests/integration'
         # env:
         #   BATS_LIB_PATH: ${{ steps.setup-bats.outputs.lib-path }}
