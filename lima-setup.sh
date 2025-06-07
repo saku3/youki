@@ -213,22 +213,6 @@ provision:
         echo 'source "$HOME/.cargo/env"' >> "$HOME/.bashrc"
       fi
 
-      # Golang setup
-      GO_VERSION="1.22.3"
-      GO_TAR="go${GO_VERSION}.linux-amd64.tar.gz"
-      GO_URL="https://go.dev/dl/${GO_TAR}"
-
-      echo "Installing Golang ${GO_VERSION}..."
-      curl -fsSL "${GO_URL}" -o "/tmp/${GO_TAR}"
-      sudo rm -rf /usr/local/go
-      sudo tar -C /usr/local -xzf "/tmp/${GO_TAR}"
-      rm "/tmp/${GO_TAR}"
-
-      if ! grep -q '/usr/local/go/bin' "$HOME/.bashrc"; then
-        echo 'export PATH=$PATH:/usr/local/go/bin' >> "$HOME/.bashrc"
-      fi
-      export PATH=$PATH:/usr/local/go/bin
-
       # Install required development packages
       sudo dnf install -y \
         pkg-config \
@@ -240,7 +224,8 @@ provision:
         jq \
         git
       
-      sudo dnf install -y just
+      sudo dnf install -y just   
+      sudo dnf install -y golang
 
       # Clone runc
       mkdir -p ~/go/src/github.com/opencontainers
@@ -258,7 +243,7 @@ provision:
         sudo ./install.sh /usr/local
       fi
 
-      just youki-release
+      # just youki-release
 LIMA_YAML
 
 SED_EXPR=""

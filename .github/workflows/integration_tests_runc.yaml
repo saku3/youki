@@ -1,4 +1,4 @@
-name: 🧪 SELinux Tests
+name: 🧪 Runc integration test
 
 on:
   push:
@@ -7,54 +7,65 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      dirs: ${{ steps.filter.outputs.changes }}
+  youki-build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        arch: [ "x86_64", "aarch64" ]
+        libc: [ "gnu", "musl" ]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-  test:
-    name: Runc Lima Tests
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Lima
-        uses: lima-vm/lima-actions/setup@v1
-        id: lima-setup
-
-      - name: Cache Lima images
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/lima
-          key: lima-${{ steps.lima-setup.outputs.version }}-runc
-
-      - name: Create Lima VM
-        # working-directory: experiment/selinux
+      - uses: actions/checkout@v4
+      - name: Setup Rust toolchain and cache
+        uses: actions-rust-lang/setup-rust-toolchain@v1.3.7
+        env:
+          RUST_CACHE_KEY_OS: rust-cache-${{ matrix.arch }}-${{ matrix.libc }}
+      - name: Install just
+        uses: taiki-e/install-action@just
+      - name: Install cross-rs
+        run: RUSTFLAGS="" cargo install cross --git https://github.com/cross-rs/cross
+      - name: Setup target
         run: |
-          chmod +x ./lima-setup.sh
-          ./lima-setup.sh --cpus 2 --memory 2GiB
+          echo "CARGO=cross" >> ${GITHUB_ENV}
+          echo "TARGET=${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}" >> ${GITHUB_ENV}
+      - name: Build youki
+        run: just youki-release
+      - name: Upload youki binary
+        if: ${{ matrix.arch == 'x86_64' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: youki-${{ matrix.arch }}-${{ matrix.libc }}
+          path: youki
 
-      # - name: Run tests
-      #   working-directory: experiment/selinux
-      #   run: |
-      #     ./lima-run.sh cargo test
-
-      # - name: Run application
-      #   working-directory: experiment/selinux
-      #   run: |
-      #     ./lima-run.sh cargo run
-
-      # - name: Clean up
-      #   if: always()
-      #   working-directory: experiment/selinux
-      #   run: |
-      #     ./lima-setup.sh --cleanup
+  runc-integration-tests:
+    runs-on: ubuntu-24.04
+    needs: [youki-build]
+    timeout-minutes: 40
+    strategy:
+      matrix:
+        arch: [ "x86_64" ]
+        libc: [ "gnu", "musl" ]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: opencontainers/runc
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.5'
+          cache: true
+      - run: sudo apt-get -y update
+      - run: sudo apt-get install -y pkg-config libsystemd-dev libelf-dev libseccomp-dev btrfs-progs libbtrfs-dev
+      - name: Download youki binary
+        uses: actions/download-artifact@v4
+        with:
+          name: youki-${{ matrix.arch }}-${{ matrix.libc }}
+      - name: Replace runc to youki
+        run: |
+          # sudo rm -f /usr/bin/runc /usr/local/bin/runc /usr/sbin/runc
+          sudo chmod 755 youki
+          sudo mv youki runc
+          runc --version
+      # - name: Integration Test
+      #   run: sudo make 
