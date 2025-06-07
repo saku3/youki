@@ -1,8 +1,8 @@
 name: 🚀 Tagpr for GitHub Actions
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
 jobs:
   tagpr:
     runs-on: ubuntu-latest

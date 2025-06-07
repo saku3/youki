@@ -66,6 +66,6 @@ jobs:
           # sudo rm -f /usr/bin/runc /usr/local/bin/runc /usr/sbin/runc
           sudo chmod 755 youki
           sudo mv youki runc
-          runc --version
+          ./runc --version
       # - name: Integration Test
       #   run: sudo make 
