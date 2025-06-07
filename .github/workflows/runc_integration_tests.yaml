@@ -61,9 +61,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: youki-${{ matrix.arch }}-${{ matrix.libc }}
-      # - name: Replace runc to youki
-      #   run: |
-      #     sudo chmod 755 youki
+      - name: youki
+        run: |
+          sudo chmod 755 youki
       - name: Setup Bats and bats libs
         uses: bats-core/bats-action@3.0.1
         with:
