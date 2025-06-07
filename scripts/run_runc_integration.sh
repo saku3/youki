@@ -4,11 +4,8 @@ ROOT=$(git rev-parse --show-toplevel)
 RUNC_DIR="${ROOT}/tests/runc/src/github.com/opencontainers/runc"
 RUNC_TEST_DIR="${ROOT}/tests/runc/src/github.com/opencontainers/runc/tests/integration"
 PATTERN=${2:-.}
-echo "Test dir: $RUNC_TEST_DIR"
 
-if [[ -x ./youki ]]; then
-  echo "youki binary found"
-else
+if [[ ! -x ./youki ]]; then
   echo "youki binary not found"
   exit 1
 fi

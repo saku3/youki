@@ -49,8 +49,6 @@ jobs:
         libc: [ "gnu", "musl" ]
     steps:
       - uses: actions/checkout@v4
-        with:
-          repository: opencontainers/runc
       - uses: actions/setup-go@v5
         with:
           go-version: '1.23.5'
