@@ -61,11 +61,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: youki-${{ matrix.arch }}-${{ matrix.libc }}
-      - name: Replace runc to youki
-        run: |
-          sudo chmod 755 youki
-          sudo mv youki runc
-          ./runc --version
+      # - name: Replace runc to youki
+      #   run: |
+      #     sudo chmod 755 youki
       - name: Setup Bats and bats libs
         uses: bats-core/bats-action@3.0.1
         with:
@@ -77,7 +75,8 @@ jobs:
       - name: runc integration tests
         run: |
           make test-binaries
-          sudo -E PATH="$PATH" script -e -c 'bats -t tests/integration'
-        env:
-          BATS_LIB_PATH: ${{ steps.setup-bats.outputs.lib-path }}
-          TERM: xterm
+          sh scripts/run_runc_integration.sh
+        #   sudo -E PATH="$PATH" script -e -c 'bats -t tests/integration'
+        # env:
+        #   BATS_LIB_PATH: ${{ steps.setup-bats.outputs.lib-path }}
+        #   TERM: xterm
