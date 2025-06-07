@@ -63,7 +63,6 @@ jobs:
           name: youki-${{ matrix.arch }}-${{ matrix.libc }}
       - name: Replace runc to youki
         run: |
-          # sudo rm -f /usr/bin/runc /usr/local/bin/runc /usr/sbin/runc
           sudo chmod 755 youki
           sudo mv youki runc
           ./runc --version
@@ -78,6 +77,4 @@ jobs:
       - name: runc integration tests
         run: |
           make test-binaries
-          bats -t tests/integration
-      # - name: Integration Test
-      #   run: sudo make 
+          sudo bats -t tests/integration
