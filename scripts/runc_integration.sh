@@ -30,6 +30,7 @@ run.bats:runc run [execve error]
 events.bats:events oom
 events.bats:events --interval default
 rlimits.bats:runc run with RLIMIT_NOFILE(The same as system's hard value)
+mounts.bats:runc run [ro /sys/fs/cgroup mounts + cgroupns]
 mounts.bats:runc run [mount order, container bind-mount source]
 mounts.bats:runc run [mount order, container bind-mount source] (userns)
 mounts.bats:runc run [mount order, container idmap source]
