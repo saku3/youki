@@ -59,7 +59,6 @@ while IFS= read -r test_case; do
 
     if ! sudo -E PATH="$PATH" "$BATS_PATH" "$test_case" > "$logfile" 2>&1; then
         echo "Test failed: $test_case"
-        cat "$logfile"
         FAILED=1
     else
         echo "Test passed: $test_case"
