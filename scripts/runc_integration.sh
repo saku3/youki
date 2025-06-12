@@ -57,6 +57,12 @@ done <<< "$SKIP_PATTERN"
 
 mkdir -p log
 FAILED=0
+PASSED_COUNT=0
+FAILED_COUNT=0
+
+BATS_FILES=$(find "$RUNC_TEST_DIR" -name "*.bats")
+BATS_FILE_COUNT=$(echo "$BATS_FILES" | wc -l)
+echo "Total .bats files found: $BATS_FILE_COUNT"
 
 while IFS= read -r test_case; do
     echo "Running $test_case"
@@ -66,12 +72,17 @@ while IFS= read -r test_case; do
     if ! sudo -E PATH="$PATH" "$BATS_PATH" "$test_case" > "$logfile" 2>&1; then
         echo "Test failed: $test_case"
         FAILED=1
+        ((FAILED_COUNT++))
     else
         echo "Test passed: $test_case"
+        ((PASSED_COUNT++))
     fi
-done < <(find "$RUNC_TEST_DIR" -name "*.bats")
+done <<< "$BATS_FILES"
 
 find "$RUNC_TEST_DIR" -name "*.bats" -exec sed -i '/skip "skip runc integration test in youki"/d' {} +
 
 echo "Runc integration test finished"
+echo "Passed tests: $PASSED_COUNT"
+echo "Failed tests: $FAILED_COUNT"
+
 exit $FAILED
