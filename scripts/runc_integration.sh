@@ -69,7 +69,14 @@ while IFS= read -r test_case; do
     logfile="./log/$(basename "$test_case").log"
     mkdir -p "$(dirname "$logfile")"
 
-    if ! sudo -E PATH="$PATH" "$BATS_PATH" "$test_case" > "$logfile" 2>&1; then
+    timeout 300s sudo -E PATH="$PATH" "$BATS_PATH" "$test_case" > "$logfile" 2>&1
+    exit_code=$?
+
+    if [[ $exit_code -eq 124 ]]; then
+        echo "Test timed out: $test_case"
+        FAILED=1
+        ((FAILED_COUNT++))
+    elif [[ $exit_code -ne 0 ]]; then
         echo "Test failed: $test_case"
         FAILED=1
         ((FAILED_COUNT++))
