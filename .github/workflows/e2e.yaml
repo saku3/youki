@@ -287,5 +287,10 @@ jobs:
           assert-install: false
           detik-install: false
           file-install: false
+      - name: runc install
+        run: |
+          cd tests/runc
+          make 
+          make install 
       - name: runc integration tests
         run: scripts/runc_integration.sh /usr/local/sbin/runc
