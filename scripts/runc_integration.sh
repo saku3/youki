@@ -1,15 +1,16 @@
 #!/bin/bash -u
 
+RUNTIME=${1:-./youki}
 ROOT=$(git rev-parse --show-toplevel)
 RUNC_DIR="${ROOT}/tests/runc/src/github.com/opencontainers/runc"
 RUNC_TEST_DIR="${ROOT}/tests/runc/src/github.com/opencontainers/runc/tests/integration"
 
-if [[ ! -x ./youki ]]; then
-  echo "youki binary not found"
+if [[ ! -x "$RUNTIME" ]]; then
+  echo "runtime binary not found: $RUNTIME"
   exit 1
 fi
 
-cp ./youki "$RUNC_DIR/runc"
+cp "$RUNTIME" "$RUNC_DIR/runc"
 chmod +x "$RUNC_DIR/runc"
 
 cd "$RUNC_DIR"
