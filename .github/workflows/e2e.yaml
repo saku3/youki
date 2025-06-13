@@ -288,4 +288,4 @@ jobs:
           detik-install: false
           file-install: false
       - name: runc integration tests
-        run: scripts/runc_integration.sh
+        run: scripts/runc_integration.sh /usr/local/sbin/runc
