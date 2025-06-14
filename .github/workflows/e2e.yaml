@@ -294,8 +294,9 @@ jobs:
           sudo chmod 755 /usr/bin/runc
       - name: runc integration tests
         run: |
-          cd tests/runc/src/github.com/opencontainers/runc
           scripts/test.sh
+      # cd tests/runc/src/github.com/opencontainers/runc
+      # RUNC=/usr/bin/youki
       # sudo -E PATH="$PATH" script -e -c 'make localintegration'
       # - name: runc integration tests
       #   run: scripts/runc_integration.sh /usr/bin/runc
