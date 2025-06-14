@@ -70,7 +70,7 @@ while IFS= read -r test_case; do
     logfile="./log/$(basename "$test_case").log"
     mkdir -p "$(dirname "$logfile")"
 
-    timeout 300s sudo -E PATH="$PATH" "$BATS_PATH" "$test_case" > "$logfile" 2>&1
+    script -q -e -c "timeout 300s sudo -E PATH=\"$PATH\" \"$BATS_PATH\" \"$test_case\"" > "$logfile" 2>&1
     exit_code=$?
 
     if [[ $exit_code -eq 124 ]]; then
