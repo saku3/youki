@@ -88,7 +88,7 @@ while IFS= read -r test_case; do
     fi
 
     cat $logfile
-done <<< "$BATS_FILES"
+done < <(find "$RUNC_TEST_DIR" -name "*.bats")
 
 find "$RUNC_TEST_DIR" -name "*.bats" -exec sed -i '/skip "skip runc integration test in youki"/d' {} +
 
