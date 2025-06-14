@@ -295,6 +295,6 @@ jobs:
       - name: runc integration tests
         run: |
           cd tests/runc/src/github.com/opencontainers/runc
-          make localintegration
+          sudo -E PATH="$PATH" script -e -c 'make localintegration'
       # - name: runc integration tests
       #   run: scripts/runc_integration.sh /usr/bin/runc
