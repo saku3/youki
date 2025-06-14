@@ -85,6 +85,8 @@ while IFS= read -r test_case; do
         echo "Test passed: $test_case"
         ((PASSED_COUNT++))
     fi
+
+    cat $logfile
 done <<< "$BATS_FILES"
 
 find "$RUNC_TEST_DIR" -name "*.bats" -exec sed -i '/skip "skip runc integration test in youki"/d' {} +
