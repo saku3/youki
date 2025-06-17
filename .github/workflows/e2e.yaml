@@ -297,6 +297,11 @@ jobs:
       #     wget -q https://github.com/opencontainers/runc/releases/download/v1.3.0/runc.amd64
       #     sudo mv runc.amd64 /usr/bin/runc
       #     sudo chmod 755 /usr/bin/runc
+      - name: Allow userns for runc
+        # https://discourse.ubuntu.com/t/ubuntu-24-04-lts-noble-numbat-release-notes/39890#unprivileged-user-namespace-restrictions-15
+        if: matrix.os == 'ubuntu-24.04'
+        run: |
+          sed "s;^profile runc /usr/sbin/;profile runc-test $PWD/;" < /etc/apparmor.d/runc | sudo apparmor_parser
       - name: runc integration tests
         run: |
           cd tests/runc/src/github.com/opencontainers/runc
