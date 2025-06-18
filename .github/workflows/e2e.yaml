@@ -281,9 +281,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: youki-${{ matrix.arch }}-${{ matrix.libc }}
-      - name: youki
+      # - name: youki
+      #   run: |
+      #     sudo chmod 755 youki
+      - name: Setup youki as runc
         run: |
-          sudo chmod 755 youki
+          sudo mv youki /usr/local/bin/runc
+          sudo chmod +x /usr/local/bin/runc
       - name: Setup Bats and bats libs
         uses: bats-core/bats-action@3.0.1
         with:
@@ -299,7 +303,7 @@ jobs:
       - name: runc integration tests
         run: |
           cd tests/runc/src/github.com/opencontainers/runc
-          sudo make && sudo make install
+          # sudo make && sudo make install
           # sudo -E PATH="$PATH" make all
           sudo -E PATH="$PATH" script -e -c 'make localintegration'
       # - name: runc integration tests
