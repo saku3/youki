@@ -281,14 +281,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: youki-${{ matrix.arch }}-${{ matrix.libc }}
-      # - name: youki
-      #   run: |
-      #     sudo chmod 755 youki
       - name: Setup youki as runc
         run: |
           sudo cp youki $(pwd)/tests/runc/src/github.com/opencontainers/runc/runc
-          sudo mv youki /usr/local/bin/runc
-          sudo chmod +x /usr/local/bin/runc
           sudo chmod +x $(pwd)/tests/runc/src/github.com/opencontainers/runc/runc
       - name: Setup Bats and bats libs
         uses: bats-core/bats-action@3.0.1
