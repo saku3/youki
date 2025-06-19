@@ -38,7 +38,7 @@ mounts.bats:runc run [mount order, container bind-mount source]
 mounts.bats:runc run [mount order, container bind-mount source] (userns)
 mounts.bats:runc run [mount order, container idmap source]
 mounts.bats:runc run [mount order, container idmap source] (userns)
-env.bats:empty HOME env var is overridden with multiple overrides
+env.bats:env var HOME is set only once
 EOF
 )
 
