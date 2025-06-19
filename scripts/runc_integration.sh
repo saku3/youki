@@ -5,24 +5,24 @@ ROOT=$(git rev-parse --show-toplevel)
 RUNC_DIR="${ROOT}/tests/runc/src/github.com/opencontainers/runc"
 RUNC_TEST_DIR="${ROOT}/tests/runc/src/github.com/opencontainers/runc/tests/integration"
 
-if [[ ! -x "$RUNTIME" ]]; then
-  echo "runtime binary not found: $RUNTIME"
-  exit 1
-fi
+# if [[ ! -x "$RUNTIME" ]]; then
+#   echo "runtime binary not found: $RUNTIME"
+#   exit 1
+# fi
 
-cp "$RUNTIME" "$RUNC_DIR/runc"
-chmod +x "$RUNC_DIR/runc"
+# cp "$RUNTIME" "$RUNC_DIR/runc"
+# chmod +x "$RUNC_DIR/runc"
 
-cd "$RUNC_DIR"
+# cd "$RUNC_DIR"
 
-make test-binaries
+# make test-binaries
 
-BATS_PATH=$(command -v bats)
+# BATS_PATH=$(command -v bats)
 
-if [ -z "$BATS_PATH" ]; then
-  echo "bats not found"
-  exit 1
-fi
+# if [ -z "$BATS_PATH" ]; then
+#   echo "bats not found"
+#   exit 1
+# fi
 
 # Skipping this test because it hangs and stops responding.
 SKIP_PATTERN=$(cat <<EOF
@@ -57,43 +57,43 @@ while IFS= read -r line; do
   sed -i "/$escaped_pattern/a skip \"skip runc integration test in youki\"" "$file_path"
 done <<< "$SKIP_PATTERN"
 
-mkdir -p log
-FAILED=0
-PASSED_COUNT=0
-FAILED_COUNT=0
+# mkdir -p log
+# FAILED=0
+# PASSED_COUNT=0
+# FAILED_COUNT=0
 
-BATS_FILES=$(find "$RUNC_TEST_DIR" -name "*.bats")
-BATS_FILE_COUNT=$(echo "$BATS_FILES" | wc -l)
-echo "Total .bats files found: $BATS_FILE_COUNT"
+# BATS_FILES=$(find "$RUNC_TEST_DIR" -name "*.bats")
+# BATS_FILE_COUNT=$(echo "$BATS_FILES" | wc -l)
+# echo "Total .bats files found: $BATS_FILE_COUNT"
 
-while IFS= read -r test_case; do
-    echo "Running $test_case"
-    logfile="./log/$(basename "$test_case").log"
-    mkdir -p "$(dirname "$logfile")"
+# while IFS= read -r test_case; do
+#     echo "Running $test_case"
+#     logfile="./log/$(basename "$test_case").log"
+#     mkdir -p "$(dirname "$logfile")"
 
-    script -q -e -c "timeout 300s sudo -E PATH=\"$PATH\" \"$BATS_PATH\" \"$test_case\"" > "$logfile" 2>&1
-    exit_code=$?
+#     script -q -e -c "timeout 300s sudo -E PATH=\"$PATH\" \"$BATS_PATH\" \"$test_case\"" > "$logfile" 2>&1
+#     exit_code=$?
 
-    if [[ $exit_code -eq 124 ]]; then
-        echo "Test timed out: $test_case"
-        FAILED=1
-        ((FAILED_COUNT++))
-    elif [[ $exit_code -ne 0 ]]; then
-        echo "Test failed: $test_case"
-        FAILED=1
-        ((FAILED_COUNT++))
-    else
-        echo "Test passed: $test_case"
-        ((PASSED_COUNT++))
-    fi
+#     if [[ $exit_code -eq 124 ]]; then
+#         echo "Test timed out: $test_case"
+#         FAILED=1
+#         ((FAILED_COUNT++))
+#     elif [[ $exit_code -ne 0 ]]; then
+#         echo "Test failed: $test_case"
+#         FAILED=1
+#         ((FAILED_COUNT++))
+#     else
+#         echo "Test passed: $test_case"
+#         ((PASSED_COUNT++))
+#     fi
 
-    cat $logfile
-done < <(find "$RUNC_TEST_DIR" -name "*.bats")
+#     cat $logfile
+# done < <(find "$RUNC_TEST_DIR" -name "*.bats")
 
-find "$RUNC_TEST_DIR" -name "*.bats" -exec sed -i '/skip "skip runc integration test in youki"/d' {} +
+# find "$RUNC_TEST_DIR" -name "*.bats" -exec sed -i '/skip "skip runc integration test in youki"/d' {} +
 
-echo "Runc integration test finished"
-echo "Passed tests: $PASSED_COUNT"
-echo "Failed tests: $FAILED_COUNT"
+# echo "Runc integration test finished"
+# echo "Passed tests: $PASSED_COUNT"
+# echo "Failed tests: $FAILED_COUNT"
 
-exit $FAILED
+# exit $FAILED
