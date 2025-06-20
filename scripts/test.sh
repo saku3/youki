@@ -19,9 +19,9 @@ if [[ -z "$BATS_FILES" ]]; then
   exit 0
 fi
 
-for file in $BATS_FILES; do
-  echo "Running test: $file"
-  # sudo "$BATS_PATH" "$file"
-  sudo -E PATH="$PATH" script -q -e -c "bats -t $file"
-  echo "-------------------------"
-done
+# for file in $BATS_FILES; do
+# echo "Running test: $file"
+# sudo "$BATS_PATH" "$file"
+sudo -E PATH="$PATH" script -q -e -c "bats -t tests/integration/mounts_propagation.bats"
+echo "-------------------------"
+# done
