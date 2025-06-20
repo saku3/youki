@@ -22,6 +22,6 @@ fi
 for file in $BATS_FILES; do
   echo "Running test: $file"
   # sudo "$BATS_PATH" "$file"
-  sudo -E PATH="$PATH" script -e -c "bats -t $file"
+  sudo -E PATH="$PATH" script -q -e -c "bats -t $file"
   echo "-------------------------"
 done
