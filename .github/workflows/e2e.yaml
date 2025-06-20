@@ -302,4 +302,5 @@ jobs:
           sudo make test-binaries
           sudo make runc
           # sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration'
-          scripts/test.sh
+      - name: test
+        run: scripts/test.sh
