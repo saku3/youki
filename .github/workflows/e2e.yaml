@@ -309,5 +309,5 @@ jobs:
           sudo make runc
           sudo -E PATH="$PATH" script -e -c 'bats -t tests/integration'
       - name: runc integration tests
-        run: scripts/runc_integration.sh /usr/bin/runc
+        run: scripts/runc_integration.sh
         # run: scripts/runc_integration.sh /usr/bin/runc
