@@ -3,6 +3,8 @@
 TARGET_DIR=${1:-"tests/runc/src/github.com/opencontainers/runc/tests/integration"} 
 BATS_PATH=$(command -v bats || true)
 
+cd "tests/runc/src/github.com/opencontainers/runc"
+
 if [[ -z "$BATS_PATH" ]]; then
   echo "bats not found. Please install it (e.g., sudo apt-get install bats)"
   exit 1
