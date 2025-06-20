@@ -31,6 +31,8 @@ for file in $BATS_FILES; do
   mkdir -p "$(dirname "$logfile")"
 
   # sudo -E PATH="$PATH" script -q -e -c "bats -t '$file'" "$logfile"
-  sudo bats -t "$file"
+  BATS_PATH=$(which bats)
+  sudo -E "$BATS_PATH" -t "$file"
+  # sudo bats -t "$file"
   cat $logfile
 done
