@@ -7,9 +7,6 @@ on:
   pull_request:
     branches:
       - main
-
-env:
-  CGO_CFLAGS: -g -O2 -Werror
   
 jobs:
   youki-build:
@@ -305,8 +302,10 @@ jobs:
           # sudo make && sudo make install
           # sudo -E PATH="$PATH" make all
           # sudo -E PATH="$PATH" script -e -c 'make localintegration'
+          sudo rm -f /usr/bin/runc /usr/local/bin/runc /usr/sbin/runc
           sudo make test-binaries
           sudo make runc
+          sudo make install
           # sudo -E PATH="$PATH" script -e -c 'bats -t tests/integration'
       - name: runc integration tests
         # run: scripts/runc_integration.sh
