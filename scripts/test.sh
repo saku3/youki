@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 
-TARGET_DIR=${1:-"tests/runc/src/github.com/opencontainers/runc/tests/integration"} 
+TARGET_DIR=${1:-"tests/integration"} 
 BATS_PATH=$(command -v bats || true)
 
 cd "tests/runc/src/github.com/opencontainers/runc"
