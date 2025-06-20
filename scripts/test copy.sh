@@ -19,20 +19,20 @@ if [[ -z "$BATS_FILES" ]]; then
   exit 0
 fi
 
+# for file in $BATS_FILES; do
+#   echo "Running test: $file"
+# # sudo "$BATS_PATH" "$file"
+#   sudo -E PATH="$PATH" script -q -e -c "bats -t $file"
+# # sudo -E PATH="$PATH" script -q -e -c "bats -t tests/integration/mounts_propagation.bats"
+# done
 for file in $BATS_FILES; do
   echo "Running test: $file"
   logfile="./script-log-$(basename "$file").log"
   mkdir -p "$(dirname "$logfile")"
 
-  if ! sudo -E "$BATS_PATH" -t "$file" | tee "$logfile"; then
-    echo "Direct run failed, retrying with script..."
-
-    if ! sudo -E PATH="$PATH" script -q -e -c "$BATS_PATH -t '$file'" "$logfile"; then
-      echo "Test failed (even with script): $file"
-      cat "$logfile"
-      exit 1
-    fi
-  fi
-
-  echo "Test passed: $file"
+  # sudo -E PATH="$PATH" script -q -e -c "bats -t '$file'" "$logfile"
+  BATS_PATH=$(which bats)
+  sudo -E "$BATS_PATH" -t "$file"
+  # sudo bats -t "$file"
+  cat $logfile
 done
