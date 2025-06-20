@@ -1,5 +1,7 @@
 #!/bin/bash -eu
 
+[ -t 1 ] || NO_COLOR=1
+
 TARGET_DIR=${1:-"tests/integration"} 
 BATS_PATH=$(command -v bats || true)
 
