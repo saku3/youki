@@ -300,7 +300,7 @@ jobs:
         run: |
           cd tests/runc/src/github.com/opencontainers/runc
           sudo make test-binaries
-          sudo make runc
+          # sudo make runc
           # sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration'
       - name: test
         run: scripts/test.sh
