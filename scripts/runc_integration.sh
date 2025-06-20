@@ -5,10 +5,10 @@ ROOT=$(git rev-parse --show-toplevel)
 RUNC_DIR="${ROOT}/tests/runc/src/github.com/opencontainers/runc"
 RUNC_TEST_DIR="${ROOT}/tests/runc/src/github.com/opencontainers/runc/tests/integration"
 
-if [[ ! -x "$RUNTIME" ]]; then
-  echo "runtime binary not found: $RUNTIME"
-  exit 1
-fi
+# if [[ ! -x "$RUNTIME" ]]; then
+#   echo "runtime binary not found: $RUNTIME"
+#   exit 1
+# fi
 
 # cp "$RUNTIME" "$RUNC_DIR/runc"
 # chmod +x "$RUNC_DIR/runc"

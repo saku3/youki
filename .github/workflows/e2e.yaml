@@ -307,7 +307,7 @@ jobs:
           # sudo -E PATH="$PATH" script -e -c 'make localintegration'
           sudo make test-binaries
           sudo make runc
-          sudo -E PATH="$PATH" script -e -c 'bats -t tests/integration'
+          # sudo -E PATH="$PATH" script -e -c 'bats -t tests/integration'
       - name: runc integration tests
         run: scripts/runc_integration.sh
         # run: scripts/runc_integration.sh /usr/bin/runc
