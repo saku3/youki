@@ -1,18 +1,10 @@
 #!/bin/bash -u
 
-RUNTIME=${1:-./runc}
 ROOT=$(git rev-parse --show-toplevel)
 RUNC_DIR="${ROOT}/tests/runc/src/github.com/opencontainers/runc"
 RUNC_TEST_DIR="${ROOT}/tests/runc/src/github.com/opencontainers/runc/tests/integration"
 
 cd "$RUNC_DIR"
-
-BATS_PATH=$(command -v bats)
-
-if [ -z "$BATS_PATH" ]; then
-  echo "bats not found"
-  exit 1
-fi
 
 # Skipping this test because it hangs and stops responding.
 SKIP_PATTERN=$(cat <<EOF

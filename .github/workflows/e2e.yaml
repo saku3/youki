@@ -295,10 +295,10 @@ jobs:
         run: |
           sed "s;^profile runc /usr/sbin/;profile runc-test $(pwd)/tests/runc/src/github.com/opencontainers/runc/;" < /etc/apparmor.d/runc | sudo apparmor_parser
       - name: configure skip test
-        run: scripts/runc_integration.sh
+        run: scripts/skip_runc_tests.sh
       - name: runc integration tests
         run: |
           cd tests/runc/src/github.com/opencontainers/runc
           sudo make test-binaries
-          sudo make runc
+          # sudo make runc
           sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration'
