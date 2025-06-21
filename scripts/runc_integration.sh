@@ -63,18 +63,25 @@ count=0
 
 for file in $BATS_FILES; do
   echo "Running test: $file"
-  logfile="./$(basename "$file").log"
+  logfile="./log/$(basename "$file").log"
   mkdir -p "$(dirname "$logfile")"
 
-  if ! sudo -E "$BATS_PATH" -t "$file" | tee "$logfile"; then
+  if ! sudo -E "$BATS_PATH" -t "$file" > "$logfile" 2>&1; then
+    echo "Test failed: $file"
+    cat "$logfile"
     echo "Direct run failed, retrying with script..."
+    status_file=$(mktemp)
 
-    # if ! sudo -E PATH="$PATH" script -q -e -c "$BATS_PATH -t '$file'" "$logfile"; then
-    if ! sudo -E PATH="$PATH" script -q -e -c "$BATS_PATH -t '$file'"; then
+    sudo -E PATH="$PATH" script -q -e -c "sh -c '$BATS_PATH -t \"$file\"; echo \$? > \"$status_file\"'" "$logfile"
+    SCRIPT_EXIT_CODE=$(cat "$status_file")
+    rm -f "$status_file"
+
+    if [ "$SCRIPT_EXIT_CODE" -ne 0 ]; then
       echo "Test failed (even with script): $file"
       cat "$logfile"
       exit 1
     fi
+
   fi
 
   echo "Test passed: $file"
