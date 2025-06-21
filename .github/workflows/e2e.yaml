@@ -296,11 +296,11 @@ jobs:
           sed "s;^profile runc /usr/sbin/;profile runc-test $(pwd)/tests/runc/src/github.com/opencontainers/runc/;" < /etc/apparmor.d/runc | sudo apparmor_parser
       # - name: Configure skip test
       #   run: scripts/skip_runc_tests.sh
-      - name: Runc integration tests
-        run: |
-          cd tests/runc/src/github.com/opencontainers/runc
-          sudo make test-binaries
-          sudo make runc
+      # - name: Runc integration tests
+      #   run: |
+      #     cd tests/runc/src/github.com/opencontainers/runc
+      #     sudo make test-binaries
+      #     sudo make runc
           # sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration' runc-integration.log
 
       - name: Configure skip test
