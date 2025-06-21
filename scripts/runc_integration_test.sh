@@ -119,6 +119,7 @@ mounts.bats:runc run [mount order, container bind-mount source]
 mounts.bats:runc run [mount order, container bind-mount source] (userns)
 mounts.bats:runc run [mount order, container idmap source]
 mounts.bats:runc run [mount order, container idmap source] (userns)
+mounts.bats:runc run [ro /dev mount]
 mounts_recursive.bats:runc run [rbind,ro mount is read-only but not recursively]
 mounts_sshfs.bats:runc run [mount(8)-unlike behaviour: --bind with clearing flag]
 mounts_sshfs.bats:runc run [implied-rw bind mount of a ro fuse sshfs mount]
