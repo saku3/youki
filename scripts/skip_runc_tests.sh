@@ -11,6 +11,7 @@ SKIP_PATTERN=$(cat <<EOF
 cgroups.bats:runc run/create should refuse pre-existing frozen cgroup
 run.bats:runc run [execve error]
 events.bats:events oom
+events.bats:events --stats with psi data
 events.bats:events --interval default
 rlimits.bats:runc run with RLIMIT_NOFILE(The same as system's hard value)
 mounts.bats:runc run [tmpcopyup]
