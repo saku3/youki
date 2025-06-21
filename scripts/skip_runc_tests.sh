@@ -41,3 +41,5 @@ while IFS= read -r line; do
   escaped_pattern=$(printf '%s\n' "$test_pattern" | sed 's/[^^]/[&]/g; s/\^/\\^/g')
   sed -i "/$escaped_pattern/a skip \"skip runc integration test in youki\"" "$file_path"
 done <<< "$SKIP_PATTERN"
+
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration' runc-integration.log
