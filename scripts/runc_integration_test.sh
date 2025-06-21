@@ -43,26 +43,69 @@ cpu_affinity.bats:runc exec [CPU affinity, initial and final set from process.js
 cpu_affinity.bats:runc exec [CPU affinity, initial and final set from config.json]
 create.bats:runc create exec
 create.bats:runc create --pid-file
-run.bats:runc run [execve error]
 dev.bats:runc run [redundant default /dev/tty]
 dev.bats:runc run/update [device cgroup deny]
 dev.bats:runc run [device cgroup allow rm block device]
 dev.bats:runc run [device cgroup allow rw char device]
+debug.bats:global --debug
+debug.bats:global --debug to --log
+debug.bats:global --debug to --log --log-format 'text'
+debug.bats:global --debug to --log --log-format 'json'
+delete.bats:runc delete
 env.bats:empty HOME env var is overridden
 env.bats:empty HOME env var is overridden with multiple overrides
+env.bats:env var HOME is set only once
+env.bats:env var override is set only once
+env.bats:env var with new-line is honored
 events.bats:events oom
 events.bats:events --interval 1s
 events.bats:events --interval 100ms
 events.bats:events --stats with psi data
 events.bats:events --interval default
 events.bats:events --stats
-debug.bats:global --debug
-debug.bats:global --debug to --log
-debug.bats:global --debug to --log --log-format 'text'
-debug.bats:global --debug to --log --log-format 'json'
-delete.bats:runc delete
-rlimits.bats:runc run with RLIMIT_NOFILE(The same as system's hard value)
+exec.bats:runc exec [exit codes]
+exec.bats:runc exec ls -la
+exec.bats:runc exec --user
+exec.bats:runc exec --additional-gids
+exec.bats:runc exec --preserve-fds
+exec.bats:runc --debug exec
+exec.bats:runc --debug --log exec
+exec.bats:runc exec --cgroup subcgroup [v2]
+exec.bats:runc exec [execve error]
+exec.bats:runc exec check default home
 ioprio.bats:ioprio_set is applied to process group
+help.bats:runc -h
+help.bats:runc foo -h
+help.bats:runc command -h
+hooks.bats:runc run [startContainer hook should inherit process environment]
+hooks.bats:runc create [second createRuntime hook
+hooks.bats:runc create [hook fails]
+hooks.bats:runc run [hook fails]
+hooks_so.bats:runc run (hooks library tests)
+idmap.bats:simple idmap mount [userns]
+idmap.bats:simple idmap mount [no userns]
+idmap.bats:write to an idmap mount [no userns]
+idmap.bats:idmap mount with propagation flag [userns]
+idmap.bats:idmap mount with relative path [userns]
+idmap.bats:idmap mount with bind mount [userns]
+idmap.bats:idmap mount with bind mount [no userns]
+idmap.bats:two idmap mounts (same mapping) with two bind mounts [userns]
+idmap.bats:write to an idmap mount [userns]
+idmap.bats:same idmap mount (different mappings) [userns]
+idmap.bats:same idmap mount (different mappings) [no userns]
+idmap.bats:multiple idmap mounts (different mappings) [userns]
+idmap.bats:multiple idmap mounts (different mappings) [no userns]
+idmap.bats:idmap mount (complicated mapping) [userns]
+idmap.bats:idmap mount (complicated mapping) [no userns]
+idmap.bats:idmap mount (non-recursive idmap) [userns]
+idmap.bats:idmap mount (non-recursive idmap) [no userns]
+idmap.bats:idmap mount (idmap flag) [userns]
+idmap.bats:idmap mount (idmap flag) [no userns]
+idmap.bats:idmap mount (ridmap flag) [userns]
+idmap.bats:idmap mount (ridmap flag) [no userns]
+idmap.bats:idmap mount (idmap flag, implied mapping) [userns]
+idmap.bats:idmap mount (ridmap flag, implied mapping) [userns]
+idmap.bats:idmap mount (idmap flag, implied mapping, userns join) [userns]
 kill.bats:kill detached busybox
 kill.bats:kill KILL [host pidns]
 kill.bats:kill KILL [host pidns + init gone]
@@ -88,51 +131,6 @@ mounts_sshfs.bats:runc run [ro bind mount of a nodev,nosuid,noexec fuse sshfs mo
 mounts_sshfs.bats:runc run [ro,symfollow bind mount of a rw,nodev,nosymfollow fuse sshfs mount]
 mounts_sshfs.bats:runc run [bind mount {no,rel,strict}atime semantics]
 mounts_sshfs.bats:runc run [ro,noexec bind mount of a nosuid,noatime fuse sshfs mount]
-env.bats:env var HOME is set only once
-env.bats:env var override is set only once
-env.bats:env var with new-line is honored
-exec.bats:runc exec [exit codes]
-exec.bats:runc exec ls -la
-exec.bats:runc exec --user
-exec.bats:runc exec --additional-gids
-exec.bats:runc exec --preserve-fds
-exec.bats:runc --debug exec
-exec.bats:runc --debug --log exec
-exec.bats:runc exec --cgroup subcgroup [v2]
-exec.bats:runc exec [execve error]
-exec.bats:runc exec check default home
-help.bats:runc -h
-help.bats:runc foo -h
-hooks.bats:runc run [startContainer hook should inherit process environment]
-idmap.bats:simple idmap mount [userns]
-idmap.bats:simple idmap mount [no userns]
-idmap.bats:write to an idmap mount [no userns]
-idmap.bats:idmap mount with propagation flag [userns]
-idmap.bats:idmap mount with relative path [userns]
-idmap.bats:idmap mount with bind mount [userns]
-idmap.bats:idmap mount with bind mount [no userns]
-idmap.bats:two idmap mounts (same mapping) with two bind mounts [userns]
-idmap.bats:write to an idmap mount [userns]
-idmap.bats:same idmap mount (different mappings) [userns]
-idmap.bats:same idmap mount (different mappings) [no userns]
-idmap.bats:multiple idmap mounts (different mappings) [userns]
-idmap.bats:multiple idmap mounts (different mappings) [no userns]
-idmap.bats:idmap mount (complicated mapping) [userns]
-idmap.bats:idmap mount (complicated mapping) [no userns]
-idmap.bats:idmap mount (non-recursive idmap) [userns]
-idmap.bats:idmap mount (non-recursive idmap) [no userns]
-idmap.bats:idmap mount (idmap flag) [userns]
-idmap.bats:idmap mount (idmap flag) [no userns]
-idmap.bats:idmap mount (ridmap flag) [userns]
-idmap.bats:idmap mount (ridmap flag) [no userns]
-idmap.bats:idmap mount (idmap flag, implied mapping) [userns]
-idmap.bats:idmap mount (ridmap flag, implied mapping) [userns]
-idmap.bats:idmap mount (idmap flag, implied mapping, userns join) [userns]
-help.bats:runc command -h
-hooks.bats:runc create [second createRuntime hook
-hooks.bats:runc create [hook fails]
-hooks.bats:runc run [hook fails]
-hooks_so.bats:runc run (hooks library tests)
 personality.bats:runc run personality for i686
 personality.bats:runc run personality with exec for i686
 personality.bats:runc run personality with exec for x86_64
@@ -143,8 +141,17 @@ ps.bats:ps -e -x
 rlimits.bats:runc exec with RLIMIT_NOFILE(The same as system's hard value)
 rlimits.bats:runc exec with RLIMIT_NOFILE(Bigger than system's hard value)
 rlimits.bats:runc exec with RLIMIT_NOFILE(Smaller than system's hard value)
+rlimits.bats:runc run with RLIMIT_NOFILE(The same as system's hard value)
+run.bats:runc run with tmpfs
+run.bats:runc run with tmpfs perms
+run.bats:runc run [execve error]
+run.bats:runc run [/proc/self/exe clone]
+run.bats:runc run [joining existing container namespaces]
 run.bats:runc run --keep
 run.bats:runc run --keep (check cgroup exists)
+scheduler.bats:scheduler is applied
+scheduler.bats:scheduler vs cpus
+seccomp-notify.bats:runc exec [seccomp] (SCMP_ACT_NOTIFY noNewPrivileges false)
 seccomp-notify.bats:runc run [seccomp] (SCMP_ACT_NOTIFY noNewPrivileges false)
 seccomp-notify.bats:runc run [seccomp] (SCMP_ACT_NOTIFY noNewPrivileges true)
 seccomp-notify.bats:runc exec [seccomp] (SCMP_ACT_NOTIFY noNewPrivileges true)
@@ -153,10 +160,13 @@ seccomp-notify.batsrunc run [seccomp] (SCMP_ACT_NOTIFY kill seccompagent)
 seccomp-notify.bats:runc run [seccomp] (SCMP_ACT_NOTIFY no seccompagent)
 seccomp-notify.bats:runc run [seccomp] (SCMP_ACT_NOTIFY error chmod)
 seccomp-notify.bats:runc run [seccomp] (SCMP_ACT_NOTIFY example config)
+seccomp-notify.bats:runc run [seccomp] (SCMP_ACT_NOTIFY kill seccompagent)
+seccomp.bats:runc run [seccomp -ENOSYS handling]
 seccomp.bats:runc run [seccomp] (SCMP_ACT_ERRNO default)
 seccomp.bats:runc run [seccomp] (SCMP_ACT_ERRNO explicit errno)
 seccomp.bats:runc run [seccomp] (SECCOMP_FILTER_FLAG_*)
 seccomp.bats:runc run [seccomp] (startContainer hook)
+start_hello.bats:runc run as user with no exec bit but CAP_DAC_OVERRIDE set
 timens.bats:runc run [timens with no offsets]
 timens.bats:runc run [simple timens]
 timens.bats:runc exec [simple timens]
