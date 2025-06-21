@@ -58,4 +58,4 @@ sudo make test-binaries
 if [[ "$RUNTIME" == "runc" ]]; then
   sudo make runc
 fi
-sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration' runc-integration.log
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration'
