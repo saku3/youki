@@ -37,6 +37,7 @@ cgroups.bats:runc run (hugetlb limits)
 cgroups.bats:runc run/create should refuse pre-existing frozen cgroup
 cgroups.bats:runc run (cgroup v2 resources.unified only)
 cgroups.bats:runc run (cgroup v2 resources.unified swap)
+cgroups.bats:runc create (limits + cgrouppath + permission on the cgroup dir) succeeds
 cpu_affinity.bats:runc exec [CPU affinity, only initial set from process.json]
 cpu_affinity.bats:runc exec [CPU affinity, initial and final set from process.json]
 cpu_affinity.bats:runc exec [CPU affinity, initial and final set from config.json]
