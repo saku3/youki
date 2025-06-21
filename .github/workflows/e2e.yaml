@@ -258,10 +258,6 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [youki-build]
     timeout-minutes: 15
-    strategy:
-      matrix:
-        arch: [ "x86_64" ]
-        libc: [ "gnu" ]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -277,7 +273,9 @@ jobs:
       - name: Download youki binary
         uses: actions/download-artifact@v4
         with:
-          name: youki-${{ matrix.arch }}-${{ matrix.libc }}
+          name: youki-x86_64-gnu
+      - name: Add the permission to run
+        run: chmod +x ./youki
       - name: Setup Bats and bats libs
         uses: bats-core/bats-action@3.0.1
         with:
