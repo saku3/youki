@@ -49,3 +49,36 @@ while IFS= read -r line; do
   escaped_pattern=$(printf '%s\n' "$test_pattern" | sed 's/[^^]/[&]/g; s/\^/\\^/g')
   sed -i "/$escaped_pattern/a skip \"skip runc integration test in youki\"" "$file_path"
 done <<< "$SKIP_PATTERN"
+
+BATS_FILES=$(find "$RUNC_DIR" -type f -name "*.bats")
+TOTAL=$(echo "$BATS_FILES" | wc -l)
+
+if [[ -z "$BATS_FILES" || "$TOTAL" -eq 0 ]]; then
+  echo "No .bats files found in $TARGET_DIR"
+  exit 0
+fi
+
+echo "Found $TOTAL .bats test files to run"
+count=0
+
+for file in $BATS_FILES; do
+  echo "Running test: $file"
+  logfile="./$(basename "$file").log"
+  mkdir -p "$(dirname "$logfile")"
+
+  if ! sudo -E "$BATS_PATH" -t "$file" | tee "$logfile"; then
+    echo "Direct run failed, retrying with script..."
+
+    # if ! sudo -E PATH="$PATH" script -q -e -c "$BATS_PATH -t '$file'" "$logfile"; then
+    if ! sudo -E PATH="$PATH" script -q -e -c "$BATS_PATH -t '$file'"; then
+      echo "Test failed (even with script): $file"
+      cat "$logfile"
+      exit 1
+    fi
+  fi
+
+  echo "Test passed: $file"
+  count=$((count + 1))
+done
+
+echo "Successfully executed $count / $TOTAL test files"
