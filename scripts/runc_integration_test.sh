@@ -26,43 +26,36 @@ capabilities.bats:runc run with some capabilities
 capabilities.bats:runc exec --cap
 capabilities.bats:runc exec --cap [ambient is set from spec]
 capabilities.bats:runc run [ambient caps not set in inheritable result in a warning]
+cgroups.bats:runc create (limits + cgrouppath + permission on the cgroup dir) succeeds
 cgroups.bats:runc exec (cgroup v2 + init process in non-root cgroup) succeeds
+cgroups.bats:runc run (blkio weight)
+cgroups.bats:runc run (per-device multiple iops via unified)
+cgroups.bats:runc run (hugetlb limits)
+cgroups.bats:runc run (cgroup v2 resources.unified only)
+cgroups.bats:runc run (cgroup v2 resources.unified swap)
 cgroups.bats:runc run (cgroupv2 mount inside container)
 cgroups.bats:runc exec should refuse a paused container
 cgroups.bats:runc exec --ignore-paused
 cgroups.bats:runc run/create should error for a non-empty cgroup
-cgroups.bats:runc run (blkio weight)
-cgroups.bats:runc run (per-device multiple iops via unified)
-cgroups.bats:runc run (hugetlb limits)
-cgroups.bats:runc run/create should refuse pre-existing frozen cgroup
-cgroups.bats:runc run (cgroup v2 resources.unified only)
-cgroups.bats:runc run (cgroup v2 resources.unified swap)
-cgroups.bats:runc create (limits + cgrouppath + permission on the cgroup dir) succeeds
 cpu_affinity.bats:runc exec [CPU affinity, only initial set from process.json]
 cpu_affinity.bats:runc exec [CPU affinity, initial and final set from process.json]
 cpu_affinity.bats:runc exec [CPU affinity, initial and final set from config.json]
 create.bats:runc create exec
-create.bats:runc create --pid-file
-dev.bats:runc run [redundant default /dev/tty]
-dev.bats:runc run/update [device cgroup deny]
-dev.bats:runc run [device cgroup allow rm block device]
-dev.bats:runc run [device cgroup allow rw char device]
 debug.bats:global --debug
 debug.bats:global --debug to --log
 debug.bats:global --debug to --log --log-format 'text'
 debug.bats:global --debug to --log --log-format 'json'
-delete.bats:runc delete
+delete.bats:@test "runc delete"
+delete.bats:delete --force in cgroupv2 with subcgroups
+dev.bats:runc run [redundant default /dev/tty]
+dev.bats:runc run/update [device cgroup deny]
+dev.bats:runc run [device cgroup allow rw char device]
+dev.bats:runc run [device cgroup allow rm block device]
 env.bats:empty HOME env var is overridden
 env.bats:empty HOME env var is overridden with multiple overrides
-env.bats:env var HOME is set only once
-env.bats:env var override is set only once
-env.bats:env var with new-line is honored
-events.bats:events oom
+events.bats:events --stats
 events.bats:events --interval 1s
 events.bats:events --interval 100ms
-events.bats:events --stats with psi data
-events.bats:events --interval default
-events.bats:events --stats
 exec.bats:runc exec [exit codes]
 exec.bats:runc exec ls -la
 exec.bats:runc exec --user
@@ -73,24 +66,22 @@ exec.bats:runc --debug --log exec
 exec.bats:runc exec --cgroup subcgroup [v2]
 exec.bats:runc exec [execve error]
 exec.bats:runc exec check default home
-ioprio.bats:ioprio_set is applied to process group
 help.bats:runc -h
-help.bats:runc foo -h
 help.bats:runc command -h
-hooks.bats:runc run [startContainer hook should inherit process environment]
-hooks.bats:runc create [second createRuntime hook
+help.bats:runc foo -h
+hooks.bats:runc create [second createRuntime hook fails]
 hooks.bats:runc create [hook fails]
 hooks.bats:runc run [hook fails]
+hooks.bats:runc run [startContainer hook should inherit process environment]
 hooks_so.bats:runc run (hooks library tests)
-idmap.bats:simple idmap mount [userns]
 idmap.bats:simple idmap mount [no userns]
+idmap.bats:write to an idmap mount [userns]
 idmap.bats:write to an idmap mount [no userns]
 idmap.bats:idmap mount with propagation flag [userns]
 idmap.bats:idmap mount with relative path [userns]
 idmap.bats:idmap mount with bind mount [userns]
 idmap.bats:idmap mount with bind mount [no userns]
 idmap.bats:two idmap mounts (same mapping) with two bind mounts [userns]
-idmap.bats:write to an idmap mount [userns]
 idmap.bats:same idmap mount (different mappings) [userns]
 idmap.bats:same idmap mount (different mappings) [no userns]
 idmap.bats:multiple idmap mounts (different mappings) [userns]
@@ -106,6 +97,7 @@ idmap.bats:idmap mount (ridmap flag) [no userns]
 idmap.bats:idmap mount (idmap flag, implied mapping) [userns]
 idmap.bats:idmap mount (ridmap flag, implied mapping) [userns]
 idmap.bats:idmap mount (idmap flag, implied mapping, userns join) [userns]
+ioprio.bats:ioprio_set is applied to process group
 kill.bats:kill detached busybox
 kill.bats:kill KILL [host pidns]
 kill.bats:kill KILL [host pidns + init gone]
@@ -114,13 +106,6 @@ mask.bats:mask paths [file]
 mask.bats:mask paths [directory]
 mask.bats:mask paths [prohibit symlink /proc]
 mask.bats:mask paths [prohibit symlink /sys]
-mounts.bats:runc run [tmpcopyup]
-mounts.bats:runc run [/proc is a symlink]
-mounts.bats:runc run [ro /sys/fs/cgroup mounts + cgroupns]
-mounts.bats:runc run [mount order, container bind-mount source]
-mounts.bats:runc run [mount order, container bind-mount source] (userns)
-mounts.bats:runc run [mount order, container idmap source]
-mounts.bats:runc run [mount order, container idmap source] (userns)
 mounts.bats:runc run [ro /dev mount]
 mounts_recursive.bats:runc run [rbind,ro mount is read-only but not recursively]
 mounts_sshfs.bats:runc run [mount(8)-unlike behaviour: --bind with clearing flag]
@@ -129,38 +114,33 @@ mounts_sshfs.bats:runc run [explicit-rw bind mount of a ro fuse sshfs mount]
 mounts_sshfs.bats:runc run [dev,exec,suid,atime bind mount of a nodev,nosuid,noexec,noatime fuse sshfs mount]
 mounts_sshfs.bats:runc run [ro bind mount of a nodev,nosuid,noexec fuse sshfs mount]
 mounts_sshfs.bats:runc run [ro,symfollow bind mount of a rw,nodev,nosymfollow fuse sshfs mount]
-mounts_sshfs.bats:runc run [bind mount {no,rel,strict}atime semantics]
 mounts_sshfs.bats:runc run [ro,noexec bind mount of a nosuid,noatime fuse sshfs mount]
+mounts_sshfs.bats:runc run [bind mount {no,rel,strict}atime semantics]
 personality.bats:runc run personality for i686
 personality.bats:runc run personality with exec for i686
 personality.bats:runc run personality with exec for x86_64
 pidfd-socket.bats:runc create [ --pidfd-socket ]
-pidfd-socket.bats:runc exec [ --pidfd-socket ] [cgroups_v2]
 pidfd-socket.bats:runc run [ --pidfd-socket ]
+pidfd-socket.bats:runc exec [ --pidfd-socket ] [cgroups_v2]
 ps.bats:ps -e -x
 rlimits.bats:runc exec with RLIMIT_NOFILE(The same as system's hard value)
 rlimits.bats:runc exec with RLIMIT_NOFILE(Bigger than system's hard value)
 rlimits.bats:runc exec with RLIMIT_NOFILE(Smaller than system's hard value)
-rlimits.bats:runc run with RLIMIT_NOFILE(The same as system's hard value)
-run.bats:runc run with tmpfs
-run.bats:runc run with tmpfs perms
-run.bats:runc run [execve error]
-run.bats:runc run [/proc/self/exe clone]
-run.bats:runc run [joining existing container namespaces]
 run.bats:runc run --keep
 run.bats:runc run --keep (check cgroup exists)
+run.bats:runc run with tmpfs
+run.bats:runc run with tmpfs perms
+run.bats:runc run [/proc/self/exe clone]
+run.bats:runc run [joining existing container namespaces]
 scheduler.bats:scheduler is applied
 scheduler.bats:scheduler vs cpus
-seccomp-notify.bats:runc exec [seccomp] (SCMP_ACT_NOTIFY noNewPrivileges false)
 seccomp-notify.bats:runc run [seccomp] (SCMP_ACT_NOTIFY noNewPrivileges false)
-seccomp-notify.bats:runc run [seccomp] (SCMP_ACT_NOTIFY noNewPrivileges true)
+seccomp-notify.bats:runc exec [seccomp] (SCMP_ACT_NOTIFY noNewPrivileges false)
 seccomp-notify.bats:runc exec [seccomp] (SCMP_ACT_NOTIFY noNewPrivileges true)
 seccomp-notify.bats:runc run [seccomp] (SCMP_ACT_NOTIFY important syscalls noNewPrivileges false)
-seccomp-notify.batsrunc run [seccomp] (SCMP_ACT_NOTIFY kill seccompagent)
+seccomp-notify.bats:runc run [seccomp] (SCMP_ACT_NOTIFY kill seccompagent)
 seccomp-notify.bats:runc run [seccomp] (SCMP_ACT_NOTIFY no seccompagent)
 seccomp-notify.bats:runc run [seccomp] (SCMP_ACT_NOTIFY error chmod)
-seccomp-notify.bats:runc run [seccomp] (SCMP_ACT_NOTIFY example config)
-seccomp-notify.bats:runc run [seccomp] (SCMP_ACT_NOTIFY kill seccompagent)
 seccomp.bats:runc run [seccomp -ENOSYS handling]
 seccomp.bats:runc run [seccomp] (SCMP_ACT_ERRNO default)
 seccomp.bats:runc run [seccomp] (SCMP_ACT_ERRNO explicit errno)
