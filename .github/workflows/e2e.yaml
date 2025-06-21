@@ -294,18 +294,8 @@ jobs:
         # https://discourse.ubuntu.com/t/ubuntu-24-04-lts-noble-numbat-release-notes/39890#unprivileged-user-namespace-restrictions-15
         run: |
           sed "s;^profile runc /usr/sbin/;profile runc-test $(pwd)/tests/runc/src/github.com/opencontainers/runc/;" < /etc/apparmor.d/runc | sudo apparmor_parser
-      # - name: Configure skip test
-      #   run: scripts/skip_runc_tests.sh
-      # - name: Runc integration tests
-      #   run: |
-      #     cd tests/runc/src/github.com/opencontainers/runc
-      #     sudo make test-binaries
-      #     sudo make runc
-          # sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration' runc-integration.log
-
-      - name: Configure skip test
-        run: scripts/skip_runc_tests.sh
-
+      - name: Runc integration test
+        run: scripts/runc_integration_test.sh
       - name: Upload runc integration logs
         uses: actions/upload-artifact@v4
         with:
