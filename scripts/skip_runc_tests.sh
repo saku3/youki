@@ -22,7 +22,6 @@ mounts.bats:runc run [mount order, container idmap source]
 mounts.bats:runc run [mount order, container idmap source] (userns)
 env.bats:env var HOME is set only once
 idmap.bats:simple idmap mount [userns]
-mounts_propagation.bats:runc run [rootfsPropagation shared]
 EOF
 )
 
