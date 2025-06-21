@@ -11,7 +11,7 @@ if [[ "$RUNTIME" == "youki" ]]; then
     echo "youki binary not found"
     exit 1
   fi
-  cp "$RUNTIME" "$RUNC_DIR/runc"
+  cp ./youki "$RUNC_DIR/runc"
   chmod +x "$RUNC_DIR/runc"
 fi
 
@@ -54,7 +54,7 @@ while IFS= read -r line; do
 done <<< "$SKIP_PATTERN"
 
 sudo make test-binaries
-## Run make runc only when runc is specified.
+# Build runc binary only if runtime is 'runc'
 if [[ "$RUNTIME" == "runc" ]]; then
   sudo make runc
 fi
