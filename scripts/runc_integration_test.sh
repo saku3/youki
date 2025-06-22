@@ -1,19 +1,16 @@
 #!/bin/bash -u
 
-RUNTIME=${1:-youki}
-
+RUNTIME=${1:-./youki}
 ROOT=$(git rev-parse --show-toplevel)
 RUNC_DIR="${ROOT}/tests/runc/src/github.com/opencontainers/runc"
 RUNC_TEST_DIR="${ROOT}/tests/runc/src/github.com/opencontainers/runc/tests/integration"
 
-if [[ "$RUNTIME" == "youki" ]]; then
-  if [[ ! -x ./youki ]]; then
-    echo "youki binary not found"
-    exit 1
-  fi
-  cp ./youki "$RUNC_DIR/runc"
-  chmod +x "$RUNC_DIR/runc"
+if [[ ! -x "$RUNTIME" ]]; then
+  echo "$RUNTIME binary not found"
+  exit 1
 fi
+cp $RUNTIME "$RUNC_DIR/runc"
+chmod +x "$RUNC_DIR/runc"
 
 cd "$RUNC_DIR"
 
@@ -209,10 +206,6 @@ while IFS= read -r line; do
 done <<< "$SKIP_PATTERN"
 
 sudo make test-binaries
-# Build runc binary only if runtime is 'runc'
-if [[ "$RUNTIME" == "runc" ]]; then
-  sudo make runc
-fi
 sudo -E PATH="$PATH" script -q -e -c 'bats -t  tests/integration'
 
 # cleanup
