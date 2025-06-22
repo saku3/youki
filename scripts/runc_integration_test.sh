@@ -55,6 +55,7 @@ dev.bats:runc run [device cgroup allow rm block device]
 env.bats:empty HOME env var is overridden
 env.bats:empty HOME env var is overridden with multiple overrides
 env.bats:env var HOME is set only once
+env.bats:env var with new-line is honored
 events.bats:events oom
 events.bats:events --interval 1s
 events.bats:events --interval 100ms
