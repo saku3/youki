@@ -52,6 +52,7 @@ dev.bats:runc run [device cgroup allow rm block device]
 env.bats:empty HOME env var is overridden
 env.bats:empty HOME env var is overridden with multiple overrides
 env.bats:env var HOME is set only once
+env.bats:env var with new-line is honored
 events.bats:events oom
 events.bats:events --interval 1s
 events.bats:events --interval 100ms
@@ -116,6 +117,7 @@ mounts.bats:runc run [mount order, container bind-mount source]
 mounts.bats:runc run [mount order, container bind-mount source] (userns)
 mounts.bats:runc run [mount order, container idmap source]
 mounts.bats:runc run [mount order, container idmap source] (userns)
+mounts.bats:runc run [ro /dev mount]
 mounts_recursive.bats:runc run [rbind,ro mount is read-only but not recursively]
 mounts_sshfs.bats:runc run [mount(8)-unlike behaviour: --bind with clearing flag]
 mounts_sshfs.bats:runc run [implied-rw bind mount of a ro fuse sshfs mount]
