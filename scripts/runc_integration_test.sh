@@ -49,6 +49,7 @@ dev.bats:runc run [redundant default /dev/tty]
 dev.bats:runc run/update [device cgroup deny]
 dev.bats:runc run [device cgroup allow rw char device]
 dev.bats:runc run [device cgroup allow rm block device]
+env.bats:@test "env var override"
 env.bats:empty HOME env var is overridden
 env.bats:empty HOME env var is overridden with multiple overrides
 env.bats:env var HOME is set only once
@@ -138,6 +139,7 @@ rlimits.bats:runc run with RLIMIT_NOFILE(The same as system's hard value)
 rlimits.bats:runc exec with RLIMIT_NOFILE(The same as system's hard value)
 rlimits.bats:runc exec with RLIMIT_NOFILE(Bigger than system's hard value)
 rlimits.bats:runc exec with RLIMIT_NOFILE(Smaller than system's hard value)
+run.bats:@test "runc run"
 run.bats:runc run --keep
 run.bats:runc run --keep (check cgroup exists)
 run.bats:runc run with tmpfs
