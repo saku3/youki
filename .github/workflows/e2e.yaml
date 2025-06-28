@@ -290,4 +290,5 @@ jobs:
           sed "s;^profile runc /usr/sbin/;profile runc-test $(pwd)/tests/runc/src/github.com/opencontainers/runc/;" < /etc/apparmor.d/runc | sudo apparmor_parser
       - name: Runc integration test
         run: |
+          cp scripts/cgroups.bats tests/runc/src/github.com/opencontainers/runc/tests/integration/cgroups.bats
           scripts/runc_integration_test.sh
