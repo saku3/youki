@@ -257,7 +257,7 @@ jobs:
   runc-integration-tests:
     runs-on: ubuntu-24.04
     needs: [youki-build]
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
@@ -288,5 +288,14 @@ jobs:
         # https://github.com/opencontainers/runc/pull/4286
         run: |
           sed "s;^profile runc /usr/sbin/;profile runc-test $(pwd)/tests/runc/src/github.com/opencontainers/runc/;" < /etc/apparmor.d/runc | sudo apparmor_parser
-      - name: Runc integration test
-        run: scripts/runc_integration_test.sh
+      - name: Runc integration test with strace
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y strace
+          strace -f -o trace.log scripts/runc_integration_test.sh
+      - name: Upload trace.log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trace-log
+          path: trace.log
