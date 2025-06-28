@@ -1,8 +1,8 @@
 #!/bin/bash -u
 
-# set -euo pipefail
-# PS4='+ ${BASH_SOURCE}:${LINENO} > '
-# set -x
+set -euo pipefail
+PS4='+ ${BASH_SOURCE}:${LINENO} > '
+set -x
 
 RUNTIME=${1:-./youki}
 ROOT=$(git rev-parse --show-toplevel)
