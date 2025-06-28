@@ -210,7 +210,7 @@ while IFS= read -r line; do
 done <<< "$SKIP_PATTERN"
 
 sudo make test-binaries
-sudo -E PATH="$PATH" script -q -e -c 'bats -t  tests/integration'
+sudo -E PATH="$PATH" script -q -e -c 'bats --trace -t tests/integration'
 
 # cleanup
 find "$RUNC_TEST_DIR" -name "*.bats" -exec sed -i '/skip "skip runc integration test in youki"/d' {} +
