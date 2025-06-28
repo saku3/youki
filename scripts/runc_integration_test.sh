@@ -139,7 +139,6 @@ rlimits.bats:runc run with RLIMIT_NOFILE(The same as system's hard value)
 rlimits.bats:runc exec with RLIMIT_NOFILE(The same as system's hard value)
 rlimits.bats:runc exec with RLIMIT_NOFILE(Bigger than system's hard value)
 rlimits.bats:runc exec with RLIMIT_NOFILE(Smaller than system's hard value)
-run.bats:@test "runc run"
 run.bats:runc run --keep
 run.bats:runc run --keep (check cgroup exists)
 run.bats:runc run with tmpfs
