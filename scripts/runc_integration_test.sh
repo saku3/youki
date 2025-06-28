@@ -1,8 +1,8 @@
 #!/bin/bash -u
 
-set -euo pipefail
-PS4='+ ${BASH_SOURCE}:${LINENO} > '
-set -x
+# set -euo pipefail
+# PS4='+ ${BASH_SOURCE}:${LINENO} > '
+# set -x
 
 RUNTIME=${1:-./youki}
 ROOT=$(git rev-parse --show-toplevel)
@@ -213,24 +213,24 @@ while IFS= read -r line; do
 done <<< "$SKIP_PATTERN"
 
 sudo make test-binaries
-# sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/root.bats'
-# sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/kill.bats'
-# sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/pause.bats'
-# sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/seccomp.bats'
-# sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/version.bats'
-# sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/scheduler.bats'
-# sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/no_pivot.bats'
-# sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/root.bats'
-# sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/personality.bats'
-# sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/list.bats'
-# sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/help.bats'
-# sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/cpu_affinity.bats'
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/root.bats'
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/kill.bats'
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/pause.bats'
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/seccomp.bats'
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/version.bats'
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/scheduler.bats'
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/no_pivot.bats'
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/root.bats'
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/personality.bats'
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/list.bats'
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/help.bats'
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/cpu_affinity.bats'
 sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/run.bats'
-# sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/mounts_recursive.bats'
-# sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/events.bats'
-# sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/pidfd-socket.bats'
-# sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/mounts.bats'
-# sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/env.bats'
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/mounts_recursive.bats'
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/events.bats'
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/pidfd-socket.bats'
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/mounts.bats'
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/env.bats'
 sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/cgroups.bats'
 # sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/tty.bats'
 # sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/seccomp-notify-compat.bats'
