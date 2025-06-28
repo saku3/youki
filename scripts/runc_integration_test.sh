@@ -1,8 +1,8 @@
 #!/bin/bash -u
 
-set -euo pipefail
-PS4='+ ${BASH_SOURCE}:${LINENO} > '
-set -x
+# set -euo pipefail
+# PS4='+ ${BASH_SOURCE}:${LINENO} > '
+# set -x
 
 RUNTIME=${1:-./youki}
 ROOT=$(git rev-parse --show-toplevel)
@@ -265,9 +265,12 @@ sudo make test-binaries
 # sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/ioprio.bats'
 # sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/umask.bats'
 
+find . -name "*.bats" -type f -exec sed -i '/^@test/ a\
+set -x
+' {} +
 
-sudo -E PATH="$PATH" script -q -e -c 'bats --trace -t tests/integration'
-# sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration'
+# sudo -E PATH="$PATH" script -q -e -c 'bats --trace -t tests/integration'
+sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration'
 
 # cleanup
 find "$RUNC_TEST_DIR" -name "*.bats" -exec sed -i '/skip "skip runc integration test in youki"/d' {} +
