@@ -269,7 +269,7 @@ jobs:
       - name: install deps
         run: |
           sudo apt update
-          sudo apt -y install libseccomp-dev sshfs uidmap strace
+          sudo apt -y install libseccomp-dev sshfs uidmap
       - name: Download youki binary
         uses: actions/download-artifact@v4
         with:
@@ -288,12 +288,6 @@ jobs:
         # https://github.com/opencontainers/runc/pull/4286
         run: |
           sed "s;^profile runc /usr/sbin/;profile runc-test $(pwd)/tests/runc/src/github.com/opencontainers/runc/;" < /etc/apparmor.d/runc | sudo apparmor_parser
-      - name: Runc integration test with strace
+      - name: Runc integration test
         run: |
-          strace -f -o trace.log scripts/runc_integration_test.sh
-      - name: Upload trace.log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: trace-log
-          path: trace.log
+          scripts/runc_integration_test.sh
