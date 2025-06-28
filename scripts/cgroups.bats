@@ -359,7 +359,7 @@ convert_hugetlb_size() {
   requires root cgroups_v2
 
   exec 2>/dev/tty
-  set -x
+  # set -x
   set_cgroups_path
 
   echo "debug: updating config with memory and cpu settings" >&2
