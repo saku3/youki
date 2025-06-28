@@ -77,4 +77,5 @@ jobs:
         run: |
           cp scripts/cgroups.bats tests/runc/src/github.com/opencontainers/runc/tests/integration/cgroups.bats
           cp scripts/seccomp.bats tests/runc/src/github.com/opencontainers/runc/tests/integration/seccomp.bats
+          cp scripts/seccomp.bats tests/runc/src/github.com/opencontainers/runc/tests/integration/host-mntns.bats.bats
           scripts/runc_integration_test.sh
