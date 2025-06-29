@@ -27,18 +27,18 @@ capabilities.bats:runc run with some capabilities
 capabilities.bats:runc exec --cap
 capabilities.bats:runc exec --cap [ambient is set from spec]
 capabilities.bats:runc run [ambient caps not set in inheritable result in a warning]
-cgroups.bats:runc create (limits + cgrouppath + permission on the cgroup dir) succeeds
-cgroups.bats:runc exec (cgroup v2 + init process in non-root cgroup) succeeds
-cgroups.bats:runc run (blkio weight)
-cgroups.bats:runc run (per-device multiple iops via unified)
-cgroups.bats:runc run (hugetlb limits)
-cgroups.bats:runc run (cgroup v2 resources.unified only)
-cgroups.bats:runc run (cgroup v2 resources.unified swap)
-cgroups.bats:runc run (cgroupv2 mount inside container)
-cgroups.bats:runc exec should refuse a paused container
-cgroups.bats:runc exec --ignore-paused
-cgroups.bats:runc run/create should error for a non-empty cgroup
-cgroups.bats:runc run/create should refuse pre-existing frozen cgroup
+acgroups.bats:runc create (limits + cgrouppath + permission on the cgroup dir) succeeds
+acgroups.bats:runc exec (cgroup v2 + init process in non-root cgroup) succeeds
+acgroups.bats:runc run (blkio weight)
+acgroups.bats:runc run (per-device multiple iops via unified)
+acgroups.bats:runc run (hugetlb limits)
+acgroups.bats:runc run (cgroup v2 resources.unified only)
+acgroups.bats:runc run (cgroup v2 resources.unified swap)
+acgroups.bats:runc run (cgroupv2 mount inside container)
+acgroups.bats:runc exec should refuse a paused container
+acgroups.bats:runc exec --ignore-paused
+acgroups.bats:runc run/create should error for a non-empty cgroup
+acgroups.bats:runc run/create should refuse pre-existing frozen cgroup
 cpu_affinity.bats:runc exec [CPU affinity, only initial set from process.json]
 cpu_affinity.bats:runc exec [CPU affinity, initial and final set from process.json]
 cpu_affinity.bats:runc exec [CPU affinity, initial and final set from config.json]
@@ -196,21 +196,21 @@ version.bats:runc version
 EOF
 )
 
-while IFS= read -r line; do
-  [[ -z "$line" ]] && continue
+# while IFS= read -r line; do
+#   [[ -z "$line" ]] && continue
 
-  file_part="${line%%:*}"
-  test_pattern="${line#*:}"
+#   file_part="${line%%:*}"
+#   test_pattern="${line#*:}"
 
-  file_path=$(find "$RUNC_TEST_DIR" -name "$file_part")
-  if [[ -z "$file_path" || ! -f "$file_path" ]]; then
-    echo "Warning: file $file_part not found"
-    continue
-  fi
+#   file_path=$(find "$RUNC_TEST_DIR" -name "$file_part")
+#   if [[ -z "$file_path" || ! -f "$file_path" ]]; then
+#     echo "Warning: file $file_part not found"
+#     continue
+#   fi
 
-  escaped_pattern=$(printf '%s\n' "$test_pattern" | sed 's/[^^]/[&]/g; s/\^/\\^/g')
-  sed -i "/$escaped_pattern/a skip \"skip runc integration test in youki\"" "$file_path"
-done <<< "$SKIP_PATTERN"
+#   escaped_pattern=$(printf '%s\n' "$test_pattern" | sed 's/[^^]/[&]/g; s/\^/\\^/g')
+#   sed -i "/$escaped_pattern/a skip \"skip runc integration test in youki\"" "$file_path"
+# done <<< "$SKIP_PATTERN"
 
 sudo make test-binaries
 # sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/root.bats'
@@ -265,9 +265,9 @@ sudo make test-binaries
 # sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/ioprio.bats'
 # sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration/umask.bats'
 
-find . -name "*.bats" -type f -exec sed -i '/^@test/ a\
-set -x
-' {} +
+# find . -name "*.bats" -type f -exec sed -i '/^@test/ a\
+# set -x
+# ' {} +
 
 # sudo -E PATH="$PATH" script -q -e -c 'bats --trace -t tests/integration'
 sudo -E PATH="$PATH" script -q -e -c 'bats -t tests/integration'
