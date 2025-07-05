@@ -21,6 +21,7 @@ seccomp = ["libcontainer/libseccomp"]
 wasm-wasmer = ["wasmer", "wasmer-wasix"]
 wasm-wasmedge = ["wasmedge-sdk/standalone", "wasmedge-sdk/static"]
 wasm-wasmtime = ["wasmtime", "wasi-common"]
+libkrun = []
 
 [dependencies.clap]
 version = "4.1.6"

@@ -109,6 +109,7 @@ impl Executor for DefaultExecutor {
 }
 
 pub fn get_executor() -> Box<dyn Executor> {
+    tracing::debug!("これがnewの時に呼ばれているのか");
     Box::new(DefaultExecutor {})
 }
 

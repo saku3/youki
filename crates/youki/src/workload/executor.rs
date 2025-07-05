@@ -6,6 +6,7 @@ pub struct DefaultExecutor {}
 
 impl Executor for DefaultExecutor {
     fn exec(&self, spec: &Spec) -> Result<(), ExecutorError> {
+        tracing::debug!("executing libkrun executer");
         #[cfg(feature = "wasm-wasmer")]
         match super::wasmer::get_executor().exec(spec) {
             Ok(_) => return Ok(()),
@@ -24,6 +25,29 @@ impl Executor for DefaultExecutor {
             Err(ExecutorError::CantHandle(_)) => (),
             Err(err) => return Err(err),
         }
+        #[cfg(feature = "libkrun")]
+        {
+            tracing::debug!("trying libkrun executor");
+            match super::libkrun::get_executor().exec(spec) {
+                Ok(_) => {
+                    tracing::debug!("libkrun executor accepted workload");
+                    return Ok(());
+                }
+                Err(ExecutorError::CantHandle(_)) => {
+                    tracing::debug!("libkrun executor cannot handle this spec");
+                }
+                Err(err) => {
+                    tracing::error!("libkrun executor failed: {:?}", err);
+                    return Err(err);
+                }
+            }
+        }
+        // #[cfg(feature = "libkrun")]
+        // match super::libkrun::get_executor().exec(spec) {
+        //     Ok(_) => return Ok(()),
+        //     Err(ExecutorError::CantHandle(_)) => (),
+        //     Err(err) => return Err(err),
+        // }
 
         // Leave the default executor as the last option, which executes normal
         // container workloads.
@@ -31,6 +55,7 @@ impl Executor for DefaultExecutor {
     }
 
     fn validate(&self, spec: &Spec) -> Result<(), ExecutorValidationError> {
+        tracing::debug!("validate libkrun executer");
         #[cfg(feature = "wasm-wasmer")]
         match super::wasmer::get_executor().validate(spec) {
             Ok(_) => return Ok(()),
@@ -49,11 +74,17 @@ impl Executor for DefaultExecutor {
             Err(ExecutorValidationError::CantHandle(_)) => (),
             Err(err) => return Err(err),
         }
-
+        #[cfg(feature = "libkrun")]
+        match super::libkrun::get_executor().validate(spec) {
+            Ok(_) => return Ok(()),
+            Err(ExecutorValidationError::CantHandle(_)) => (),
+            Err(err) => return Err(err),
+        }
         libcontainer::workload::default::get_executor().validate(spec)
     }
 }
 
 pub fn default_executor() -> DefaultExecutor {
+    tracing::debug!("これもすぐに呼ばれるということ");
     DefaultExecutor {}
 }

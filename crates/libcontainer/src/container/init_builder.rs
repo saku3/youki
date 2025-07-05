@@ -63,6 +63,7 @@ impl InitContainerBuilder {
 
     /// Creates a new container
     pub fn build(self) -> Result<Container, LibcontainerError> {
+        tracing::debug!("build()関数を実行します");
         let spec = self.load_spec()?;
         let container_dir = self.create_container_dir()?;
 
@@ -88,7 +89,9 @@ impl InitContainerBuilder {
             None
         };
 
+        tracing::debug!("ここがuser_nsですね");
         let user_ns_config = UserNamespaceConfig::new(&spec)?;
+        tracing::debug!("ここがuser_nsですね");
 
         let config = YoukiConfig::from_spec(&spec, container.id())?;
         config.save(&container_dir).map_err(|err| {
@@ -200,8 +203,10 @@ impl InitContainerBuilder {
             }
         }
 
+        tracing::debug!("ここがuser_nsの最初");
         utils::validate_spec_for_new_user_ns(spec)?;
-
+        tracing::debug!("ここがuser_nsの最初");
+        
         Ok(())
     }
 
