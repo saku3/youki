@@ -12,6 +12,7 @@ impl Executor for LibkrunExecutor {
             return Err(ExecutorError::CantHandle(EXECUTOR_NAME));
         }
 
+
         tracing::debug!("executing workload with libkrun handler");
         let process = spec.process().as_ref();
 
