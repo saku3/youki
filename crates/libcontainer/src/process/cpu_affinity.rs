@@ -77,11 +77,11 @@ pub fn set_cpuset_affinity_from_string(pid: Pid, cpuset_str: &str) -> Result<()>
 }
 
 pub fn log_cpu_affinity() -> Result<()> {
-    let cpuset = sched_getaffinity(Pid::this()).map_err(CPUAffinityError::GetAffinity)?;
-    let mask = (0..usize::BITS as usize)
-        .filter(|&i| cpuset.is_set(i).unwrap_or(false))
-        .fold(0, |mask, i| mask | (1 << i));
-    tracing::debug!("affinity: 0x{:x}", mask);
+    // let cpuset = sched_getaffinity(Pid::this()).map_err(CPUAffinityError::GetAffinity)?;
+    // let mask = (0..usize::BITS as usize)
+    //     .filter(|&i| cpuset.is_set(i).unwrap_or(false))
+    //     .fold(0, |mask, i| mask | (1 << i));
+    // tracing::debug!("affinity: 0x{:x}", mask);
     Ok(())
 }
 

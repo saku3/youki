@@ -51,10 +51,8 @@ impl KrunConfig {
         }
 
         if let Some(ref lib) = kconf.handle_sev {
-            unsafe {
                 let ctx_id = Self::libkrun_create_context(lib).map_err(|e| e.to_string())?;
                 kconf.ctx_id_sev = Some(ctx_id);
-            }
         }
 
         Ok(Box::into_raw(kconf))
