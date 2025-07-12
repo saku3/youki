@@ -9,9 +9,11 @@ use std::path::PathBuf;
 use std::ffi::CString;
 use std::os::unix::ffi::OsStrExt;
 
+use libloading::{Library, Symbol};
 use nix::fcntl::{openat, OFlag};
 use nix::sys::stat::Mode;
 use nix::unistd::write;
+use std::os::raw::{c_char, c_int};
 
 const EXECUTOR_NAME: &str = "libkrun";
 
@@ -48,15 +50,15 @@ impl Executor for LibkrunExecutor {
 
         // write_config_to_rootfs(&rootfs, &json_spec)?;
 
-        // 初期化フェーズ: BeforeMounts
-        configure_container(
-            true,
-            &spec,
-            // &state_dir,
-            // &container_spec_path,
-            // rootfs.as_deref(),
-        )
-        .map_err(|e| ExecutorError::Other(format!("configure_container failed: {}", e)))?;
+        // // 初期化フェーズ: BeforeMounts ここでやっても意味ない
+        // configure_container(
+        //     true,
+        //     &spec,
+        //     // &state_dir,
+        //     // &container_spec_path,
+        //     // rootfs.as_deref(),
+        // )
+        // .map_err(|e| ExecutorError::Other(format!("configure_container failed: {}", e)))?;
 
         tracing::debug!("executing workload with libkrun handler");
         let process = spec.process().as_ref();
@@ -100,6 +102,52 @@ impl Executor for LibkrunExecutor {
         //     tracing::error!(err = ?err, file = ?cmd, "could not load libkrun module from file");
         //     ExecutorError::Other("could not load libkrun module from file".to_string())
         // })?;
+        let lib = unsafe {
+            Library::new("/usr/local/lib64/libkrun.so")
+                .map_err(|e| ExecutorError::Other(format!("failed to load libkrun.so: {}", e)))?
+        };
+
+        unsafe {
+            let krun_create_ctx: Symbol<unsafe extern "C" fn() -> c_int> =
+                lib.get(b"krun_create_ctx").map_err(|e| {
+                    ExecutorError::Other(format!("failed to load krun_create_ctx: {}", e))
+                })?;
+            let krun_set_vm_config: Symbol<unsafe extern "C" fn(c_int, c_int, c_int) -> c_int> =
+                lib.get(b"krun_set_vm_config").map_err(|e| {
+                    ExecutorError::Other(format!("failed to load krun_set_vm_config: {}", e))
+                })?;
+            let krun_set_root: Symbol<unsafe extern "C" fn(c_int, *const c_char) -> c_int> =
+                lib.get(b"krun_set_root").map_err(|e| {
+                    ExecutorError::Other(format!("failed to load krun_set_root: {}", e))
+                })?;
+            let krun_set_exec: Symbol<
+                unsafe extern "C" fn(c_int, *const c_char, c_int, *const *const c_char) -> c_int,
+            > = lib.get(b"krun_set_exec").map_err(|e| {
+                ExecutorError::Other(format!("failed to load krun_set_exec: {}", e))
+            })?;
+            let krun_start_enter: Symbol<unsafe extern "C" fn(c_int) -> c_int> =
+                lib.get(b"krun_start_enter").map_err(|e| {
+                    ExecutorError::Other(format!("failed to load krun_start_enter: {}", e))
+                })?;
+
+            let ctx_id = krun_create_ctx();
+            krun_set_vm_config(ctx_id, 1, 512);
+            let root = CString::new("rootfs").map_err(|e| {
+                ExecutorError::Other(format!("failed to create CString for rootfs: {}", e))
+            })?;
+            krun_set_root(ctx_id, root.as_ptr());
+
+            let bin = CString::new("/bin/sh").map_err(|e| {
+                ExecutorError::Other(format!("failed to create CString for /bin/sh: {}", e))
+            })?;
+            let envp: [*const c_char; 1] = [std::ptr::null()];
+            krun_set_exec(ctx_id, bin.as_ptr(), 0, envp.as_ptr());
+
+            let ret = krun_start_enter(ctx_id);
+            if ret < 0 {
+                eprintln!("krun_start_enter failed with return code: {}", ret);
+            }
+        }
 
         std::process::exit(0)
     }
