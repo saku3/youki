@@ -206,7 +206,7 @@ impl InitContainerBuilder {
         tracing::debug!("ここがuser_nsの最初");
         utils::validate_spec_for_new_user_ns(spec)?;
         tracing::debug!("ここがuser_nsの最初");
-        
+
         Ok(())
     }
 

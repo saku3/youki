@@ -63,6 +63,10 @@ pub trait CloneBoxExecutor {
 }
 
 pub trait Executor: CloneBoxExecutor {
+    //  /// Pre Executes the workload
+    // fn pre_exec(&self) -> Result<(), ExecutorError>{
+    //     Ok(())
+    // }
     /// Executes the workload
     fn exec(&self, spec: &Spec) -> Result<(), ExecutorError>;
 

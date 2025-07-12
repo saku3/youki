@@ -5,9 +5,9 @@ pub mod config;
 pub mod container;
 pub mod error;
 pub mod hooks;
+pub mod krun;
 pub mod namespaces;
 pub mod notify_socket;
-pub mod krun;
 pub mod process;
 pub mod rootfs;
 #[cfg(feature = "libseccomp")]

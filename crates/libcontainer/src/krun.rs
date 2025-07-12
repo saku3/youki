@@ -1,15 +1,15 @@
-use std::ffi::{CString, c_void};
-use std::ptr;
-use std::os::raw::c_char;
 use libloading::{Library, Symbol};
+use std::ffi::{c_void, CString};
+use std::os::raw::c_char;
+use std::ptr;
 use thiserror::Error;
 
 pub struct KrunConfig {
-    handle: Option<Library>,
-    handle_sev: Option<Library>,
-    sev: bool,
-    ctx_id: Option<i32>,
-    ctx_id_sev: Option<i32>,
+    pub handle: Option<Library>,
+    pub handle_sev: Option<Library>,
+    pub sev: bool,
+    pub ctx_id: Option<i32>,
+    pub ctx_id_sev: Option<i32>,
 }
 
 #[derive(Debug, Error)]
@@ -51,8 +51,8 @@ impl KrunConfig {
         }
 
         if let Some(ref lib) = kconf.handle_sev {
-                let ctx_id = Self::libkrun_create_context(lib).map_err(|e| e.to_string())?;
-                kconf.ctx_id_sev = Some(ctx_id);
+            let ctx_id = Self::libkrun_create_context(lib).map_err(|e| e.to_string())?;
+            kconf.ctx_id_sev = Some(ctx_id);
         }
 
         Ok(Box::into_raw(kconf))
@@ -60,8 +60,9 @@ impl KrunConfig {
 
     pub fn libkrun_create_context(lib: &Library) -> Result<i32, LibKrunError> {
         unsafe {
-            let krun_create_ctx: Symbol<unsafe extern "C" fn() -> i32> =
-                lib.get(b"krun_create_ctx").map_err(|e| LibKrunError::SymbolError(e.to_string()))?;
+            let krun_create_ctx: Symbol<unsafe extern "C" fn() -> i32> = lib
+                .get(b"krun_create_ctx")
+                .map_err(|e| LibKrunError::SymbolError(e.to_string()))?;
 
             let ctx_id = krun_create_ctx();
             if ctx_id < 0 {
