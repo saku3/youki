@@ -71,7 +71,7 @@ pub fn container_init_process(
     if let Some(true) = ctx.process.no_new_privileges() {
         let _ = prctl::set_no_new_privileges(true);
     }
-
+    
     use nix::sys::stat::{makedev, mknod, Mode, SFlag};
     use std::fs::create_dir_all;
     use std::path::Path;

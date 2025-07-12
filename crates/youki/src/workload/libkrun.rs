@@ -33,10 +33,10 @@ pub struct LibkrunExecutor {
 }
 
 impl Executor for LibkrunExecutor {
-    // fn pre_exec(&self) -> Result<(), ExecutorError> {
-    //     println!("pre_exec!!!");
-    //     Ok(())
-    // }
+    fn pre_exec(&self) -> Result<(), ExecutorError> {
+        println!("pre_exec!!!");
+        Ok(())
+    }
     fn exec(&self, spec: &Spec) -> Result<(), ExecutorError> {
         if !can_handle(spec) {
             return Err(ExecutorError::CantHandle(EXECUTOR_NAME));

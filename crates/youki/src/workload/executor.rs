@@ -5,32 +5,32 @@ use libcontainer::workload::{Executor, ExecutorError, ExecutorValidationError};
 pub struct DefaultExecutor {}
 
 impl Executor for DefaultExecutor {
-    // fn pre_exec(&self) -> Result<(), ExecutorError> {
-    //     #[cfg(feature = "libkrun")]
-    //     {
-    //         tracing::debug!("trying libkrun pre executor");
-    //         match super::libkrun::get_executor().pre_exec() {
-    //             Ok(_) => {
-    //                 tracing::debug!("libkrun executor accepted workload");
-    //                 return Ok(());
-    //             }
-    //             Err(ExecutorError::CantHandle(e)) => {
-    //                 tracing::debug!("libkrun executor cannot handle this spec");
-    //                 return Err(ExecutorError::CantHandle(e));
-    //             }
-    //             Err(err) => {
-    //                 tracing::error!("libkrun executor failed: {:?}", err);
-    //                 return Err(err);
-    //             }
-    //         }
-    //     }
+    fn pre_exec(&self) -> Result<(), ExecutorError> {
+        #[cfg(feature = "libkrun")]
+        {
+            tracing::debug!("trying libkrun pre executor");
+            match super::libkrun::get_executor().pre_exec() {
+                Ok(_) => {
+                    tracing::debug!("libkrun executor accepted workload");
+                    return Ok(());
+                }
+                Err(ExecutorError::CantHandle(e)) => {
+                    tracing::debug!("libkrun executor cannot handle this spec");
+                    return Err(ExecutorError::CantHandle(e));
+                }
+                Err(err) => {
+                    tracing::error!("libkrun executor failed: {:?}", err);
+                    return Err(err);
+                }
+            }
+        }
 
-    //     #[cfg(not(feature = "libkrun"))]
-    //     {
-    //         tracing::debug!("libkrun feature is not enabled; skipping pre_exec");
-    //         return Ok(());
-    //     }
-    // }
+        #[cfg(not(feature = "libkrun"))]
+        {
+            tracing::debug!("libkrun feature is not enabled; skipping pre_exec");
+            return Ok(());
+        }
+    }
 
     fn exec(&self, spec: &Spec) -> Result<(), ExecutorError> {
         tracing::debug!("executing libkrun executer");
