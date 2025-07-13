@@ -10,7 +10,6 @@ use oci_spec::runtime::Spec;
 
 use super::{Container, ContainerStatus};
 use crate::error::{CreateContainerError, LibcontainerError, MissingSpecError};
-use crate::krun::KrunConfig;
 use crate::notify_socket::NotifyListener;
 use crate::process::args::{ContainerArgs, ContainerType};
 use crate::process::intel_rdt::delete_resctrl_subdirectory;
@@ -87,22 +86,6 @@ impl ContainerBuilderImpl {
     fn run_container(&mut self) -> Result<Pid, LibcontainerError> {
         tracing::debug!("ここでやっと?");
         self.executor.pre_exec();
-        // self.executor.pre_exec();
-        // match KrunConfig::load() {
-        //     Ok(kconf_ptr) => {
-        //         println!("libkrun loaded successfully!");
-
-        //         // ポインタから Box に戻す（使用後に drop するため）
-        //         let kconf: Box<KrunConfig> = unsafe { Box::from_raw(kconf_ptr) };
-
-        //         // 必要に応じて _kconf.ctx_id などにアクセス可能
-        //         // self.executor.lib = kconf.ctx_id;
-        //     }
-        //     Err(err_msg) => {
-        //         eprintln!("Failed to load libkrun: {}", err_msg);
-        //     }
-        // }
-
 
         let linux = self.spec.linux().as_ref().ok_or(MissingSpecError::Linux)?;
         let cgroups_path = utils::get_cgroup_path(linux.cgroups_path(), &self.container_id);

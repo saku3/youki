@@ -6120,6 +6120,7 @@ dependencies = [
  "libloading",
  "liboci-cli",
  "nix 0.29.0",
+ "once_cell",
  "pentacle",
  "procfs",
  "scopeguard",

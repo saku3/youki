@@ -24,11 +24,25 @@ impl Executor for LibkrunExecutor {
     fn pre_exec(&self) -> Result<(), ExecutorError> {
         println!("pre_exec!!!");
         let lib = unsafe {
-            Library::new("libkrun.so.1").map_err(|_| ExecutorError::Other("libloading error".to_string()))?
+            Library::new("libkrun.so.1")
+                .map_err(|_| ExecutorError::Other("libloading error".to_string()))?
         };
         LIBKRUN
             .set(Arc::new(lib))
             .map_err(|_| ExecutorError::Other("libloading set error".to_string()))?;
+
+        let lib = get_libkrun();
+        let krun_create_ctx: Symbol<unsafe extern "C" fn() -> c_int> = unsafe {
+            lib.get(b"krun_create_ctx").map_err(|e| {
+                ExecutorError::Other(format!("failed to load krun_create_ctx: {}", e))
+            })?
+        };
+
+        let ctx_id = unsafe { krun_create_ctx() };
+        CTX_ID
+            .set(ctx_id)
+            .map_err(|_| ExecutorError::Other("ctx_id already initialized".to_string()))?;
+
         Ok(())
     }
     fn exec(&self, spec: &Spec) -> Result<(), ExecutorError> {
@@ -81,10 +95,7 @@ impl Executor for LibkrunExecutor {
 
         unsafe {
             let lib = get_libkrun();
-            let krun_create_ctx: Symbol<unsafe extern "C" fn() -> c_int> =
-                lib.get(b"krun_create_ctx").map_err(|e| {
-                    ExecutorError::Other(format!("failed to load krun_create_ctx: {}", e))
-                })?;
+            let ctx_id = get_ctx_id();
             let krun_set_vm_config: Symbol<unsafe extern "C" fn(c_int, c_int, c_int) -> c_int> =
                 lib.get(b"krun_set_vm_config").map_err(|e| {
                     ExecutorError::Other(format!("failed to load krun_set_vm_config: {}", e))
@@ -103,7 +114,6 @@ impl Executor for LibkrunExecutor {
                     ExecutorError::Other(format!("failed to load krun_start_enter: {}", e))
                 })?;
 
-            let ctx_id = krun_create_ctx();
             krun_set_vm_config(ctx_id, 1, 512);
 
             let root = CString::new("rootfs").map_err(|e| {
@@ -141,18 +151,16 @@ use once_cell::sync::OnceCell;
 
 static LIBKRUN: OnceCell<Arc<Library>> = OnceCell::new();
 
-// pub fn preload_libkrun() -> Result<(), String> {
-//     let lib = unsafe {
-//         Library::new("libkrun.so.1").map_err(|e| format!("failed to preload libkrun: {e}"))?
-//     };
-//     LIBKRUN
-//         .set(Arc::new(lib))
-//         .map_err(|_| "already initialized".to_string())?;
-//     Ok(())
-// }
-
 pub fn get_libkrun() -> Arc<Library> {
     LIBKRUN.get().expect("libkrun not preloaded").clone()
+}
+
+static CTX_ID: OnceCell<c_int> = OnceCell::new();
+
+pub fn get_ctx_id() -> c_int {
+    *CTX_ID
+        .get()
+        .expect("ctx_id not initialized. Call pre_exec() first.")
 }
 
 fn can_handle(spec: &Spec) -> bool {
