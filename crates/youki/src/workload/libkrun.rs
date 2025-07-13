@@ -111,7 +111,7 @@ impl Executor for LibkrunExecutor {
 
             krun_set_vm_config(ctx_id, 1, 512);
 
-            let root = CString::new("rootfs").map_err(|e| {
+            let root = CString::new("/").map_err(|e| {
                 ExecutorError::Other(format!("failed to create CString for rootfs: {}", e))
             })?;
             krun_set_root(ctx_id, root.as_ptr());
