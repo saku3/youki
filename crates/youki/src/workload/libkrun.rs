@@ -1,18 +1,12 @@
 use anyhow::anyhow;
 use libcontainer::oci_spec::runtime::Spec;
 use libcontainer::workload::{Executor, ExecutorError, ExecutorValidationError, EMPTY};
-use std::error::Error;
-use std::fs;
-use std::path::Path;
 use std::path::PathBuf;
 use std::sync::Arc;
 
 use std::ffi::CString;
-use std::os::unix::ffi::OsStrExt;
 
 use libloading::{Library, Symbol};
-use nix::fcntl::{openat, OFlag};
-use nix::sys::stat::Mode;
 use std::os::raw::{c_char, c_int};
 
 const EXECUTOR_NAME: &str = "libkrun";
@@ -81,6 +75,7 @@ impl Executor for LibkrunExecutor {
         let stripped = args[0].strip_prefix(std::path::MAIN_SEPARATOR);
         if let Some(cmd_stripped) = stripped {
             cmd = cmd_stripped.to_string();
+            tracing::debug!("process command: {}", cmd);
         }
 
         let envs: Vec<(String, String)> = process
@@ -165,10 +160,4 @@ pub fn get_ctx_id() -> c_int {
 
 fn can_handle(spec: &Spec) -> bool {
     true
-}
-
-// libkrun_configure_container
-fn configure_container(handle_sev_present: bool, spec: &Spec) -> Result<(), anyhow::Error> {
-    tracing::debug!("Spec: {:#?}", spec);
-    Ok(())
 }

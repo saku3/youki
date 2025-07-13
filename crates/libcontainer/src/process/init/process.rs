@@ -6,7 +6,6 @@ use std::{env, fs, mem};
 use nc;
 use nix::mount::{MntFlags, MsFlags};
 use nix::sched::CloneFlags;
-use nix::sys::stat::Mode;
 use nix::unistd::{self, close, dup2, setsid, Gid, Uid};
 use oci_spec::runtime::{
     IOPriorityClass, LinuxIOPriority, LinuxNamespaceType, LinuxSchedulerFlag, LinuxSchedulerPolicy,
@@ -71,7 +70,7 @@ pub fn container_init_process(
     if let Some(true) = ctx.process.no_new_privileges() {
         let _ = prctl::set_no_new_privileges(true);
     }
-    
+
     use nix::sys::stat::{makedev, mknod, Mode, SFlag};
     use std::fs::create_dir_all;
     use std::path::Path;
@@ -79,7 +78,12 @@ pub fn container_init_process(
     let host_kvm = Path::new("/dev/kvm");
     let container_kvm = ctx.rootfs.join("dev/kvm");
 
+    tracing::debug!("create kvm");
+    if container_kvm.exists() {
+        fs::remove_file(&container_kvm).ok();
+    }
     if !container_kvm.exists() {
+        tracing::debug!("mknod kvm");
         let parent = container_kvm.parent().ok_or_else(|| {
             tracing::error!("Failed to get parent directory of {:?}", container_kvm);
             InitProcessError::Other("Invalid container_kvm path: has no parent".into())
@@ -110,42 +114,6 @@ pub fn container_init_process(
             return Err(InitProcessError::NixOther(e));
         }
     }
-
-    // let host_kvm = Path::new("/dev/kvm");
-    // let container_kvm = ctx.rootfs.join("dev/kvm");
-    // if !container_kvm.exists() {
-    //     let parent = container_kvm.parent().unwrap_or_else(|| {
-    //         tracing::error!("Failed to get parent directory of {:?}", container_kvm);
-    //         Path::new("/") // fallback
-    //     });
-
-    //     if let Err(e) = std::fs::create_dir_all(parent) {
-    //         tracing::error!(
-    //             ?e,
-    //             ?parent,
-    //             "Failed to create directory for container KVM device at {:?}",
-    //             container_kvm
-    //         );
-    //         return Err(InitProcessError::Io(e));
-    //     }
-
-    //     // bind mount /dev/kvm → container rootfs 下の /dev/kvm
-    //     if let Err(e) = nix::mount::mount(
-    //         Some(host_kvm),
-    //         container_kvm.as_path(),
-    //         None::<&str>,
-    //         MsFlags::MS_BIND,
-    //         None::<&str>,
-    //     ) {
-    //         tracing::error!(
-    //             ?e,
-    //             host_kvm = ?host_kvm,
-    //             container_kvm = ?container_kvm,
-    //             "Failed to bind-mount KVM device"
-    //         );
-    //         return Err(InitProcessError::NixOther(e));
-    //     }
-    // }
 
     if matches!(args.container_type, ContainerType::InitContainer) {
         // create_container hook needs to be called after the namespace setup, but
