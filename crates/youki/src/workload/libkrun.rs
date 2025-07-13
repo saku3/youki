@@ -18,23 +18,17 @@ use std::os::raw::{c_char, c_int};
 const EXECUTOR_NAME: &str = "libkrun";
 
 #[derive(Clone)]
-pub struct LibkrunExecutor {
-    pub krun_create_ctx: unsafe extern "C" fn() -> c_int,
-    pub krun_set_vm_config: unsafe extern "C" fn(c_int, u8, u32) -> c_int,
-    pub krun_set_root: Option<unsafe extern "C" fn(c_int, *const c_char) -> c_int>,
-    pub krun_set_root_disk: Option<unsafe extern "C" fn(c_int, *const c_char) -> c_int>,
-    pub krun_set_tee_config_file: Option<unsafe extern "C" fn(c_int, *const c_char) -> c_int>,
-    pub krun_set_log_level: Option<unsafe extern "C" fn(u32) -> c_int>,
-    pub krun_set_exec:
-        Option<unsafe extern "C" fn(c_int, *const c_char, c_int, *const *const c_char) -> c_int>,
-    pub krun_start_enter: unsafe extern "C" fn(c_int) -> c_int,
-
-    _lib: Arc<Library>, // ✅ Arcで共有可能に
-}
+pub struct LibkrunExecutor {}
 
 impl Executor for LibkrunExecutor {
     fn pre_exec(&self) -> Result<(), ExecutorError> {
         println!("pre_exec!!!");
+        let lib = unsafe {
+            Library::new("libkrun.so.1").map_err(|_| ExecutorError::Other("libloading error".to_string()))?
+        };
+        LIBKRUN
+            .set(Arc::new(lib))
+            .map_err(|_| ExecutorError::Other("libloading set error".to_string()))?;
         Ok(())
     }
     fn exec(&self, spec: &Spec) -> Result<(), ExecutorError> {
@@ -86,28 +80,43 @@ impl Executor for LibkrunExecutor {
             .collect();
 
         unsafe {
-            let ctx_id = (self.krun_create_ctx)();
-            (self.krun_set_vm_config)(ctx_id, 1, 512);
-
-            if let Some(set_root) = self.krun_set_root {
-                let root = CString::new("rootfs").map_err(|e| {
-                    ExecutorError::Other(format!("failed to create CString for rootfs: {}", e))
+            let lib = get_libkrun();
+            let krun_create_ctx: Symbol<unsafe extern "C" fn() -> c_int> =
+                lib.get(b"krun_create_ctx").map_err(|e| {
+                    ExecutorError::Other(format!("failed to load krun_create_ctx: {}", e))
                 })?;
-                set_root(ctx_id, root.as_ptr());
-            }
+            let krun_set_vm_config: Symbol<unsafe extern "C" fn(c_int, c_int, c_int) -> c_int> =
+                lib.get(b"krun_set_vm_config").map_err(|e| {
+                    ExecutorError::Other(format!("failed to load krun_set_vm_config: {}", e))
+                })?;
+            let krun_set_root: Symbol<unsafe extern "C" fn(c_int, *const c_char) -> c_int> =
+                lib.get(b"krun_set_root").map_err(|e| {
+                    ExecutorError::Other(format!("failed to load krun_set_root: {}", e))
+                })?;
+            let krun_set_exec: Symbol<
+                unsafe extern "C" fn(c_int, *const c_char, c_int, *const *const c_char) -> c_int,
+            > = lib.get(b"krun_set_exec").map_err(|e| {
+                ExecutorError::Other(format!("failed to load krun_set_exec: {}", e))
+            })?;
+            let krun_start_enter: Symbol<unsafe extern "C" fn(c_int) -> c_int> =
+                lib.get(b"krun_start_enter").map_err(|e| {
+                    ExecutorError::Other(format!("failed to load krun_start_enter: {}", e))
+                })?;
+
+            let ctx_id = krun_create_ctx();
+            krun_set_vm_config(ctx_id, 1, 512);
+
+            let root = CString::new("rootfs").map_err(|e| {
+                ExecutorError::Other(format!("failed to create CString for rootfs: {}", e))
+            })?;
+            krun_set_root(ctx_id, root.as_ptr());
 
             let bin = CString::new("/bin/sh").map_err(|e| {
                 ExecutorError::Other(format!("failed to create CString for /bin/sh: {}", e))
             })?;
             let envp: [*const c_char; 1] = [std::ptr::null()];
-            if let Some(set_exec) = self.krun_set_exec {
-                set_exec(ctx_id, bin.as_ptr(), 0, envp.as_ptr());
-            } else {
-                return Err(ExecutorError::Other(
-                    "krun_set_exec is not available".to_string(),
-                ));
-            }
-            let ret = (self.krun_start_enter)(ctx_id);
+            krun_set_exec(ctx_id, bin.as_ptr(), 0, envp.as_ptr());
+            let ret = krun_start_enter(ctx_id);
             if ret < 0 {
                 eprintln!("krun_start_enter failed with return code: {}", ret);
             }
@@ -126,60 +135,24 @@ impl Executor for LibkrunExecutor {
 }
 
 pub fn get_executor() -> LibkrunExecutor {
-    let lib =
-        Arc::new(unsafe { Library::new("libkrun.so.1").expect("Failed to load libkrun.so.1") });
+    LibkrunExecutor {}
+}
+use once_cell::sync::OnceCell;
 
-    macro_rules! load_fn {
-        ($name:literal, $ty:ty) => {
-            unsafe {
-                let symbol: Symbol<$ty> = lib
-                    .get(concat!($name, "\0").as_bytes())
-                    .expect(concat!("symbol not found: ", $name));
-                *symbol
-            }
-        };
-    }
+static LIBKRUN: OnceCell<Arc<Library>> = OnceCell::new();
 
-    macro_rules! load_optional_fn {
-        ($name:literal, $ty:ty) => {
-            unsafe {
-                match lib.get::<$ty>(concat!($name, "\0").as_bytes()) {
-                    Ok(sym) => Some(*sym),
-                    Err(_) => None,
-                }
-            }
-        };
-    }
+// pub fn preload_libkrun() -> Result<(), String> {
+//     let lib = unsafe {
+//         Library::new("libkrun.so.1").map_err(|e| format!("failed to preload libkrun: {e}"))?
+//     };
+//     LIBKRUN
+//         .set(Arc::new(lib))
+//         .map_err(|_| "already initialized".to_string())?;
+//     Ok(())
+// }
 
-    LibkrunExecutor {
-        krun_create_ctx: load_fn!("krun_create_ctx", unsafe extern "C" fn() -> c_int),
-        krun_set_vm_config: load_fn!(
-            "krun_set_vm_config",
-            unsafe extern "C" fn(c_int, u8, u32) -> c_int
-        ),
-        krun_set_root: load_optional_fn!(
-            "krun_set_root",
-            unsafe extern "C" fn(c_int, *const c_char) -> c_int
-        ),
-        krun_set_root_disk: load_optional_fn!(
-            "krun_set_root_disk",
-            unsafe extern "C" fn(c_int, *const c_char) -> c_int
-        ),
-        krun_set_tee_config_file: load_optional_fn!(
-            "krun_set_tee_config_file",
-            unsafe extern "C" fn(c_int, *const c_char) -> c_int
-        ),
-        krun_set_log_level: load_optional_fn!(
-            "krun_set_log_level",
-            unsafe extern "C" fn(u32) -> c_int
-        ),
-        krun_set_exec: load_optional_fn!(
-            "krun_set_exec",
-            unsafe extern "C" fn(c_int, *const c_char, c_int, *const *const c_char) -> c_int
-        ),
-        krun_start_enter: load_fn!("krun_start_enter", unsafe extern "C" fn(c_int) -> c_int),
-        _lib: lib,
-    }
+pub fn get_libkrun() -> Arc<Library> {
+    LIBKRUN.get().expect("libkrun not preloaded").clone()
 }
 
 fn can_handle(spec: &Spec) -> bool {
