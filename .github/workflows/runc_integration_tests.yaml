@@ -52,4 +52,11 @@ jobs:
         run: |
           sed "s;^profile runc /usr/sbin/;profile runc-test $(pwd)/tests/runc/src/github.com/opencontainers/runc/;" < /etc/apparmor.d/runc | sudo apparmor_parser
       - name: Runc integration test
-        run: tests/runc/runc_integration_test.sh
+        run: |
+          bash tests/runc/runc_integration_test.sh | tee runc_integration_test.log
+
+      - name: Upload integration test log
+        uses: actions/upload-artifact@v4
+        with:
+          name: runc-integration-test-log
+          path: runc_integration_test.log
