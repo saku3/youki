@@ -35,7 +35,6 @@ runc delete [host pidns + init gone]
 runc delete --force [host pidns + init gone]
 runc delete --force [paused container]
 runc delete --force in cgroupv1 with subcgroups
-runc delete --force in cgroupv2 with subcgroups
 runc delete removes failed systemd unit
 runc run [redundant default /dev/ptmx]
 runc exec vs systemctl daemon-reload
