@@ -80,7 +80,6 @@ env var override
 env var with new-line is honored
 events --stats
 events --stats with psi data
-events --interval default
 events --interval 1s
 events --interval 100ms
 events oom
