@@ -87,7 +87,7 @@
       "gid": 0
     },
     "args": [
-      "sh"
+      "/bin/sh"
     ],
     "env": [
       "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
@@ -133,8 +133,27 @@
   "hostname": "youki",
   "annotations": {},
   "linux": {
+    "devices": [
+      {
+        "path": "/dev/kvm",
+        "type": "c",
+        "major": 10,
+        "minor": 232,
+        "fileMode": 438,
+        "uid": 0,
+        "gid": 0
+      }
+    ],
     "resources": {
-      "devices": []
+      "devices": [
+        {
+          "allow": true,
+          "type": "c",
+          "major": 10,
+          "minor": 232,
+          "access": "rwm"
+        }
+      ]
     },
     "namespaces": [
       {
