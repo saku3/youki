@@ -6,6 +6,7 @@ use clap::Parser;
 /// Execute a process within an existing container
 /// Reference: https://github.com/opencontainers/runc/blob/main/man/runc-exec.8.md
 #[derive(Parser, Debug)]
+#[clap(trailing_var_arg = true)]
 pub struct Exec {
     /// Unix socket (file) path , which will receive file descriptor of the writing end of the pseudoterminal
     #[clap(long)]
