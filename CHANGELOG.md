@@ -1,5 +1,7 @@
 # Changelog
 
+## [v0.0.1](https://github.com/saku3/youki/commits/v0.0.1) - 2025-07-25
+
 ## [v0.5.4](https://github.com/youki-dev/youki/compare/v0.5.3...v0.5.4) - 2025-07-17
 ### 💪 Improvements
 - add support exec-cpu-affinity by @saku3 in https://github.com/youki-dev/youki/pull/3164
