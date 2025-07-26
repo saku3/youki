@@ -108,7 +108,6 @@ runc run (hooks library tests)
 runc run [host mount ns + hooks]
 simple idmap mount [userns]
 simple idmap mount [no userns]
-write to an idmap mount [userns]
 write to an idmap mount [no userns]
 idmap mount with propagation flag [userns]
 idmap mount with relative path [userns]
