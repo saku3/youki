@@ -81,7 +81,6 @@ events --stats
 events --stats with psi data
 events --interval 1s
 events --interval 100ms
-events oom
 runc exec
 runc exec [exit codes]
 runc exec --pid-file
