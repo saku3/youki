@@ -111,7 +111,7 @@ clean-test-kind:
 
 # run bpftrace hack
 hack-bpftrace:
-    BPFTRACE_STRLEN=120 ./hack/debug.bt
+    BPFTRACE_MAX_STRLEN=80 ./hack/debug.bt
 
 # a hacky benchmark method we have been using casually to compare performance
 hack-benchmark:
