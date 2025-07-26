@@ -81,7 +81,6 @@ events --stats
 events --interval 1s
 events --interval 100ms
 runc exec
-runc exec [exit codes]
 runc exec --pid-file
 runc exec --pid-file with new CWD
 runc exec ls -la
