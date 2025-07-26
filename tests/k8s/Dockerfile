@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-ARG KIND_NODE_VERSION=v1.23.13
+ARG KIND_NODE_VERSION=v1.33.2
 
 FROM kindest/node:${KIND_NODE_VERSION} AS kind-base
 
