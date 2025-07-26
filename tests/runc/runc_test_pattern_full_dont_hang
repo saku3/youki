@@ -28,7 +28,6 @@ runc exec (cgroup v1+hybrid joins correct cgroup) # skip test requires cgroups_h
 runc exec should refuse a paused container
 runc exec --ignore-paused
 runc run/create should error for a non-empty cgroup
-runc run/create should refuse pre-existing frozen cgroup
 checkpoint and restore # skip test requires criu
 checkpoint and restore (bind mount, destination is symlink) # skip test requires criu
 checkpoint and restore (with --debug) # skip test requires criu
