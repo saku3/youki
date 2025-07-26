@@ -74,7 +74,6 @@ runc run [devices vs systemd NeedDaemonReload] # skip requires systemd >= v230
 non-empty HOME env is used
 empty HOME env var is overridden
 empty HOME env var is overridden with multiple overrides
-env var HOME is set only once
 env var override is set only once
 env var override
 env var with new-line is honored
