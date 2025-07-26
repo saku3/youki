@@ -100,19 +100,19 @@ test-kind: kind-cluster
     kubectl --context=kind-{{ KIND_CLUSTER_NAME }} describe deployment nginx-deployment
 
     @echo "🔍 Checking pod logs (first container):"
-    POD_NAME=$$(kubectl --context=kind-{{ KIND_CLUSTER_NAME }} get pods -l app=nginx -o jsonpath="{.items[0].metadata.name}") && \
-    kubectl --context=kind-{{ KIND_CLUSTER_NAME }} logs $$POD_NAME --tail=20 || echo "⚠️ No logs available"
+    POD_NAME="$$(kubectl --context=kind-{{ KIND_CLUSTER_NAME }} get pods -l app=nginx -o jsonpath='{.items[0].metadata.name}')" ; \
+    kubectl --context=kind-{{ KIND_CLUSTER_NAME }} logs "$$POD_NAME" --tail=20 || echo "⚠️ No logs available"
 
     @echo "🧠 Verifying container runtime is youki:"
-    POD_NAME=$$(kubectl --context=kind-{{ KIND_CLUSTER_NAME }} get pods -l app=nginx -o jsonpath="{.items[0].metadata.name}") && \
-    NODE_NAME=$$(kubectl --context=kind-{{ KIND_CLUSTER_NAME }} get pod $$POD_NAME -o jsonpath="{.spec.nodeName}") && \
-    docker exec $$NODE_NAME crictl inspect $$POD_NAME | grep -q '"runtimeType": "youki"' && \
+    POD_NAME="$$(kubectl --context=kind-{{ KIND_CLUSTER_NAME }} get pods -l app=nginx -o jsonpath='{.items[0].metadata.name}')" ; \
+    NODE_NAME="$$(kubectl --context=kind-{{ KIND_CLUSTER_NAME }} get pod $$POD_NAME -o jsonpath='{.spec.nodeName}')" ; \
+    docker exec "$$NODE_NAME" crictl inspect "$$POD_NAME" | grep -q '"runtimeType": "youki"' && \
     echo "✅ nginx is running under youki!" || echo "❌ Not using youki"
 
     @echo "📡 Port-forwarding to localhost:8080 and curl check..."
-    POD_NAME=$$(kubectl --context=kind-{{ KIND_CLUSTER_NAME }} get pods -l app=nginx -o jsonpath="{.items[0].metadata.name}") && \
-    kubectl --context=kind-{{ KIND_CLUSTER_NAME }} port-forward pod/$$POD_NAME 8080:80 > /dev/null 2>&1 & \
-    sleep 2 && curl -s http://localhost:8080 | grep -i nginx && echo "✅ nginx responded" || echo "❌ nginx not responding"
+    POD_NAME="$$(kubectl --context=kind-{{ KIND_CLUSTER_NAME }} get pods -l app=nginx -o jsonpath='{.items[0].metadata.name}')" ; \
+    kubectl --context=kind-{{ KIND_CLUSTER_NAME }} port-forward pod/"$$POD_NAME" 8080:80 > /dev/null 2>&1 & \
+    sleep 2 ; curl -s http://localhost:8080 | grep -i nginx && echo "✅ nginx responded" || echo "❌ nginx not responding"
 
     @echo "🧹 Cleaning up deployment..."
     kubectl --context=kind-{{ KIND_CLUSTER_NAME }} delete -f tests/k8s/deploy.yaml
