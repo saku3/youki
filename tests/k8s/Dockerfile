@@ -33,6 +33,6 @@ EOF
 COPY justfile justfile
 RUN curl -o just.tar.gz -L https://github.com/casey/just/releases/download/1.14.0/just-1.14.0-x86_64-unknown-linux-musl.tar.gz
 RUN tar zxvf just.tar.gz just
-RUN ./just ci-prepare
+# RUN ./just ci-prepare
 COPY --link --from=shim /* /usr/local/bin/
 
