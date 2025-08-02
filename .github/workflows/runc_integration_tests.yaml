@@ -14,7 +14,7 @@ on:
 jobs:
   runc-integration-tests:
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,36 +52,11 @@ jobs:
       - name: Add execute permission
         run: chmod +x ./youki
 
-      - name: Put simple bpftrace script (tracepoint-only)
-        run: |
-          cat > ./hack/ci.bt <<'BT'
-          BEGIN
-          {
-            printf("Tracing (CI) youki/runc syscalls... Hit Ctrl-C to end.\n");
-            printf("%-12s %15s %-8s %-9s %s\n", "TIME", "COMM", "PID", "EVENT", "ARGS");
-          }
-
-          tracepoint:syscalls:sys_enter_clone3,
-          tracepoint:syscalls:sys_enter_setns,
-          tracepoint:syscalls:sys_enter_unshare,
-          tracepoint:syscalls:sys_enter_mount,
-          tracepoint:syscalls:sys_enter_pivot_root,
-          tracepoint:syscalls:sys_enter_write,
-          tracepoint:syscalls:sys_enter_openat
-          /(comm == "youki" || comm == "runc" || strcontains(comm, "youki:[") || strcontains(comm, "runsc"))/
-          {
-            printf("%-12ld %15s %-8d %-9s ", elapsed, comm, pid, probe);
-            printf("%s\n", str(arg0));
-          }
-
-          END { printf("Tracing ended.\n"); }
-          BT
-
       - name: Start bpftrace alongside tests
         env:
           BPFTRACE_STRLEN: "256"
         run: |
-          sudo timeout --signal=INT 600s bpftrace -o bpftrace.log ./hack/ci.bt &
+          just hack-bpftrace > bpftrace.log 2>&1 &
           echo $! > bpftrace.pid
 
       - name: Setup Bats and bats libs
