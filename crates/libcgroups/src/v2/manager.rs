@@ -94,10 +94,11 @@ impl Manager {
 
     /// Creates a unified cgroup at `self.full_path` and attaches a process to it
     fn create_unified_cgroup(&self, pid: Pid) -> Result<(), V2ManagerError> {
-        let controllers: Vec<String> = util::get_available_controllers(&self.root_path)?
+        let controllers = util::get_available_controllers(&self.root_path)?
             .iter()
             .map(|c| format!("+{c}"))
-            .collect();
+            .collect::<Vec<_>>()
+            .join(" ");
 
         Self::write_controllers(&self.root_path, &controllers)?;
 
@@ -129,12 +130,23 @@ impl Manager {
     }
 
     /// Writes a list of controllers to the `{path}/cgroup.subtree_control` file
-    fn write_controllers(path: &Path, controllers: &[String]) -> Result<(), WrappedIoError> {
-        for controller in controllers {
-            common::write_cgroup_file_str(path.join(CGROUP_SUBTREE_CONTROL), controller)?;
+    fn write_controllers(path: &Path, controllers: &str) -> Result<(), WrappedIoError> {
+        if controllers.is_empty() {
+            return Ok(());
         }
-
-        Ok(())
+        match common::write_cgroup_file(path.join(CGROUP_SUBTREE_CONTROL), controllers) {
+            Ok(()) => Ok(()),
+            Err(e) => {
+                tracing::debug!("bulk write to cgroup.subtree_control failed:{e}. Fallback to write each one individually.");
+                let mut last_err: Option<WrappedIoError> = None;
+                for controller in controllers.split_whitespace() {
+                    if let Err(err) = common::write_cgroup_file_str(path.join(CGROUP_SUBTREE_CONTROL), controller) {
+                        last_err = Some(err);
+                    }
+                }
+                if let Some(err) = last_err { Err(err) } else { Ok(()) }
+            }
+        }
     }
 
     pub fn any(self) -> AnyCgroupManager {
