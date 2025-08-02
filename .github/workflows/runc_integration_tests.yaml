@@ -1,3 +1,16 @@
+name: 🧪 Runc integration test
+
+on:
+  schedule:
+  - cron: "0 0 * * *"
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
   runc-integration-tests:
     runs-on: ubuntu-24.04
@@ -20,16 +33,12 @@ jobs:
       - name: Install bpftrace (and headers if available)
         run: |
           sudo apt -y install bpftrace || true
-          # ヘッダは無くてもBTFで動くことが多い。失敗しても継続。
           sudo apt -y install "linux-headers-$(uname -r)" || true
 
       - name: Prepare kernel tracing env
         run: |
-          # debugfs は kprobe 系で必要なことが多い（tracepointのみなら省略可）
           sudo mount -t debugfs none /sys/kernel/debug || true
-          # 参照制限の緩和（必要に応じて）
           echo 0 | sudo tee /proc/sys/kernel/kptr_restrict
-          # 失敗しても先へ進む
           sudo sysctl -w kernel.perf_event_paranoid=1 || true
 
       - name: Build youki
