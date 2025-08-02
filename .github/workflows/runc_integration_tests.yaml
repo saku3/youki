@@ -1,16 +1,3 @@
-name: 🧪 Runc integration test
-
-on:
-  schedule:
-  - cron: "0 0 * * *"
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
 jobs:
   runc-integration-tests:
     runs-on: ubuntu-24.04
@@ -22,12 +9,28 @@ jobs:
 
       - name: Install just
         uses: taiki-e/install-action@just
-      - name: install runc and youki  requirements
+
+      - name: Install runc and youki requirements
         run: |
           sudo apt update
           sudo apt -y install libseccomp-dev sshfs uidmap \
                pkg-config libsystemd-dev build-essential libelf-dev \
                libclang-dev libssl-dev
+
+      - name: Install bpftrace (and headers if available)
+        run: |
+          sudo apt -y install bpftrace || true
+          # ヘッダは無くてもBTFで動くことが多い。失敗しても継続。
+          sudo apt -y install "linux-headers-$(uname -r)" || true
+
+      - name: Prepare kernel tracing env
+        run: |
+          # debugfs は kprobe 系で必要なことが多い（tracepointのみなら省略可）
+          sudo mount -t debugfs none /sys/kernel/debug || true
+          # 参照制限の緩和（必要に応じて）
+          echo 0 | sudo tee /proc/sys/kernel/kptr_restrict
+          # 失敗しても先へ進む
+          sudo sysctl -w kernel.perf_event_paranoid=1 || true
 
       - name: Build youki
         run: just youki-release
@@ -37,8 +40,41 @@ jobs:
           go-version: '1.23.x'
           cache: true
 
-      - name: Add the permission to run
+      - name: Add execute permission
         run: chmod +x ./youki
+
+      - name: Put simple bpftrace script (tracepoint-only)
+        run: |
+          cat > ./hack/ci.bt <<'BT'
+          BEGIN
+          {
+            printf("Tracing (CI) youki/runc syscalls... Hit Ctrl-C to end.\n");
+            printf("%-12s %15s %-8s %-9s %s\n", "TIME", "COMM", "PID", "EVENT", "ARGS");
+          }
+
+          tracepoint:syscalls:sys_enter_clone3,
+          tracepoint:syscalls:sys_enter_setns,
+          tracepoint:syscalls:sys_enter_unshare,
+          tracepoint:syscalls:sys_enter_mount,
+          tracepoint:syscalls:sys_enter_pivot_root,
+          tracepoint:syscalls:sys_enter_write,
+          tracepoint:syscalls:sys_enter_openat
+          /(comm == "youki" || comm == "runc" || strcontains(comm, "youki:[") || strcontains(comm, "runsc"))/
+          {
+            printf("%-12ld %15s %-8d %-9s ", elapsed, comm, pid, probe);
+            printf("%s\n", str(arg0));
+          }
+
+          END { printf("Tracing ended.\n"); }
+          BT
+
+      - name: Start bpftrace alongside tests
+        env:
+          BPFTRACE_STRLEN: "256"
+        run: |
+          sudo timeout --signal=INT 600s bpftrace -o bpftrace.log ./hack/ci.bt &
+          echo $! > bpftrace.pid
+
       - name: Setup Bats and bats libs
         uses: bats-core/bats-action@3.0.1
         with:
@@ -47,16 +83,26 @@ jobs:
           assert-install: false
           detik-install: false
           file-install: false
+
       - name: Allow userns for runc
-        # https://github.com/opencontainers/runc/pull/4286
         run: |
           sed "s;^profile runc /usr/sbin/;profile runc-test $(pwd)/tests/runc/src/github.com/opencontainers/runc/;" < /etc/apparmor.d/runc | sudo apparmor_parser
+
       - name: Runc integration test
         run: |
           bash tests/runc/runc_integration_test.sh ./youki tests/runc/runc_test_pattern_full_dont_hang | tee runc_integration_test.log
 
-      - name: Upload integration test log
+      - name: Stop bpftrace (if still running)
+        run: |
+          if [ -f bpftrace.pid ]; then
+            sudo kill -INT "$(cat bpftrace.pid)" || true
+            wait "$(cat bpftrace.pid)" || true
+          fi
+
+      - name: Upload logs
         uses: actions/upload-artifact@v4
         with:
-          name: runc-integration-test-log
-          path: runc_integration_test.log
+          name: runc-integration-with-bpftrace
+          path: |
+            runc_integration_test.log
+            bpftrace.log
