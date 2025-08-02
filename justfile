@@ -90,9 +90,31 @@ kind-cluster: bin-kind
 
 # run youki with kind
 test-kind: kind-cluster
+    @echo "🚀 Deploying nginx to kind cluster: kind-{{ KIND_CLUSTER_NAME }}"
     kubectl --context=kind-{{ KIND_CLUSTER_NAME }} apply -f tests/k8s/deploy.yaml
-    kubectl --context=kind-{{ KIND_CLUSTER_NAME }} wait deployment nginx-deployment --for condition=Available=True --timeout=90s
-    kubectl --context=kind-{{ KIND_CLUSTER_NAME }} get pods -o wide
+
+    @echo "⏳ Waiting for nginx deployment to become available..."
+    kubectl --context=kind-{{ KIND_CLUSTER_NAME }} wait deployment nginx-deployment --for=condition=Available=True --timeout=90s
+
+    @echo "📦 Describing deployment:"
+    kubectl --context=kind-{{ KIND_CLUSTER_NAME }} describe deployment nginx-deployment
+
+    @echo "🔍 Checking pod logs (first container):"
+    POD_NAME="$$(kubectl --context=kind-{{ KIND_CLUSTER_NAME }} get pods -l app=nginx -o jsonpath='{.items[0].metadata.name}')" ; \
+    kubectl --context=kind-{{ KIND_CLUSTER_NAME }} logs "$$POD_NAME" --tail=20 || echo "⚠️ No logs available"
+
+    @echo "🧠 Verifying container runtime is youki:"
+    POD_NAME="$$(kubectl --context=kind-{{ KIND_CLUSTER_NAME }} get pods -l app=nginx -o jsonpath='{.items[0].metadata.name}')" ; \
+    NODE_NAME="$$(kubectl --context=kind-{{ KIND_CLUSTER_NAME }} get pod $$POD_NAME -o jsonpath='{.spec.nodeName}')" ; \
+    docker exec "$$NODE_NAME" crictl inspect "$$POD_NAME" | grep -q '"runtimeType": "youki"' && \
+    echo "✅ nginx is running under youki!" || echo "❌ Not using youki"
+
+    @echo "📡 Port-forwarding to localhost:8080 and curl check..."
+    POD_NAME="$$(kubectl --context=kind-{{ KIND_CLUSTER_NAME }} get pods -l app=nginx -o jsonpath='{.items[0].metadata.name}')" ; \
+    kubectl --context=kind-{{ KIND_CLUSTER_NAME }} port-forward pod/"$$POD_NAME" 8080:80 > /dev/null 2>&1 & \
+    sleep 2 ; curl -s http://localhost:8080 | grep -i nginx && echo "✅ nginx responded" || echo "❌ nginx not responding"
+
+    @echo "🧹 Cleaning up deployment..."
     kubectl --context=kind-{{ KIND_CLUSTER_NAME }} delete -f tests/k8s/deploy.yaml
 
 # Bin
