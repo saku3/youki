@@ -134,7 +134,19 @@ impl Manager {
         if controllers.is_empty() {
             return Ok(());
         }
-        common::write_cgroup_file_str(path.join(CGROUP_SUBTREE_CONTROL), controllers)
+        match common::write_cgroup_file(path.join(CGROUP_SUBTREE_CONTROL), controllers) {
+            Ok(()) => Ok(()),
+            Err(e) => {
+                tracing::debug!("bulk write to cgroup.subtree_control failed:{e}. Fallback to write each one individually.");
+                let mut last_err: Option<WrappedIoError> = None;
+                for controller in controllers.split_whitespace() {
+                    if let Err(err) = common::write_cgroup_file_str(path.join(CGROUP_SUBTREE_CONTROL), controller) {
+                        last_err = Some(err);
+                    }
+                }
+                if let Some(err) = last_err { Err(err) } else { Ok(()) }
+            }
+        }
     }
 
     pub fn any(self) -> AnyCgroupManager {
