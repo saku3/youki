@@ -5,11 +5,11 @@ use libcontainer::workload::{Executor, ExecutorError, ExecutorValidationError};
 pub struct DefaultExecutor {}
 
 impl Executor for DefaultExecutor {
-    fn pre_exec(&self) -> Result<(), ExecutorError> {
+    fn pre_exec(&self, spec: &mut Spec) -> Result<(), ExecutorError> {
         #[cfg(feature = "libkrun")]
         {
             tracing::debug!("trying libkrun pre executor");
-            match super::libkrun::get_executor().pre_exec() {
+            match super::libkrun::get_executor().pre_exec(spec) {
                 Ok(_) => {
                     tracing::debug!("libkrun executor accepted workload");
                     return Ok(());
@@ -112,6 +112,5 @@ impl Executor for DefaultExecutor {
 }
 
 pub fn default_executor() -> DefaultExecutor {
-    tracing::debug!("これもすぐに呼ばれるということ");
     DefaultExecutor {}
 }

@@ -11,7 +11,6 @@ pub struct DefaultExecutor {}
 
 impl Executor for DefaultExecutor {
     fn exec(&self, spec: &Spec) -> Result<(), ExecutorError> {
-        tracing::debug!("executing workload with default handler");
         let args = spec
             .process()
             .as_ref()
@@ -109,7 +108,6 @@ impl Executor for DefaultExecutor {
 }
 
 pub fn get_executor() -> Box<dyn Executor> {
-    tracing::debug!("これがnewの時に呼ばれているのか");
     Box::new(DefaultExecutor {})
 }
 

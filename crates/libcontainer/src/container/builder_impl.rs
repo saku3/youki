@@ -85,8 +85,7 @@ impl ContainerBuilderImpl {
 
     fn run_container(&mut self) -> Result<Pid, LibcontainerError> {
         tracing::debug!("ここでやっと?");
-        self.executor.pre_exec();
-
+        let _  = self.executor.pre_exec(&self.spec);
         let linux = self.spec.linux().as_ref().ok_or(MissingSpecError::Linux)?;
         let cgroups_path = utils::get_cgroup_path(linux.cgroups_path(), &self.container_id);
         let cgroup_config = libcgroups::common::CgroupConfig {
@@ -107,8 +106,6 @@ impl ContainerBuilderImpl {
         // user namespace in the case that the path is located in paths only
         // root can access.
         let notify_listener = NotifyListener::new(&self.notify_path)?;
-
-        // ここで実行するlibkrun_configure_container
 
         let json_spec = serde_json::to_string_pretty(&*self.spec).map_err(|e| {
             LibcontainerError::Other(format!("failed to serialize spec to JSON: {}", e))
