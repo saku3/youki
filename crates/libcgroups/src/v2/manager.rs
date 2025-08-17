@@ -94,10 +94,11 @@ impl Manager {
 
     /// Creates a unified cgroup at `self.full_path` and attaches a process to it
     fn create_unified_cgroup(&self, pid: Pid) -> Result<(), V2ManagerError> {
-        let controllers: Vec<String> = util::get_available_controllers(&self.root_path)?
+        let controllers = util::get_available_controllers(&self.root_path)?
             .iter()
             .map(|c| format!("+{c}"))
-            .collect();
+            .collect::<Vec<_>>()
+            .join(" ");
 
         Self::write_controllers(&self.root_path, &controllers)?;
 
@@ -129,12 +130,11 @@ impl Manager {
     }
 
     /// Writes a list of controllers to the `{path}/cgroup.subtree_control` file
-    fn write_controllers(path: &Path, controllers: &[String]) -> Result<(), WrappedIoError> {
-        for controller in controllers {
-            common::write_cgroup_file_str(path.join(CGROUP_SUBTREE_CONTROL), controller)?;
+    fn write_controllers(path: &Path, controllers: &str) -> Result<(), WrappedIoError> {
+        if controllers.is_empty() {
+            return Ok(());
         }
-
-        Ok(())
+        common::write_cgroup_file_str(path.join(CGROUP_SUBTREE_CONTROL), controllers)
     }
 
     pub fn any(self) -> AnyCgroupManager {
