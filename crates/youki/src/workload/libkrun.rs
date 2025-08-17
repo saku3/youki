@@ -1,36 +1,34 @@
-use anyhow::anyhow;
-use libcontainer::oci_spec::runtime::Spec;
-use libcontainer::workload::{Executor, ExecutorError, ExecutorValidationError, EMPTY};
+use std::ffi::CString;
+use std::os::raw::{c_char, c_int};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
-use std::ffi::CString;
+use anyhow::anyhow;
+use libcontainer::oci_spec::runtime::Spec;
+use libcontainer::workload::{Executor, ExecutorError, ExecutorValidationError, EMPTY};
 use libloading::{Library, Symbol};
-use std::os::raw::{c_char, c_int};
 use once_cell::sync::Lazy;
 
 const EXECUTOR_NAME: &str = "libkrun";
 const LIBKRUN_NAME: &str = "libkrun.so.1";
 
 // Lazy loading of libkrun
-static LIBKRUN: Lazy<Option<Arc<Library>>> = Lazy::new(|| {
-    unsafe { Library::new(LIBKRUN_NAME).ok().map(Arc::new) }
-});
+static LIBKRUN: Lazy<Option<Arc<Library>>> =
+    Lazy::new(|| unsafe { Library::new(LIBKRUN_NAME).ok().map(Arc::new) });
 
 // Lazy, mutable ctx_id holder
 static CTX_ID: Lazy<Mutex<Option<c_int>>> = Lazy::new(|| Mutex::new(None));
 
 fn get_libkrun() -> Arc<Library> {
-    LIBKRUN
-        .as_ref()
-        .expect("libkrun not preloaded")
-        .clone()
+    LIBKRUN.as_ref().expect("libkrun not preloaded").clone()
 }
 
 fn set_ctx_id(value: c_int) -> Result<(), ExecutorError> {
     let mut guard = CTX_ID.lock().unwrap();
     if guard.is_some() {
-        return Err(ExecutorError::Other("ctx_id already initialized".to_string()));
+        return Err(ExecutorError::Other(
+            "ctx_id already initialized".to_string(),
+        ));
     }
     *guard = Some(value);
     Ok(())
@@ -38,8 +36,7 @@ fn set_ctx_id(value: c_int) -> Result<(), ExecutorError> {
 
 fn get_ctx_id() -> c_int {
     let guard = CTX_ID.lock().unwrap();
-    guard
-        .expect("ctx_id not initialized. Call pre_exec() first.")
+    guard.expect("ctx_id not initialized. Call pre_exec() first.")
 }
 
 fn can_handle(_spec: &Spec) -> bool {
@@ -55,7 +52,6 @@ pub struct LibkrunExecutor {}
 
 impl Executor for LibkrunExecutor {
     fn pre_exec(&self, spec: &mut Spec) -> Result<(), ExecutorError> {
-
         let json_spec = serde_json::to_string_pretty(&spec).map_err(|e| {
             ExecutorError::Other(format!("failed to serialize spec to JSON: {}", e))
         })?;
@@ -90,9 +86,7 @@ impl Executor for LibkrunExecutor {
         let rootfs = PathBuf::from(rootfs_path);
 
         let process = spec.process().as_ref();
-        let args = process
-            .and_then(|p| p.args().as_ref())
-            .unwrap_or(&EMPTY);
+        let args = process.and_then(|p| p.args().as_ref()).unwrap_or(&EMPTY);
         if args.is_empty() {
             tracing::error!("at least one process arg must be specified");
             return Err(ExecutorError::InvalidArg);
@@ -158,7 +152,6 @@ impl Executor for LibkrunExecutor {
 pub fn get_executor() -> LibkrunExecutor {
     LibkrunExecutor {}
 }
-
 
 // use anyhow::{Context, Result};
 // use nix::errno::Errno;

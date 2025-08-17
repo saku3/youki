@@ -1,0 +1,464 @@
+09:24:55.883097 close(3)                = 0 <0.000011>
+09:24:55.883152 close(4)                = 0 <0.000008>
+09:24:55.883222 prctl(PR_SET_DUMPABLE, SUID_DUMP_DISABLE) = 0 <0.000024>
+09:24:55.883265 write(5, "\x00\x00\x00\x00", 4) = 4 <0.000013>
+09:24:55.883300 read(5, "\x00\x00\x00\x00\x00\x00\x00\x00", 8) = 8 <0.001436>
+09:24:55.884771 openat(AT_FDCWD, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x73\x65\x74\x67\x72\x6f\x75\x70\x73", O_RDONLY|O_CLOEXEC) = 3 <0.000043>
+09:24:55.884845 statx(3, "", AT_STATX_DONT_SYNC|AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH, STATX_SIZE, {stx_mask=STATX_BASIC_STATS|STATX_MNT_ID, stx_blksize=1024, stx_attributes=0, stx_nlink=1, stx_uid=0, stx_gid=0, stx_mode=S_IFREG|0644, stx_ino=79754, stx_size=0, stx_blocks=0, stx_attributes_mask=STATX_ATTR_AUTOMOUNT|STATX_ATTR_MOUNT_ROOT|STATX_ATTR_DAX, stx_atime={tv_sec=1754731495, tv_nsec=884733397} /* 2025-08-09T09:24:55.884733397+0000 */, stx_ctime={tv_sec=1754731495, tv_nsec=884733397} /* 2025-08-09T09:24:55.884733397+0000 */, stx_mtime={tv_sec=1754731495, tv_nsec=884733397} /* 2025-08-09T09:24:55.884733397+0000 */, stx_rdev_major=0, stx_rdev_minor=0, stx_dev_major=0, stx_dev_minor=24, stx_mnt_id=0x425}) = 0 <0.000007>
+09:24:55.884923 read(3, "\x61\x6c\x6c\x6f\x77\x0a", 1023) = 6 <0.000011>
+09:24:55.884957 read(3, "", 1017)       = 0 <0.000005>
+09:24:55.884979 close(3)                = 0 <0.000011>
+09:24:55.885032 setgroups(0, NULL)      = 0 <0.000026>
+09:24:55.885090 write(5, "\x00\x00\x00\x00", 4) = 4 <0.000011>
+09:24:55.885128 read(5, "\x7c\x3b\x00\x00", 4) = 4 <0.001310>
+09:24:55.886478 openat(AT_FDCWD, "\x2f\x70\x72\x6f\x63\x2f\x6d\x6f\x75\x6e\x74\x73", O_RDONLY|O_CLOEXEC) = 3 <0.000035>
+09:24:55.886560 read(3, "\x2f\x64\x65\x76\x2f\x72\x6f\x6f\x74\x20\x2f\x20\x65\x78\x74\x34\x20\x72\x77\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x2c\x64\x69\x73\x63\x61\x72\x64\x2c\x65\x72\x72\x6f\x72\x73\x3d\x72\x65\x6d\x6f\x75\x6e\x74\x2d\x72\x6f\x2c\x63\x6f\x6d\x6d\x69\x74\x3d\x33\x30\x20\x30\x20\x30\x0a\x64\x65\x76\x74\x6d\x70\x66\x73\x20\x2f\x64\x65\x76\x20\x64\x65\x76\x74\x6d\x70\x66\x73\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x65\x78\x65\x63\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x2c\x73\x69\x7a\x65\x3d\x33\x39\x39\x33\x30\x33\x36\x6b\x2c\x6e\x72\x5f\x69\x6e\x6f\x64\x65\x73\x3d\x39\x39\x38\x32\x35\x39\x2c\x6d\x6f\x64\x65\x3d\x37\x35\x35\x2c\x69\x6e\x6f\x64\x65\x36\x34\x20\x30\x20\x30\x0a\x74\x6d\x70\x66\x73\x20\x2f\x64\x65\x76\x2f\x73\x68\x6d\x20\x74\x6d\x70\x66\x73\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x64\x65\x76\x2c\x69\x6e\x6f\x64\x65\x36\x34\x20\x30\x20\x30\x0a\x64\x65\x76\x70\x74\x73\x20\x2f\x64\x65\x76\x2f\x70\x74\x73\x20\x64\x65\x76\x70\x74\x73\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x65\x78\x65\x63\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x2c\x67\x69\x64\x3d\x35\x2c\x6d\x6f\x64\x65\x3d\x36\x32\x30\x2c\x70\x74\x6d\x78\x6d\x6f\x64\x65\x3d\x30\x30\x30\x20\x30\x20\x30\x0a\x68\x75\x67\x65\x74\x6c\x62\x66\x73\x20\x2f\x64\x65\x76\x2f\x68\x75\x67\x65\x70\x61\x67\x65\x73\x20\x68\x75\x67\x65\x74\x6c\x62\x66\x73\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x64\x65\x76\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x2c\x70\x61\x67\x65\x73\x69\x7a\x65\x3d\x32\x4d\x20\x30\x20\x30\x0a\x6d\x71\x75\x65\x75\x65\x20\x2f\x64\x65\x76\x2f\x6d\x71\x75\x65\x75\x65\x20\x6d\x71\x75\x65\x75\x65\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x64\x65\x76\x2c\x6e\x6f\x65\x78\x65\x63\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x20\x30\x20\x30\x0a\x70\x72\x6f\x63\x20\x2f\x70\x72\x6f\x63\x20\x70\x72\x6f\x63\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x64\x65\x76\x2c\x6e\x6f\x65\x78\x65\x63\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x20\x30\x20\x30\x0a\x73\x79\x73\x74\x65\x6d\x64\x2d\x31\x20\x2f\x70\x72\x6f\x63\x2f\x73\x79\x73\x2f\x66\x73\x2f\x62\x69\x6e\x66\x6d\x74\x5f\x6d\x69\x73\x63\x20\x61\x75\x74\x6f\x66\x73\x20\x72\x77\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x2c\x66\x64\x3d\x33\x32\x2c\x70\x67\x72\x70\x3d\x30\x2c\x74\x69\x6d\x65\x6f\x75\x74\x3d\x30\x2c\x6d\x69\x6e\x70\x72\x6f\x74\x6f\x3d\x35\x2c\x6d\x61\x78\x70\x72\x6f\x74\x6f\x3d\x35\x2c\x64\x69\x72\x65\x63\x74\x2c\x70\x69\x70\x65\x5f\x69\x6e\x6f\x3d\x31\x37\x30\x34\x20\x30\x20\x30\x0a\x62\x69\x6e\x66\x6d\x74\x5f\x6d\x69\x73\x63\x20\x2f\x70\x72\x6f\x63\x2f\x73\x79\x73\x2f\x66\x73\x2f\x62\x69\x6e\x66\x6d\x74\x5f\x6d\x69\x73\x63\x20\x62\x69\x6e\x66\x6d\x74\x5f\x6d\x69\x73\x63\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x64\x65\x76\x2c\x6e\x6f\x65\x78\x65\x63\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x20\x30\x20\x30\x0a\x73\x79\x73\x66\x73\x20\x2f\x73\x79\x73\x20\x73\x79\x73\x66\x73\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x64\x65\x76\x2c\x6e\x6f\x65\x78\x65\x63\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x20\x30\x20\x30\x0a\x73\x65\x63\x75\x72\x69\x74\x79\x66\x73\x20\x2f\x73\x79\x73\x2f\x6b\x65\x72\x6e\x65\x6c\x2f\x73\x65\x63\x75\x72\x69\x74\x79\x20\x73\x65\x63\x75\x72\x69\x74\x79\x66\x73\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x64\x65\x76\x2c\x6e\x6f\x65\x78\x65\x63\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x20\x30\x20\x30\x0a\x63\x67\x72\x6f\x75\x70\x32\x20\x2f\x73\x79\x73\x2f\x66\x73\x2f\x63\x67\x72\x6f\x75\x70\x20\x63\x67\x72\x6f\x75\x70\x32\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x64\x65\x76\x2c\x6e\x6f\x65\x78\x65\x63\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x2c\x6e\x73\x64\x65\x6c\x65\x67\x61\x74\x65\x2c\x6d\x65\x6d\x6f\x72\x79\x5f\x72\x65\x63\x75\x72\x73\x69\x76\x65\x70\x72\x6f\x74\x20\x30\x20\x30\x0a\x70\x73\x74\x6f\x72\x65\x20\x2f\x73\x79\x73\x2f\x66\x73\x2f\x70\x73\x74\x6f\x72\x65\x20\x70\x73\x74\x6f\x72\x65\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x64\x65\x76\x2c\x6e\x6f\x65\x78\x65\x63\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x20\x30\x20\x30\x0a\x65\x66\x69\x76\x61\x72\x66\x73\x20\x2f\x73\x79\x73\x2f\x66\x69\x72\x6d\x77\x61\x72\x65\x2f\x65\x66\x69\x2f\x65\x66\x69\x76\x61\x72\x73\x20\x65\x66\x69\x76\x61\x72\x66\x73\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x64\x65\x76\x2c\x6e\x6f\x65\x78\x65\x63\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x20\x30\x20\x30\x0a\x62\x70\x66\x20\x2f\x73\x79\x73\x2f\x66\x73\x2f\x62\x70\x66\x20\x62\x70\x66\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x64\x65\x76\x2c\x6e\x6f\x65\x78\x65\x63\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x2c\x6d\x6f\x64\x65\x3d\x37\x30\x30\x20\x30\x20\x30\x0a\x64\x65\x62\x75\x67\x66\x73\x20\x2f\x73\x79\x73\x2f\x6b\x65\x72\x6e\x65\x6c\x2f\x64\x65\x62\x75\x67\x20\x64\x65\x62\x75\x67\x66\x73\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x64\x65\x76\x2c\x6e\x6f\x65\x78\x65\x63\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x20\x30\x20\x30\x0a\x74\x72\x61\x63\x65\x66\x73\x20\x2f\x73\x79\x73\x2f\x6b\x65\x72\x6e\x65\x6c\x2f\x74\x72\x61\x63\x69\x6e\x67\x20\x74\x72\x61\x63\x65\x66\x73\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x64\x65\x76\x2c\x6e\x6f\x65\x78\x65\x63\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x20\x30\x20\x30\x0a\x63\x6f\x6e\x66\x69\x67\x66\x73\x20\x2f\x73\x79\x73\x2f\x6b\x65\x72\x6e\x65\x6c\x2f\x63\x6f\x6e\x66\x69\x67\x20\x63\x6f\x6e\x66\x69\x67\x66\x73\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x64\x65\x76\x2c\x6e\x6f\x65\x78\x65\x63\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x20\x30\x20\x30\x0a\x66\x75\x73\x65\x63\x74\x6c\x20\x2f\x73\x79\x73\x2f\x66\x73\x2f\x66\x75\x73\x65\x2f\x63\x6f\x6e\x6e\x65\x63\x74\x69\x6f\x6e\x73\x20\x66\x75\x73\x65\x63\x74\x6c\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x64\x65\x76\x2c\x6e\x6f\x65\x78\x65\x63\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x20\x30\x20\x30\x0a\x74\x6d\x70\x66\x73\x20\x2f\x72\x75\x6e\x20\x74\x6d\x70\x66\x73\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x64\x65\x76\x2c\x73\x69\x7a\x65\x3d\x31\x36\x30\x31\x37\x33\x36\x6b\x2c\x6e\x72\x5f\x69\x6e\x6f\x64\x65\x73\x3d\x38\x31\x39\x32\x30\x30\x2c\x6d\x6f\x64\x65\x3d\x37\x35\x35\x2c\x69\x6e\x6f\x64\x65\x36\x34\x20\x30\x20\x30\x0a\x74\x6d\x70\x66\x73\x20\x2f\x72\x75\x6e\x2f\x6c\x6f\x63\x6b\x20\x74\x6d\x70\x66\x73\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x64\x65\x76\x2c\x6e\x6f\x65\x78\x65\x63\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x2c\x73\x69\x7a\x65\x3d\x35\x31\x32\x30\x6b\x2c\x69\x6e\x6f\x64\x65\x36\x34\x20\x30\x20\x30\x0a\x74\x6d\x70\x66\x73\x20\x2f\x72\x75\x6e\x2f\x75\x73\x65\x72\x2f\x31\x30\x30\x30\x20\x74\x6d\x70\x66\x73\x20\x72\x77\x2c\x6e\x6f\x73\x75\x69\x64\x2c\x6e\x6f\x64\x65\x76\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x2c\x73\x69\x7a\x65\x3d\x38\x30\x30\x38\x36\x34\x6b\x2c\x6e\x72\x5f\x69\x6e\x6f\x64\x65\x73\x3d\x32\x30\x30\x32\x31\x36\x2c\x6d\x6f\x64\x65\x3d\x37\x30\x30\x2c\x75\x69\x64\x3d\x31\x30\x30\x30\x2c\x67\x69\x64\x3d\x31\x30\x30\x30\x2c\x69\x6e\x6f\x64\x65\x36\x34\x20\x30\x20\x30\x0a\x6e\x73\x66\x73\x20\x2f\x72\x75\x6e\x2f\x64\x6f\x63\x6b\x65\x72\x2f\x6e\x65\x74\x6e\x73\x2f\x61\x38\x31\x32\x61\x35\x38\x63\x64\x32\x33\x37\x20\x6e\x73\x66\x73\x20\x72\x77\x20\x30\x20\x30\x0a\x2f\x64\x65\x76\x2f\x6c\x6f\x6f\x70\x31\x20\x2f\x73\x6e\x61\x70\x2f\x61\x6d\x61\x7a\x6f\x6e\x2d\x73\x73\x6d\x2d\x61\x67\x65\x6e\x74\x2f\x31\x31\x33\x32\x30\x20\x73\x71\x75\x61\x73\x68\x66\x73\x20\x72\x6f\x2c\x6e\x6f\x64\x65\x76\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x2c\x65\x72\x72\x6f\x72\x73\x3d\x63\x6f\x6e\x74\x69\x6e\x75\x65\x2c\x74\x68\x72\x65\x61\x64\x73\x3d\x73\x69\x6e\x67\x6c\x65\x20\x30\x20\x30\x0a\x2f\x64\x65\x76\x2f\x6c\x6f\x6f\x70\x30\x20\x2f\x73\x6e\x61\x70\x2f\x61\x6d\x61\x7a\x6f\x6e\x2d\x73\x73\x6d\x2d\x61\x67\x65\x6e\x74\x2f\x39\x38\x38\x31\x20\x73\x71\x75\x61\x73\x68\x66\x73\x20\x72\x6f\x2c\x6e\x6f\x64\x65\x76\x2c\x72\x65\x6c\x61\x74\x69\x6d\x65\x2c\x65\x72\x72\x6f\x72\x73\x3d\x63\x6f\x6e\x74\x69\x6e\x75\x65\x2c\x74\x68\x72\x65\x61\x64\x73\x3d\x73\x69\x6e\x67\x6c\x65\x20\x30\x20\x30\x0a\x2f\x64\x65\x76\x2f\x6c\x6f\x6f\x70\x32\x20\x2f\x73\x6e\x61\x70\x2f\x63\x6f\x72\x65\x31\x38\x2f\x32\x39\x33\x34\x20\x73\x71\x75\x61\x73"..., 4096) = 3392 <0.000076>
+09:24:55.886674 read(3, "", 704)        = 0 <0.000009>
+09:24:55.886715 close(3)                = 0 <0.000008>
+09:24:55.886740 openat(AT_FDCWD, "\x2f\x70\x72\x6f\x63\x2f\x73\x79\x73\x2f\x6b\x65\x72\x6e\x65\x6c\x2f\x63\x61\x70\x5f\x6c\x61\x73\x74\x5f\x63\x61\x70", O_RDONLY|O_CLOEXEC) = 3 <0.000014>
+09:24:55.886776 read(3, "\x34\x30\x0a", 16) = 3 <0.000008>
+09:24:55.886812 close(3)                = 0 <0.000006>
+09:24:55.886834 socket(AF_INET, SOCK_DGRAM, IPPROTO_IP) = 3 <0.000014>
+09:24:55.886867 ioctl(3, SIOCSIFFLAGS, {ifr_name="\x6c\x6f", ifr_flags=IFF_UP|IFF_RUNNING}) = 0 <0.000097>
+09:24:55.886997 close(3)                = 0 <0.000013>
+09:24:55.887033 getcwd("\x2f\x68\x6f\x6d\x65\x2f\x75\x62\x75\x6e\x74\x75\x2f\x77\x6f\x72\x6b\x73\x70\x61\x63\x65\x2f\x79\x6f\x75\x6b\x69\x2f\x74\x75\x74\x6f\x72\x69\x61\x6c", 1024) = 38 <0.000006>
+09:24:55.887061 readlink("\x2f\x68\x6f\x6d\x65\x2f\x75\x62\x75\x6e\x74\x75\x2f\x77\x6f\x72\x6b\x73\x70\x61\x63\x65\x2f\x79\x6f\x75\x6b\x69\x2f\x74\x75\x74\x6f\x72\x69\x61\x6c\x2f\x72\x6f\x6f\x74\x66\x73", 0x7fff40803690, 1023) = -1 EINVAL (Invalid argument) <0.000009>
+09:24:55.887093 read(5, "\x00\x00\x00\x00\x00\x00\x00\x00", 520) = 8 <0.000008>
+09:24:55.887121 mount(NULL, "\x2f", NULL, MS_REC|MS_PRIVATE, NULL) = 0 <0.000014>
+09:24:55.887156 mount(NULL, "\x2f\x68\x6f\x6d\x65\x2f\x75\x62\x75\x6e\x74\x75\x2f\x77\x6f\x72\x6b\x73\x70\x61\x63\x65\x2f\x79\x6f\x75\x6b\x69\x2f\x74\x75\x74\x6f\x72\x69\x61\x6c\x2f\x72\x6f\x6f\x74\x66\x73", NULL, MS_PRIVATE, NULL) = -1 EINVAL (Invalid argument) <0.000007>
+09:24:55.887182 mount(NULL, "\x2f\x68\x6f\x6d\x65\x2f\x75\x62\x75\x6e\x74\x75\x2f\x77\x6f\x72\x6b\x73\x70\x61\x63\x65\x2f\x79\x6f\x75\x6b\x69\x2f\x74\x75\x74\x6f\x72\x69\x61\x6c", NULL, MS_PRIVATE, NULL) = -1 EINVAL (Invalid argument) <0.000008>
+09:24:55.887208 mount(NULL, "\x2f\x68\x6f\x6d\x65\x2f\x75\x62\x75\x6e\x74\x75\x2f\x77\x6f\x72\x6b\x73\x70\x61\x63\x65\x2f\x79\x6f\x75\x6b\x69", NULL, MS_PRIVATE, NULL) = -1 EINVAL (Invalid argument) <0.000007>
+09:24:55.887233 mount(NULL, "\x2f\x68\x6f\x6d\x65\x2f\x75\x62\x75\x6e\x74\x75\x2f\x77\x6f\x72\x6b\x73\x70\x61\x63\x65", NULL, MS_PRIVATE, NULL) = -1 EINVAL (Invalid argument) <0.000007>
+09:24:55.887257 mount(NULL, "\x2f\x68\x6f\x6d\x65\x2f\x75\x62\x75\x6e\x74\x75", NULL, MS_PRIVATE, NULL) = -1 EINVAL (Invalid argument) <0.000007>
+09:24:55.887282 mount(NULL, "\x2f\x68\x6f\x6d\x65", NULL, MS_PRIVATE, NULL) = -1 EINVAL (Invalid argument) <0.000006>
+09:24:55.887305 mount(NULL, "\x2f", NULL, MS_PRIVATE, NULL) = 0 <0.000006>
+09:24:55.887330 mount("\x2f\x68\x6f\x6d\x65\x2f\x75\x62\x75\x6e\x74\x75\x2f\x77\x6f\x72\x6b\x73\x70\x61\x63\x65\x2f\x79\x6f\x75\x6b\x69\x2f\x74\x75\x74\x6f\x72\x69\x61\x6c\x2f\x72\x6f\x6f\x74\x66\x73", "\x2f\x68\x6f\x6d\x65\x2f\x75\x62\x75\x6e\x74\x75\x2f\x77\x6f\x72\x6b\x73\x70\x61\x63\x65\x2f\x79\x6f\x75\x6b\x69\x2f\x74\x75\x74\x6f\x72\x69\x61\x6c\x2f\x72\x6f\x6f\x74\x66\x73", NULL, MS_BIND|MS_REC, NULL) = 0 <0.000017>
+09:24:55.887395 mount(NULL, "\x2f\x68\x6f\x6d\x65\x2f\x75\x62\x75\x6e\x74\x75\x2f\x77\x6f\x72\x6b\x73\x70\x61\x63\x65\x2f\x79\x6f\x75\x6b\x69\x2f\x74\x75\x74\x6f\x72\x69\x61\x6c\x2f\x72\x6f\x6f\x74\x66\x73", NULL, MS_REC|MS_PRIVATE, NULL) = 0 <0.000007>
+09:24:55.887425 mount(NULL, "\x2f\x68\x6f\x6d\x65\x2f\x75\x62\x75\x6e\x74\x75\x2f\x77\x6f\x72\x6b\x73\x70\x61\x63\x65\x2f\x79\x6f\x75\x6b\x69\x2f\x74\x75\x74\x6f\x72\x69\x61\x6c\x2f\x72\x6f\x6f\x74\x66\x73", NULL, MS_REMOUNT|MS_BIND, NULL) = 0 <0.000007>
+09:24:55.887449 openat(AT_FDCWD, "\x2f\x68\x6f\x6d\x65\x2f\x75\x62\x75\x6e\x74\x75\x2f\x77\x6f\x72\x6b\x73\x70\x61\x63\x65\x2f\x79\x6f\x75\x6b\x69\x2f\x74\x75\x74\x6f\x72\x69\x61\x6c\x2f\x72\x6f\x6f\x74\x66\x73", O_RDONLY|O_CLOEXEC|O_PATH) = 3 <0.000008>
+09:24:55.887477 dup(3)                  = 4 <0.000005>
+09:24:55.887501 openat(AT_FDCWD, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x63\x67\x72\x6f\x75\x70", O_RDONLY|O_CLOEXEC) = 6 <0.000015>
+09:24:55.887537 statx(6, "", AT_STATX_DONT_SYNC|AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH, STATX_SIZE, {stx_mask=STATX_BASIC_STATS|STATX_MNT_ID, stx_blksize=1024, stx_attributes=0, stx_nlink=1, stx_uid=0, stx_gid=0, stx_mode=S_IFREG|0444, stx_ino=79759, stx_size=0, stx_blocks=0, stx_attributes_mask=STATX_ATTR_AUTOMOUNT|STATX_ATTR_MOUNT_ROOT|STATX_ATTR_DAX, stx_atime={tv_sec=1754731495, tv_nsec=887507795} /* 2025-08-09T09:24:55.887507795+0000 */, stx_ctime={tv_sec=1754731495, tv_nsec=887507795} /* 2025-08-09T09:24:55.887507795+0000 */, stx_mtime={tv_sec=1754731495, tv_nsec=887507795} /* 2025-08-09T09:24:55.887507795+0000 */, stx_rdev_major=0, stx_rdev_minor=0, stx_dev_major=0, stx_dev_minor=24, stx_mnt_id=0x425}) = 0 <0.000006>
+09:24:55.887580 read(6, "\x30\x3a\x3a\x2f\x63\x6f\x6e\x74\x61\x69\x6e\x65\x72\x0a", 1023) = 14 <0.000010>
+09:24:55.887610 read(6, "", 1009)       = 0 <0.000005>
+09:24:55.887631 close(6)                = 0 <0.000007>
+09:24:55.887656 unshare(CLONE_NEWCGROUP) = 0 <0.000010>
+09:24:55.887683 openat(3, "\x70\x72\x6f\x63", O_RDONLY|O_NOFOLLOW|O_CLOEXEC|O_DIRECTORY) = 6 <0.000009>
+09:24:55.887719 mount("\x70\x72\x6f\x63", "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", "\x70\x72\x6f\x63", 0, NULL) = 0 <0.000043>
+09:24:55.887793 openat2(3, "\x70\x72\x6f\x63", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 7 <0.000008>
+09:24:55.887923 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x37", NULL, MS_REMOUNT|MS_BIND, NULL) = 0 <0.000014>
+09:24:55.887961 close(7)                = 0 <0.000006>
+09:24:55.887983 close(6)                = 0 <0.000007>
+09:24:55.888009 openat2(3, "\x64\x65\x76", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000008>
+09:24:55.888038 mount("\x74\x6d\x70\x66\x73", "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", "\x74\x6d\x70\x66\x73", MS_NOSUID|MS_STRICTATIME, "\x6d\x6f\x64\x65\x3d\x37\x35\x35\x2c\x73\x69\x7a\x65\x3d\x36\x35\x35\x33\x36\x6b") = 0 <0.000030>
+09:24:55.888094 openat2(3, "\x64\x65\x76", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 7 <0.000008>
+09:24:55.888122 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x37", NULL, MS_NOSUID|MS_REMOUNT|MS_BIND|MS_STRICTATIME, NULL) = 0 <0.000008>
+09:24:55.888150 close(7)                = 0 <0.000006>
+09:24:55.888171 close(6)                = 0 <0.000006>
+09:24:55.888194 openat2(3, "\x64\x65\x76\x2f\x70\x74\x73", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = -1 ENOENT (No such file or directory) <0.000009>
+09:24:55.888233 mkdirat(3, "\x64\x65\x76", 01755) = -1 EEXIST (File exists) <0.000008>
+09:24:55.888260 openat2(3, "\x64\x65\x76", {flags=O_RDONLY|O_CLOEXEC, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000009>
+09:24:55.888296 statx(6, "", AT_STATX_DONT_SYNC|AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH, STATX_TYPE, {stx_mask=STATX_TYPE|STATX_MODE|STATX_NLINK|STATX_UID|STATX_GID|STATX_ATIME|STATX_INO|STATX_SIZE|STATX_BLOCKS|STATX_MNT_ID, stx_blksize=4096, stx_attributes=STATX_ATTR_MOUNT_ROOT, stx_nlink=2, stx_uid=0, stx_gid=0, stx_mode=S_IFDIR|0755, stx_ino=1, stx_size=40, stx_blocks=0, stx_attributes_mask=STATX_ATTR_IMMUTABLE|STATX_ATTR_APPEND|STATX_ATTR_NODUMP|STATX_ATTR_AUTOMOUNT|STATX_ATTR_MOUNT_ROOT|STATX_ATTR_DAX, stx_atime={tv_sec=1754731495, tv_nsec=888048094} /* 2025-08-09T09:24:55.888048094+0000 */, stx_rdev_major=0, stx_rdev_minor=0, stx_dev_major=0, stx_dev_minor=220, stx_mnt_id=0x485}) = 0 <0.000006>
+09:24:55.888334 mkdirat(6, "\x70\x74\x73", 01755) = 0 <0.000014>
+09:24:55.888382 openat2(3, "\x64\x65\x76\x2f\x70\x74\x73", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 7 <0.000009>
+09:24:55.888416 close(6)                = 0 <0.000007>
+09:24:55.888438 mount("\x64\x65\x76\x70\x74\x73", "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x37", "\x64\x65\x76\x70\x74\x73", MS_NOSUID|MS_NOEXEC, "\x6e\x65\x77\x69\x6e\x73\x74\x61\x6e\x63\x65\x2c\x70\x74\x6d\x78\x6d\x6f\x64\x65\x3d\x30\x36\x36\x36\x2c\x6d\x6f\x64\x65\x3d\x30\x36\x32\x30\x2c\x67\x69\x64\x3d\x35") = 0 <0.000029>
+09:24:55.888491 openat2(3, "\x64\x65\x76\x2f\x70\x74\x73", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000008>
+09:24:55.888520 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", NULL, MS_NOSUID|MS_NOEXEC|MS_REMOUNT|MS_BIND, NULL) = 0 <0.000008>
+09:24:55.888547 close(6)                = 0 <0.000006>
+09:24:55.888568 close(7)                = 0 <0.000006>
+09:24:55.888590 openat2(3, "\x64\x65\x76\x2f\x73\x68\x6d", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = -1 ENOENT (No such file or directory) <0.000009>
+09:24:55.888621 mkdirat(3, "\x64\x65\x76", 01755) = -1 EEXIST (File exists) <0.000007>
+09:24:55.888649 openat2(3, "\x64\x65\x76", {flags=O_RDONLY|O_CLOEXEC, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000008>
+09:24:55.888678 statx(6, "", AT_STATX_DONT_SYNC|AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH, STATX_TYPE, {stx_mask=STATX_TYPE|STATX_MODE|STATX_NLINK|STATX_UID|STATX_GID|STATX_ATIME|STATX_INO|STATX_SIZE|STATX_BLOCKS|STATX_MNT_ID, stx_blksize=4096, stx_attributes=STATX_ATTR_MOUNT_ROOT, stx_nlink=3, stx_uid=0, stx_gid=0, stx_mode=S_IFDIR|0755, stx_ino=1, stx_size=60, stx_blocks=0, stx_attributes_mask=STATX_ATTR_IMMUTABLE|STATX_ATTR_APPEND|STATX_ATTR_NODUMP|STATX_ATTR_AUTOMOUNT|STATX_ATTR_MOUNT_ROOT|STATX_ATTR_DAX, stx_atime={tv_sec=1754731495, tv_nsec=888048094} /* 2025-08-09T09:24:55.888048094+0000 */, stx_rdev_major=0, stx_rdev_minor=0, stx_dev_major=0, stx_dev_minor=220, stx_mnt_id=0x485}) = 0 <0.000008>
+09:24:55.888746 mkdirat(6, "\x73\x68\x6d", 01755) = 0 <0.000013>
+09:24:55.888797 openat2(3, "\x64\x65\x76\x2f\x73\x68\x6d", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 7 <0.000009>
+09:24:55.888831 close(6)                = 0 <0.000006>
+09:24:55.888873 mount("\x73\x68\x6d", "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x37", "\x74\x6d\x70\x66\x73", MS_NOSUID|MS_NODEV|MS_NOEXEC, "\x6d\x6f\x64\x65\x3d\x31\x37\x37\x37\x2c\x73\x69\x7a\x65\x3d\x36\x35\x35\x33\x36\x6b") = 0 <0.000028>
+09:24:55.888930 openat2(3, "\x64\x65\x76\x2f\x73\x68\x6d", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000019>
+09:24:55.888983 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", NULL, MS_NOSUID|MS_NODEV|MS_NOEXEC|MS_REMOUNT|MS_BIND, NULL) = 0 <0.000009>
+09:24:55.889014 close(6)                = 0 <0.000007>
+09:24:55.889057 close(7)                = 0 <0.000006>
+09:24:55.889082 openat2(3, "\x64\x65\x76\x2f\x6d\x71\x75\x65\x75\x65", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = -1 ENOENT (No such file or directory) <0.000010>
+09:24:55.889132 mkdirat(3, "\x64\x65\x76", 01755) = -1 EEXIST (File exists) <0.000010>
+09:24:55.889166 openat2(3, "\x64\x65\x76", {flags=O_RDONLY|O_CLOEXEC, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000009>
+09:24:55.889219 statx(6, "", AT_STATX_DONT_SYNC|AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH, STATX_TYPE, {stx_mask=STATX_TYPE|STATX_MODE|STATX_NLINK|STATX_UID|STATX_GID|STATX_ATIME|STATX_INO|STATX_SIZE|STATX_BLOCKS|STATX_MNT_ID, stx_blksize=4096, stx_attributes=STATX_ATTR_MOUNT_ROOT, stx_nlink=4, stx_uid=0, stx_gid=0, stx_mode=S_IFDIR|0755, stx_ino=1, stx_size=80, stx_blocks=0, stx_attributes_mask=STATX_ATTR_IMMUTABLE|STATX_ATTR_APPEND|STATX_ATTR_NODUMP|STATX_ATTR_AUTOMOUNT|STATX_ATTR_MOUNT_ROOT|STATX_ATTR_DAX, stx_atime={tv_sec=1754731495, tv_nsec=888048094} /* 2025-08-09T09:24:55.888048094+0000 */, stx_rdev_major=0, stx_rdev_minor=0, stx_dev_major=0, stx_dev_minor=220, stx_mnt_id=0x485}) = 0 <0.000007>
+09:24:55.889259 mkdirat(6, "\x6d\x71\x75\x65\x75\x65", 01755) = 0 <0.000035>
+09:24:55.889318 openat2(3, "\x64\x65\x76\x2f\x6d\x71\x75\x65\x75\x65", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 7 <0.000008>
+09:24:55.889349 close(6)                = 0 <0.000026>
+09:24:55.889404 mount("\x6d\x71\x75\x65\x75\x65", "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x37", "\x6d\x71\x75\x65\x75\x65", MS_NOSUID|MS_NODEV|MS_NOEXEC, NULL) = 0 <0.000019>
+09:24:55.889448 openat2(3, "\x64\x65\x76\x2f\x6d\x71\x75\x65\x75\x65", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000009>
+09:24:55.889503 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", NULL, MS_NOSUID|MS_NODEV|MS_NOEXEC|MS_REMOUNT|MS_BIND, NULL) = 0 <0.000009>
+09:24:55.889547 close(6)                = 0 <0.000008>
+09:24:55.889574 close(7)                = 0 <0.000006>
+09:24:55.889597 openat(3, "\x73\x79\x73", O_RDONLY|O_NOFOLLOW|O_CLOEXEC|O_DIRECTORY) = 6 <0.000026>
+09:24:55.889647 mount("\x73\x79\x73\x66\x73", "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", "\x73\x79\x73\x66\x73", MS_NOSUID|MS_NODEV|MS_NOEXEC, NULL) = 0 <0.000028>
+09:24:55.889719 openat2(3, "\x73\x79\x73", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 7 <0.000010>
+09:24:55.889756 close(6)                = 0 <0.000007>
+09:24:55.889797 openat2(3, "\x73\x79\x73\x2f\x66\x73\x2f\x63\x67\x72\x6f\x75\x70", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000015>
+09:24:55.889838 mount("\x63\x67\x72\x6f\x75\x70\x32", "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", "\x63\x67\x72\x6f\x75\x70\x32", MS_NOSUID|MS_NODEV|MS_NOEXEC|MS_RELATIME, NULL) = 0 <0.000041>
+09:24:55.889903 openat2(3, "\x73\x79\x73\x2f\x66\x73\x2f\x63\x67\x72\x6f\x75\x70", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 8 <0.000009>
+09:24:55.889936 close(6)                = 0 <0.000016>
+09:24:55.889981 openat(AT_FDCWD, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x75\x69\x64\x5f\x6d\x61\x70", O_RDONLY|O_CLOEXEC) = 6 <0.000014>
+09:24:55.890017 statx(6, "", AT_STATX_DONT_SYNC|AT_SYMLINK_NOFOLLOW|AT_EMPTY_PATH, STATX_SIZE, {stx_mask=STATX_BASIC_STATS|STATX_MNT_ID, stx_blksize=1024, stx_attributes=0, stx_nlink=1, stx_uid=0, stx_gid=0, stx_mode=S_IFREG|0644, stx_ino=79763, stx_size=0, stx_blocks=0, stx_attributes_mask=STATX_ATTR_AUTOMOUNT|STATX_ATTR_MOUNT_ROOT|STATX_ATTR_DAX, stx_atime={tv_sec=1754731495, tv_nsec=889989870} /* 2025-08-09T09:24:55.889989870+0000 */, stx_ctime={tv_sec=1754731495, tv_nsec=889989870} /* 2025-08-09T09:24:55.889989870+0000 */, stx_mtime={tv_sec=1754731495, tv_nsec=889989870} /* 2025-08-09T09:24:55.889989870+0000 */, stx_rdev_major=0, stx_rdev_minor=0, stx_dev_major=0, stx_dev_minor=24, stx_mnt_id=0x425}) = 0 <0.000023>
+09:24:55.890083 read(6, "\x20\x20\x20\x20\x20\x20\x20\x20\x20\x30\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x30\x20\x34\x32\x39\x34\x39\x36\x37\x32\x39\x35\x0a", 1023) = 33 <0.000009>
+09:24:55.890136 read(6, "", 990)        = 0 <0.000006>
+09:24:55.890162 close(6)                = 0 <0.000008>
+09:24:55.890188 openat(3, "\x64\x65\x76", O_RDONLY|O_CLOEXEC|O_DIRECTORY) = 6 <0.000010>
+09:24:55.890237 mknodat(6, "\x6e\x75\x6c\x6c", S_IFCHR|0666, makedev(0x1, 0x3)) = 0 <0.000013>
+09:24:55.890290 openat2(6, "\x6e\x75\x6c\x6c", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 9 <0.000009>
+09:24:55.890330 chmod("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x39", 0666) = 0 <0.000049>
+09:24:55.890402 chown("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x39", 0, 0) = 0 <0.000012>
+09:24:55.890455 close(9)                = 0 <0.000008>
+09:24:55.890481 mknodat(6, "\x7a\x65\x72\x6f", S_IFCHR|0666, makedev(0x1, 0x5)) = 0 <0.000012>
+09:24:55.890515 openat2(6, "\x7a\x65\x72\x6f", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 9 <0.000008>
+09:24:55.890546 chmod("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x39", 0666) = 0 <0.000009>
+09:24:55.890573 chown("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x39", 0, 0) = 0 <0.000009>
+09:24:55.890600 close(9)                = 0 <0.000006>
+09:24:55.890624 mknodat(6, "\x66\x75\x6c\x6c", S_IFCHR|0666, makedev(0x1, 0x7)) = 0 <0.000010>
+09:24:55.890653 openat2(6, "\x66\x75\x6c\x6c", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 9 <0.000007>
+09:24:55.890682 chmod("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x39", 0666) = 0 <0.000009>
+09:24:55.890710 chown("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x39", 0, 0) = 0 <0.000009>
+09:24:55.890739 close(9)                = 0 <0.000006>
+09:24:55.890761 mknodat(6, "\x74\x74\x79", S_IFCHR|0666, makedev(0x5, 0)) = 0 <0.000010>
+09:24:55.890792 openat2(6, "\x74\x74\x79", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 9 <0.000008>
+09:24:55.890821 chmod("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x39", 0666) = 0 <0.000009>
+09:24:55.890850 chown("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x39", 0, 0) = 0 <0.000009>
+09:24:55.890876 close(9)                = 0 <0.000006>
+09:24:55.890898 mknodat(6, "\x72\x61\x6e\x64\x6f\x6d", S_IFCHR|0666, makedev(0x1, 0x8)) = 0 <0.000010>
+09:24:55.890930 openat2(6, "\x72\x61\x6e\x64\x6f\x6d", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 9 <0.000008>
+09:24:55.890959 chmod("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x39", 0666) = 0 <0.000009>
+09:24:55.890987 chown("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x39", 0, 0) = 0 <0.000008>
+09:24:55.891013 close(9)                = 0 <0.000006>
+09:24:55.891036 mknodat(6, "\x75\x72\x61\x6e\x64\x6f\x6d", S_IFCHR|0666, makedev(0x1, 0x9)) = 0 <0.000009>
+09:24:55.891064 openat2(6, "\x75\x72\x61\x6e\x64\x6f\x6d", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 9 <0.000008>
+09:24:55.891093 chmod("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x39", 0666) = 0 <0.000009>
+09:24:55.891119 chown("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x39", 0, 0) = 0 <0.000008>
+09:24:55.891147 close(9)                = 0 <0.000006>
+09:24:55.891168 symlinkat("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64", 6, "\x66\x64") = 0 <0.000012>
+09:24:55.891202 symlinkat("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x30", 6, "\x73\x74\x64\x69\x6e") = 0 <0.000010>
+09:24:55.891232 symlinkat("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x31", 6, "\x73\x74\x64\x6f\x75\x74") = 0 <0.000011>
+09:24:55.891265 symlinkat("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x32", 6, "\x73\x74\x64\x65\x72\x72") = 0 <0.000010>
+09:24:55.891295 symlinkat("\x2f\x70\x72\x6f\x63\x2f\x6b\x63\x6f\x72\x65", 6, "\x63\x6f\x72\x65") = 0 <0.000010>
+09:24:55.891326 symlinkat("\x70\x74\x73\x2f\x70\x74\x6d\x78", 6, "\x70\x74\x6d\x78") = 0 <0.000017>
+09:24:55.891363 close(6)                = 0 <0.000008>
+09:24:55.891466 write(5, "\x00\x00\x00\x00\x00\x00\x00\x00", 8) = 8 <0.000018>
+09:24:55.891509 read(5, "\x00\x00\x00\x00\x00\x00\x00\x00", 520) = 8 <0.000207>
+09:24:55.891754 openat2(3, "\x70\x72\x6f\x63\x2f\x61\x63\x70\x69", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000018>
+09:24:55.891795 statx(6, "", AT_STATX_DONT_SYNC|AT_EMPTY_PATH, STATX_TYPE, {stx_mask=STATX_BASIC_STATS|STATX_MNT_ID, stx_blksize=1024, stx_attributes=0, stx_nlink=3, stx_uid=0, stx_gid=0, stx_mode=S_IFDIR|0555, stx_ino=4026532000, stx_size=0, stx_blocks=0, stx_attributes_mask=STATX_ATTR_AUTOMOUNT|STATX_ATTR_MOUNT_ROOT|STATX_ATTR_DAX, stx_atime={tv_sec=1754731495, tv_nsec=891728255} /* 2025-08-09T09:24:55.891728255+0000 */, stx_ctime={tv_sec=1754731495, tv_nsec=891728255} /* 2025-08-09T09:24:55.891728255+0000 */, stx_mtime={tv_sec=1754731495, tv_nsec=891728255} /* 2025-08-09T09:24:55.891728255+0000 */, stx_rdev_major=0, stx_rdev_minor=0, stx_dev_major=0, stx_dev_minor=219, stx_mnt_id=0x484}) = 0 <0.000006>
+09:24:55.891953 mount("\x74\x6d\x70\x66\x73", "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", "\x74\x6d\x70\x66\x73", 0, "\x73\x69\x7a\x65\x3d\x30\x6b") = 0 <0.000037>
+09:24:55.892018 openat2(3, "\x70\x72\x6f\x63\x2f\x61\x63\x70\x69", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 9 <0.000009>
+09:24:55.892053 close(6)                = 0 <0.000007>
+09:24:55.892077 openat2(3, "\x70\x72\x6f\x63\x2f\x61\x73\x6f\x75\x6e\x64", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = -1 ENOENT (No such file or directory) <0.000011>
+09:24:55.892112 openat2(3, "\x70\x72\x6f\x63\x2f\x6b\x63\x6f\x72\x65", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000011>
+09:24:55.892145 statx(6, "", AT_STATX_DONT_SYNC|AT_EMPTY_PATH, STATX_TYPE, {stx_mask=STATX_BASIC_STATS|STATX_MNT_ID, stx_blksize=1024, stx_attributes=0, stx_nlink=1, stx_uid=0, stx_gid=0, stx_mode=S_IFREG|0400, stx_ino=4026532030, stx_size=140737471598592, stx_blocks=0, stx_attributes_mask=STATX_ATTR_AUTOMOUNT|STATX_ATTR_MOUNT_ROOT|STATX_ATTR_DAX, stx_atime={tv_sec=1754731495, tv_nsec=892120995} /* 2025-08-09T09:24:55.892120995+0000 */, stx_ctime={tv_sec=1754731495, tv_nsec=892120995} /* 2025-08-09T09:24:55.892120995+0000 */, stx_mtime={tv_sec=1754731495, tv_nsec=892120995} /* 2025-08-09T09:24:55.892120995+0000 */, stx_rdev_major=0, stx_rdev_minor=0, stx_dev_major=0, stx_dev_minor=219, stx_mnt_id=0x484}) = 0 <0.000010>
+09:24:55.892194 mount("\x2f\x64\x65\x76\x2f\x6e\x75\x6c\x6c", "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", NULL, MS_BIND, NULL) = 0 <0.000017>
+09:24:55.892234 openat2(3, "\x70\x72\x6f\x63\x2f\x6b\x63\x6f\x72\x65", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 10 <0.000008>
+09:24:55.892264 close(6)                = 0 <0.000007>
+09:24:55.892286 openat2(3, "\x70\x72\x6f\x63\x2f\x6b\x65\x79\x73", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000010>
+09:24:55.892318 statx(6, "", AT_STATX_DONT_SYNC|AT_EMPTY_PATH, STATX_TYPE, {stx_mask=STATX_BASIC_STATS|STATX_MNT_ID, stx_blksize=1024, stx_attributes=0, stx_nlink=1, stx_uid=0, stx_gid=0, stx_mode=S_IFREG|0444, stx_ino=4026532083, stx_size=0, stx_blocks=0, stx_attributes_mask=STATX_ATTR_AUTOMOUNT|STATX_ATTR_MOUNT_ROOT|STATX_ATTR_DAX, stx_atime={tv_sec=1754731495, tv_nsec=892294733} /* 2025-08-09T09:24:55.892294733+0000 */, stx_ctime={tv_sec=1754731495, tv_nsec=892294733} /* 2025-08-09T09:24:55.892294733+0000 */, stx_mtime={tv_sec=1754731495, tv_nsec=892294733} /* 2025-08-09T09:24:55.892294733+0000 */, stx_rdev_major=0, stx_rdev_minor=0, stx_dev_major=0, stx_dev_minor=219, stx_mnt_id=0x484}) = 0 <0.000006>
+09:24:55.892357 mount("\x2f\x64\x65\x76\x2f\x6e\x75\x6c\x6c", "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", NULL, MS_BIND, NULL) = 0 <0.000014>
+09:24:55.892425 openat2(3, "\x70\x72\x6f\x63\x2f\x6b\x65\x79\x73", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 11 <0.000009>
+09:24:55.892456 close(6)                = 0 <0.000006>
+09:24:55.892479 openat2(3, "\x70\x72\x6f\x63\x2f\x6c\x61\x74\x65\x6e\x63\x79\x5f\x73\x74\x61\x74\x73", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000010>
+09:24:55.892510 statx(6, "", AT_STATX_DONT_SYNC|AT_EMPTY_PATH, STATX_TYPE, {stx_mask=STATX_BASIC_STATS|STATX_MNT_ID, stx_blksize=1024, stx_attributes=0, stx_nlink=1, stx_uid=0, stx_gid=0, stx_mode=S_IFREG|0644, stx_ino=4026532071, stx_size=0, stx_blocks=0, stx_attributes_mask=STATX_ATTR_AUTOMOUNT|STATX_ATTR_MOUNT_ROOT|STATX_ATTR_DAX, stx_atime={tv_sec=1754731495, tv_nsec=892460540} /* 2025-08-09T09:24:55.892460540+0000 */, stx_ctime={tv_sec=1754731495, tv_nsec=892460540} /* 2025-08-09T09:24:55.892460540+0000 */, stx_mtime={tv_sec=1754731495, tv_nsec=892460540} /* 2025-08-09T09:24:55.892460540+0000 */, stx_rdev_major=0, stx_rdev_minor=0, stx_dev_major=0, stx_dev_minor=219, stx_mnt_id=0x484}) = 0 <0.000006>
+09:24:55.892553 mount("\x2f\x64\x65\x76\x2f\x6e\x75\x6c\x6c", "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", NULL, MS_BIND, NULL) = 0 <0.000012>
+09:24:55.892585 openat2(3, "\x70\x72\x6f\x63\x2f\x6c\x61\x74\x65\x6e\x63\x79\x5f\x73\x74\x61\x74\x73", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 12 <0.000008>
+09:24:55.892616 close(6)                = 0 <0.000006>
+09:24:55.892637 openat2(3, "\x70\x72\x6f\x63\x2f\x74\x69\x6d\x65\x72\x5f\x6c\x69\x73\x74", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000009>
+09:24:55.892668 statx(6, "", AT_STATX_DONT_SYNC|AT_EMPTY_PATH, STATX_TYPE, {stx_mask=STATX_BASIC_STATS|STATX_MNT_ID, stx_blksize=1024, stx_attributes=0, stx_nlink=1, stx_uid=0, stx_gid=0, stx_mode=S_IFREG|0400, stx_ino=4026532068, stx_size=0, stx_blocks=0, stx_attributes_mask=STATX_ATTR_AUTOMOUNT|STATX_ATTR_MOUNT_ROOT|STATX_ATTR_DAX, stx_atime={tv_sec=1754731495, tv_nsec=892645511} /* 2025-08-09T09:24:55.892645511+0000 */, stx_ctime={tv_sec=1754731495, tv_nsec=892645511} /* 2025-08-09T09:24:55.892645511+0000 */, stx_mtime={tv_sec=1754731495, tv_nsec=892645511} /* 2025-08-09T09:24:55.892645511+0000 */, stx_rdev_major=0, stx_rdev_minor=0, stx_dev_major=0, stx_dev_minor=219, stx_mnt_id=0x484}) = 0 <0.000006>
+09:24:55.892708 mount("\x2f\x64\x65\x76\x2f\x6e\x75\x6c\x6c", "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", NULL, MS_BIND, NULL) = 0 <0.000012>
+09:24:55.892741 openat2(3, "\x70\x72\x6f\x63\x2f\x74\x69\x6d\x65\x72\x5f\x6c\x69\x73\x74", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 13 <0.000007>
+09:24:55.892769 close(6)                = 0 <0.000006>
+09:24:55.892792 openat2(3, "\x70\x72\x6f\x63\x2f\x74\x69\x6d\x65\x72\x5f\x73\x74\x61\x74\x73", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = -1 ENOENT (No such file or directory) <0.000008>
+09:24:55.892823 openat2(3, "\x70\x72\x6f\x63\x2f\x73\x63\x68\x65\x64\x5f\x64\x65\x62\x75\x67", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = -1 ENOENT (No such file or directory) <0.000008>
+09:24:55.892852 openat2(3, "\x73\x79\x73\x2f\x66\x69\x72\x6d\x77\x61\x72\x65", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000013>
+09:24:55.892886 statx(6, "", AT_STATX_DONT_SYNC|AT_EMPTY_PATH, STATX_TYPE, {stx_mask=STATX_BASIC_STATS|STATX_MNT_ID, stx_blksize=4096, stx_attributes=0, stx_nlink=6, stx_uid=0, stx_gid=0, stx_mode=S_IFDIR|0755, stx_ino=14, stx_size=0, stx_blocks=0, stx_attributes_mask=STATX_ATTR_AUTOMOUNT|STATX_ATTR_MOUNT_ROOT|STATX_ATTR_DAX, stx_atime={tv_sec=1754731495, tv_nsec=892860955} /* 2025-08-09T09:24:55.892860955+0000 */, stx_ctime={tv_sec=1754731495, tv_nsec=892860955} /* 2025-08-09T09:24:55.892860955+0000 */, stx_mtime={tv_sec=1754731495, tv_nsec=892860955} /* 2025-08-09T09:24:55.892860955+0000 */, stx_rdev_major=0, stx_rdev_minor=0, stx_dev_major=0, stx_dev_minor=235, stx_mnt_id=0x489}) = 0 <0.000006>
+09:24:55.892925 mount("\x74\x6d\x70\x66\x73", "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", "\x74\x6d\x70\x66\x73", 0, "\x73\x69\x7a\x65\x3d\x30\x6b") = 0 <0.000023>
+09:24:55.892969 openat2(3, "\x73\x79\x73\x2f\x66\x69\x72\x6d\x77\x61\x72\x65", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 14 <0.000008>
+09:24:55.892999 close(6)                = 0 <0.000006>
+09:24:55.893020 openat2(3, "\x70\x72\x6f\x63\x2f\x73\x63\x73\x69", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000010>
+09:24:55.893051 statx(6, "", AT_STATX_DONT_SYNC|AT_EMPTY_PATH, STATX_TYPE, {stx_mask=STATX_BASIC_STATS|STATX_MNT_ID, stx_blksize=1024, stx_attributes=0, stx_nlink=5, stx_uid=0, stx_gid=0, stx_mode=S_IFDIR|0555, stx_ino=4026532004, stx_size=0, stx_blocks=0, stx_attributes_mask=STATX_ATTR_AUTOMOUNT|STATX_ATTR_MOUNT_ROOT|STATX_ATTR_DAX, stx_atime={tv_sec=1754731495, tv_nsec=892989330} /* 2025-08-09T09:24:55.892989330+0000 */, stx_ctime={tv_sec=1754731495, tv_nsec=892989330} /* 2025-08-09T09:24:55.892989330+0000 */, stx_mtime={tv_sec=1754731495, tv_nsec=892989330} /* 2025-08-09T09:24:55.892989330+0000 */, stx_rdev_major=0, stx_rdev_minor=0, stx_dev_major=0, stx_dev_minor=219, stx_mnt_id=0x484}) = 0 <0.000007>
+09:24:55.893095 mount("\x74\x6d\x70\x66\x73", "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", "\x74\x6d\x70\x66\x73", 0, "\x73\x69\x7a\x65\x3d\x30\x6b") = 0 <0.000020>
+09:24:55.893138 openat2(3, "\x70\x72\x6f\x63\x2f\x73\x63\x73\x69", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 15 <0.000008>
+09:24:55.893168 close(6)                = 0 <0.000006>
+09:24:55.893191 openat2(3, "\x70\x72\x6f\x63\x2f\x62\x75\x73", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000009>
+09:24:55.893222 statfs("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", {f_type=PROC_SUPER_MAGIC, f_bsize=4096, f_blocks=0, f_bfree=0, f_bavail=0, f_files=0, f_ffree=0, f_fsid={val=[0xdb, 0]}, f_namelen=255, f_frsize=4096, f_flags=ST_VALID|ST_RELATIME}) = 0 <0.000009>
+09:24:55.893257 mount("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", NULL, MS_BIND|MS_REC, NULL) = 0 <0.000012>
+09:24:55.893289 openat2(3, "\x70\x72\x6f\x63\x2f\x62\x75\x73", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 16 <0.000008>
+09:24:55.893319 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x31\x36", NULL, MS_REC|MS_PRIVATE, NULL) = 0 <0.000012>
+09:24:55.893349 close(6)                = 0 <0.000006>
+09:24:55.893388 openat2(3, "\x70\x72\x6f\x63\x2f\x66\x73", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000010>
+09:24:55.893423 statfs("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", {f_type=PROC_SUPER_MAGIC, f_bsize=4096, f_blocks=0, f_bfree=0, f_bavail=0, f_files=0, f_ffree=0, f_fsid={val=[0xdb, 0]}, f_namelen=255, f_frsize=4096, f_flags=ST_VALID|ST_RELATIME}) = 0 <0.000008>
+09:24:55.893455 mount("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", NULL, MS_BIND|MS_REC, NULL) = 0 <0.000013>
+09:24:55.893487 openat2(3, "\x70\x72\x6f\x63\x2f\x66\x73", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 17 <0.000009>
+09:24:55.893516 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x31\x37", NULL, MS_REC|MS_PRIVATE, NULL) = 0 <0.000011>
+09:24:55.893548 close(6)                = 0 <0.000006>
+09:24:55.893570 openat2(3, "\x70\x72\x6f\x63\x2f\x69\x72\x71", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000010>
+09:24:55.893601 statfs("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", {f_type=PROC_SUPER_MAGIC, f_bsize=4096, f_blocks=0, f_bfree=0, f_bavail=0, f_files=0, f_ffree=0, f_fsid={val=[0xdb, 0]}, f_namelen=255, f_frsize=4096, f_flags=ST_VALID|ST_RELATIME}) = 0 <0.000008>
+09:24:55.893632 mount("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", NULL, MS_BIND|MS_REC, NULL) = 0 <0.000012>
+09:24:55.893663 openat2(3, "\x70\x72\x6f\x63\x2f\x69\x72\x71", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 18 <0.000008>
+09:24:55.893692 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x31\x38", NULL, MS_REC|MS_PRIVATE, NULL) = 0 <0.000010>
+09:24:55.893722 close(6)                = 0 <0.000006>
+09:24:55.893744 openat2(3, "\x70\x72\x6f\x63\x2f\x73\x79\x73", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000009>
+09:24:55.893774 statfs("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", {f_type=PROC_SUPER_MAGIC, f_bsize=4096, f_blocks=0, f_bfree=0, f_bavail=0, f_files=0, f_ffree=0, f_fsid={val=[0xdb, 0]}, f_namelen=255, f_frsize=4096, f_flags=ST_VALID|ST_RELATIME}) = 0 <0.000008>
+09:24:55.893808 mount("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", NULL, MS_BIND|MS_REC, NULL) = 0 <0.000012>
+09:24:55.893840 openat2(3, "\x70\x72\x6f\x63\x2f\x73\x79\x73", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 19 <0.000008>
+09:24:55.893869 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x31\x39", NULL, MS_REC|MS_PRIVATE, NULL) = 0 <0.000011>
+09:24:55.893900 close(6)                = 0 <0.000006>
+09:24:55.893922 openat2(3, "\x70\x72\x6f\x63\x2f\x73\x79\x73\x72\x71\x2d\x74\x72\x69\x67\x67\x65\x72", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 6 <0.000010>
+09:24:55.893954 statfs("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", {f_type=PROC_SUPER_MAGIC, f_bsize=4096, f_blocks=0, f_bfree=0, f_bavail=0, f_files=0, f_ffree=0, f_fsid={val=[0xdb, 0]}, f_namelen=255, f_frsize=4096, f_flags=ST_VALID|ST_RELATIME}) = 0 <0.000008>
+09:24:55.893983 mount("\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x36", NULL, MS_BIND|MS_REC, NULL) = 0 <0.000014>
+09:24:55.894017 openat2(3, "\x70\x72\x6f\x63\x2f\x73\x79\x73\x72\x71\x2d\x74\x72\x69\x67\x67\x65\x72", {flags=O_RDONLY|O_CLOEXEC|O_PATH, resolve=RESOLVE_IN_ROOT}, 24) = 20 <0.000008>
+09:24:55.894046 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x32\x30", NULL, MS_REC|MS_PRIVATE, NULL) = 0 <0.000012>
+09:24:55.894079 close(6)                = 0 <0.000006>
+09:24:55.894100 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x32\x30", NULL, MS_RDONLY|MS_REMOUNT|MS_BIND, NULL) = 0 <0.000009>
+09:24:55.894128 close(20)               = 0 <0.000006>
+09:24:55.894150 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x31\x39", NULL, MS_RDONLY|MS_REMOUNT|MS_BIND, NULL) = 0 <0.000008>
+09:24:55.894177 close(19)               = 0 <0.000013>
+09:24:55.894211 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x31\x38", NULL, MS_RDONLY|MS_REMOUNT|MS_BIND, NULL) = 0 <0.000010>
+09:24:55.894242 close(18)               = 0 <0.000006>
+09:24:55.894266 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x31\x37", NULL, MS_RDONLY|MS_REMOUNT|MS_BIND, NULL) = 0 <0.000008>
+09:24:55.894293 close(17)               = 0 <0.000007>
+09:24:55.894317 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x31\x36", NULL, MS_RDONLY|MS_REMOUNT|MS_BIND, NULL) = 0 <0.000009>
+09:24:55.894347 close(16)               = 0 <0.000006>
+09:24:55.894384 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x31\x35", NULL, MS_RDONLY|MS_REMOUNT|MS_BIND, NULL) = 0 <0.000015>
+09:24:55.894424 close(15)               = 0 <0.000006>
+09:24:55.894446 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x31\x34", NULL, MS_RDONLY|MS_REMOUNT|MS_BIND, NULL) = 0 <0.000011>
+09:24:55.894477 close(14)               = 0 <0.000006>
+09:24:55.894499 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x31\x33", NULL, MS_RDONLY|MS_REMOUNT|MS_BIND, NULL) = 0 <0.000011>
+09:24:55.894529 close(13)               = 0 <0.000007>
+09:24:55.894554 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x31\x32", NULL, MS_RDONLY|MS_REMOUNT|MS_BIND, NULL) = 0 <0.000011>
+09:24:55.894586 close(12)               = 0 <0.000006>
+09:24:55.894610 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x31\x31", NULL, MS_RDONLY|MS_REMOUNT|MS_BIND, NULL) = 0 <0.000011>
+09:24:55.894641 close(11)               = 0 <0.000006>
+09:24:55.894663 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x31\x30", NULL, MS_RDONLY|MS_REMOUNT|MS_BIND, NULL) = 0 <0.000010>
+09:24:55.894692 close(10)               = 0 <0.000006>
+09:24:55.894714 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x39", NULL, MS_RDONLY|MS_REMOUNT|MS_BIND, NULL) = 0 <0.000010>
+09:24:55.894748 close(9)                = 0 <0.000007>
+09:24:55.894770 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x38", NULL, MS_RDONLY|MS_NOSUID|MS_NODEV|MS_NOEXEC|MS_REMOUNT|MS_BIND|MS_RELATIME, NULL) = 0 <0.000011>
+09:24:55.894802 close(8)                = 0 <0.000006>
+09:24:55.894825 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x37", NULL, MS_RDONLY|MS_NOSUID|MS_NODEV|MS_NOEXEC|MS_REMOUNT|MS_BIND, NULL) = 0 <0.000009>
+09:24:55.894865 close(7)                = 0 <0.000007>
+09:24:55.894892 mount(NULL, "\x2f\x70\x72\x6f\x63\x2f\x73\x65\x6c\x66\x2f\x66\x64\x2f\x34", NULL, MS_RDONLY|MS_REMOUNT|MS_BIND, NULL) = 0 <0.000011>
+09:24:55.894923 close(4)                = 0 <0.000006>
+09:24:55.894945 close(3)                = 0 <0.000006>
+09:24:55.894968 close_range(3, 4294967295, CLOSE_RANGE_CLOEXEC) = 0 <0.000006>
+09:24:55.894991 openat(AT_FDCWD, "\x2f", O_RDONLY|O_CLOEXEC|O_PATH|O_DIRECTORY) = 3 <0.000008>
+09:24:55.895019 openat(AT_FDCWD, "\x2f\x68\x6f\x6d\x65\x2f\x75\x62\x75\x6e\x74\x75\x2f\x77\x6f\x72\x6b\x73\x70\x61\x63\x65\x2f\x79\x6f\x75\x6b\x69\x2f\x74\x75\x74\x6f\x72\x69\x61\x6c\x2f\x72\x6f\x6f\x74\x66\x73", O_RDONLY|O_CLOEXEC|O_DIRECTORY) = 4 <0.000012>
+09:24:55.895052 fchdir(4)               = 0 <0.000006>
+09:24:55.895074 pivot_root("\x2e", "\x2e") = 0 <0.000166>
+09:24:55.895275 fchdir(3)               = 0 <0.000008>
+09:24:55.895302 mount(NULL, "\x2e", NULL, MS_REC|MS_PRIVATE, NULL) = 0 <0.000011>
+09:24:55.895332 umount2("\x2e", MNT_DETACH) = 0 <0.000065>
+09:24:55.895419 umount2("\x2e", MNT_DETACH) = -1 EINVAL (Invalid argument) <0.000007>
+09:24:55.895448 chdir("\x2f")           = 0 <0.000009>
+09:24:55.895479 close(4)                = 0 <0.000009>
+09:24:55.895504 close(3)                = 0 <0.000007>
+09:24:55.895526 mount(NULL, "\x2f", NULL, MS_REC|MS_PRIVATE, NULL) = 0 <0.000008>
+09:24:55.895554 chdir("\x2f")           = 0 <0.000007>
+09:24:55.895578 openat(AT_FDCWD, "\x2f\x64\x65\x76\x2f\x6e\x75\x6c\x6c", O_RDWR|O_CLOEXEC) = 3 <0.000013>
+09:24:55.895610 fstat(3, {st_dev=makedev(0, 0xdc), st_ino=5, st_mode=S_IFCHR|0666, st_nlink=1, st_uid=0, st_gid=0, st_blksize=4096, st_blocks=0, st_rdev=makedev(0x1, 0x3), st_atime=1754731495 /* 2025-08-09T09:24:55.890212434+0000 */, st_atime_nsec=890212434, st_mtime=1754731495 /* 2025-08-09T09:24:55.890212434+0000 */, st_mtime_nsec=890212434, st_ctime=1754731495 /* 2025-08-09T09:24:55.890391013+0000 */, st_ctime_nsec=890391013}) = 0 <0.000006>
+09:24:55.895650 fstat(0, {st_dev=makedev(0, 0x1b), st_ino=7, st_mode=S_IFCHR|0620, st_nlink=1, st_uid=0, st_gid=5, st_blksize=1024, st_blocks=0, st_rdev=makedev(0x88, 0x4), st_atime=1754731489 /* 2025-08-09T09:24:49+0000 */, st_atime_nsec=0, st_mtime=1754731489 /* 2025-08-09T09:24:49+0000 */, st_mtime_nsec=0, st_ctime=1754731053 /* 2025-08-09T09:17:33.250757738+0000 */, st_ctime_nsec=250757738}) = 0 <0.000007>
+09:24:55.895685 fstat(1, {st_dev=makedev(0, 0x1b), st_ino=7, st_mode=S_IFCHR|0620, st_nlink=1, st_uid=0, st_gid=5, st_blksize=1024, st_blocks=0, st_rdev=makedev(0x88, 0x4), st_atime=1754731489 /* 2025-08-09T09:24:49+0000 */, st_atime_nsec=0, st_mtime=1754731489 /* 2025-08-09T09:24:49+0000 */, st_mtime_nsec=0, st_ctime=1754731053 /* 2025-08-09T09:17:33.250757738+0000 */, st_ctime_nsec=250757738}) = 0 <0.000005>
+09:24:55.895719 fstat(2, {st_dev=makedev(0, 0x1b), st_ino=7, st_mode=S_IFCHR|0620, st_nlink=1, st_uid=0, st_gid=5, st_blksize=1024, st_blocks=0, st_rdev=makedev(0x88, 0x4), st_atime=1754731489 /* 2025-08-09T09:24:49+0000 */, st_atime_nsec=0, st_mtime=1754731489 /* 2025-08-09T09:24:49+0000 */, st_mtime_nsec=0, st_ctime=1754731053 /* 2025-08-09T09:17:33.250757738+0000 */, st_ctime_nsec=250757738}) = 0 <0.000005>
+09:24:55.895751 close(3)                = 0 <0.000007>
+09:24:55.895775 ioctl(0, TCGETS, {c_iflag=ICRNL|IXON|IXANY|IMAXBEL|IUTF8, c_oflag=NL0|CR0|TAB0|BS0|VT0|FF0|OPOST|ONLCR, c_cflag=B38400|CS8|CREAD, c_lflag=ISIG|ICANON|ECHO|ECHOE|ECHOK|IEXTEN|ECHOCTL|ECHOKE, c_line=N_TTY, c_cc=[[VINTR]=0x3, [VQUIT]=0x1c, [VERASE]=0x7f, [VKILL]=0x15, [VEOF]=0x4, [VTIME]=0, [VMIN]=0x1, [VSWTC]=0, [VSTART]=0x11, [VSTOP]=0x13, [VSUSP]=0x1a, [VEOL]=0xff, [VREPRINT]=0x12, [VDISCARD]=0xf, [VWERASE]=0x17, [VLNEXT]=0x16, [VEOL2]=0xff, [17]=0, [18]=0]}) = 0 <0.000009>
+09:24:55.895850 ioctl(1, TCGETS, {c_iflag=ICRNL|IXON|IXANY|IMAXBEL|IUTF8, c_oflag=NL0|CR0|TAB0|BS0|VT0|FF0|OPOST|ONLCR, c_cflag=B38400|CS8|CREAD, c_lflag=ISIG|ICANON|ECHO|ECHOE|ECHOK|IEXTEN|ECHOCTL|ECHOKE, c_line=N_TTY, c_cc=[[VINTR]=0x3, [VQUIT]=0x1c, [VERASE]=0x7f, [VKILL]=0x15, [VEOF]=0x4, [VTIME]=0, [VMIN]=0x1, [VSWTC]=0, [VSTART]=0x11, [VSTOP]=0x13, [VSUSP]=0x1a, [VEOL]=0xff, [VREPRINT]=0x12, [VDISCARD]=0xf, [VWERASE]=0x17, [VLNEXT]=0x16, [VEOL2]=0xff, [17]=0, [18]=0]}) = 0 <0.000009>
+09:24:55.895897 ioctl(2, TCGETS, {c_iflag=ICRNL|IXON|IXANY|IMAXBEL|IUTF8, c_oflag=NL0|CR0|TAB0|BS0|VT0|FF0|OPOST|ONLCR, c_cflag=B38400|CS8|CREAD, c_lflag=ISIG|ICANON|ECHO|ECHOE|ECHOK|IEXTEN|ECHOCTL|ECHOKE, c_line=N_TTY, c_cc=[[VINTR]=0x3, [VQUIT]=0x1c, [VERASE]=0x7f, [VKILL]=0x15, [VEOF]=0x4, [VTIME]=0, [VMIN]=0x1, [VSWTC]=0, [VSTART]=0x11, [VSTOP]=0x13, [VSUSP]=0x1a, [VEOL]=0xff, [VREPRINT]=0x12, [VDISCARD]=0xf, [VWERASE]=0x17, [VLNEXT]=0x16, [VEOL2]=0xff, [17]=0, [18]=0]}) = 0 <0.000006>
+09:24:55.895958 openat(AT_FDCWD, "\x2f\x65\x74\x63\x2f\x70\x61\x73\x73\x77\x64", O_RDONLY|O_CLOEXEC) = 3 <0.000010>
+09:24:55.896000 lseek(3, 0, SEEK_CUR)   = 0 <0.000006>
+09:24:55.896024 fstat(3, {st_dev=makedev(0x103, 0x1), st_ino=4208924, st_mode=S_IFREG|0644, st_nlink=1, st_uid=1000, st_gid=1000, st_blksize=4096, st_blocks=8, st_size=888, st_atime=1754726141 /* 2025-08-09T07:55:41.674095962+0000 */, st_atime_nsec=674095962, st_mtime=1752502490 /* 2025-07-14T14:14:50+0000 */, st_mtime_nsec=0, st_ctime=1754726268 /* 2025-08-09T07:57:48.981759057+0000 */, st_ctime_nsec=981759057}) = 0 <0.000006>
+09:24:55.896072 read(3, "\x72\x6f\x6f\x74\x3a\x78\x3a\x30\x3a\x30\x3a\x72\x6f\x6f\x74\x3a\x2f\x72\x6f\x6f\x74\x3a\x2f\x62\x69\x6e\x2f\x62\x61\x73\x68\x0a\x64\x61\x65\x6d\x6f\x6e\x3a\x78\x3a\x31\x3a\x31\x3a\x64\x61\x65\x6d\x6f\x6e\x3a\x2f\x75\x73\x72\x2f\x73\x62\x69\x6e\x3a\x2f\x75\x73\x72\x2f\x73\x62\x69\x6e\x2f\x6e\x6f\x6c\x6f\x67\x69\x6e\x0a\x62\x69\x6e\x3a\x78\x3a\x32\x3a\x32\x3a\x62\x69\x6e\x3a\x2f\x62\x69\x6e\x3a\x2f\x75\x73\x72\x2f\x73\x62\x69\x6e\x2f\x6e\x6f\x6c\x6f\x67\x69\x6e\x0a\x73\x79\x73\x3a\x78\x3a\x33\x3a\x33\x3a\x73\x79\x73\x3a\x2f\x64\x65\x76\x3a\x2f\x75\x73\x72\x2f\x73\x62\x69\x6e\x2f\x6e\x6f\x6c\x6f\x67\x69\x6e\x0a\x73\x79\x6e\x63\x3a\x78\x3a\x34\x3a\x36\x35\x35\x33\x34\x3a\x73\x79\x6e\x63\x3a\x2f\x62\x69\x6e\x3a\x2f\x62\x69\x6e\x2f\x73\x79\x6e\x63\x0a\x67\x61\x6d\x65\x73\x3a\x78\x3a\x35\x3a\x36\x30\x3a\x67\x61\x6d\x65\x73\x3a\x2f\x75\x73\x72\x2f\x67\x61\x6d\x65\x73\x3a\x2f\x75\x73\x72\x2f\x73\x62\x69\x6e\x2f\x6e\x6f\x6c\x6f\x67\x69\x6e\x0a\x6d\x61\x6e\x3a\x78\x3a\x36\x3a\x31\x32\x3a\x6d\x61\x6e\x3a\x2f\x76\x61\x72\x2f\x63\x61\x63\x68\x65\x2f\x6d\x61\x6e\x3a\x2f\x75\x73\x72\x2f\x73\x62\x69\x6e\x2f\x6e\x6f\x6c\x6f\x67\x69\x6e\x0a\x6c\x70\x3a\x78\x3a\x37\x3a\x37\x3a\x6c\x70\x3a\x2f\x76\x61\x72\x2f\x73\x70\x6f\x6f\x6c\x2f\x6c\x70\x64\x3a\x2f\x75\x73\x72\x2f\x73\x62\x69\x6e\x2f\x6e\x6f\x6c\x6f\x67\x69\x6e\x0a\x6d\x61\x69\x6c\x3a\x78\x3a\x38\x3a\x38\x3a\x6d\x61\x69\x6c\x3a\x2f\x76\x61\x72\x2f\x6d\x61\x69\x6c\x3a\x2f\x75\x73\x72\x2f\x73\x62\x69\x6e\x2f\x6e\x6f\x6c\x6f\x67\x69\x6e\x0a\x6e\x65\x77\x73\x3a\x78\x3a\x39\x3a\x39\x3a\x6e\x65\x77\x73\x3a\x2f\x76\x61\x72\x2f\x73\x70\x6f\x6f\x6c\x2f\x6e\x65\x77\x73\x3a\x2f\x75\x73\x72\x2f\x73\x62\x69\x6e\x2f\x6e\x6f\x6c\x6f\x67\x69\x6e\x0a\x75\x75\x63\x70\x3a\x78\x3a\x31\x30\x3a\x31\x30\x3a\x75\x75\x63\x70\x3a\x2f\x76\x61\x72\x2f\x73\x70\x6f\x6f\x6c\x2f\x75\x75\x63\x70\x3a\x2f\x75\x73\x72\x2f\x73\x62\x69\x6e\x2f\x6e\x6f\x6c\x6f\x67\x69\x6e\x0a\x70\x72\x6f\x78\x79\x3a\x78\x3a\x31\x33\x3a\x31\x33\x3a\x70\x72\x6f\x78\x79\x3a\x2f\x62\x69\x6e\x3a\x2f\x75\x73\x72\x2f\x73\x62\x69\x6e\x2f\x6e\x6f\x6c\x6f\x67\x69\x6e\x0a\x77\x77\x77\x2d\x64\x61\x74\x61\x3a\x78\x3a\x33\x33\x3a\x33\x33\x3a\x77\x77\x77\x2d\x64\x61\x74\x61\x3a\x2f\x76\x61\x72\x2f\x77\x77\x77\x3a\x2f\x75\x73\x72\x2f\x73\x62\x69\x6e\x2f\x6e\x6f\x6c\x6f\x67\x69\x6e\x0a\x62\x61\x63\x6b\x75\x70\x3a\x78\x3a\x33\x34\x3a\x33\x34\x3a\x62\x61\x63\x6b\x75\x70\x3a\x2f\x76\x61\x72\x2f\x62\x61\x63\x6b\x75\x70\x73\x3a\x2f\x75\x73\x72\x2f\x73\x62\x69\x6e\x2f\x6e\x6f\x6c\x6f\x67\x69\x6e\x0a\x6c\x69\x73\x74\x3a\x78\x3a\x33\x38\x3a\x33\x38\x3a\x4d\x61\x69\x6c\x69\x6e\x67\x20\x4c\x69\x73\x74\x20\x4d\x61\x6e\x61\x67\x65\x72\x3a\x2f\x76\x61\x72\x2f\x6c\x69\x73\x74\x3a\x2f\x75\x73\x72\x2f\x73\x62\x69\x6e\x2f\x6e\x6f\x6c\x6f\x67\x69\x6e\x0a\x69\x72\x63\x3a\x78\x3a\x33\x39\x3a\x33\x39\x3a\x69\x72\x63\x64\x3a\x2f\x72\x75\x6e\x2f\x69\x72\x63\x64\x3a\x2f\x75\x73\x72\x2f\x73\x62\x69\x6e\x2f\x6e\x6f\x6c\x6f\x67\x69\x6e\x0a\x5f\x61\x70\x74\x3a\x78\x3a\x34\x32\x3a\x36\x35\x35\x33\x34\x3a\x3a\x2f\x6e\x6f\x6e\x65\x78\x69\x73\x74\x65\x6e\x74\x3a\x2f\x75\x73\x72\x2f\x73\x62\x69\x6e\x2f\x6e\x6f\x6c\x6f\x67\x69\x6e\x0a\x6e\x6f\x62\x6f\x64\x79\x3a\x78\x3a\x36\x35\x35\x33\x34\x3a\x36\x35\x35\x33\x34\x3a\x6e\x6f\x62\x6f\x64\x79\x3a\x2f\x6e\x6f\x6e\x65\x78\x69\x73\x74\x65\x6e\x74\x3a\x2f\x75\x73\x72\x2f\x73\x62\x69\x6e\x2f\x6e\x6f\x6c\x6f\x67\x69\x6e\x0a\x75\x62\x75\x6e\x74\x75\x3a\x78\x3a\x31\x30\x30\x30\x3a\x31\x30\x30\x30\x3a\x55\x62\x75\x6e\x74\x75\x3a\x2f\x68\x6f\x6d\x65\x2f\x75\x62\x75\x6e\x74\x75\x3a\x2f\x62\x69\x6e\x2f\x62\x61\x73\x68\x0a", 4096) = 888 <0.000009>
+09:24:55.896116 close(3)                = 0 <0.000007>
+09:24:55.896140 chdir("\x2f")           = 0 <0.000007>
+09:24:55.896166 getcwd("\x2f", 4096)    = 2 <0.000006>
+09:24:55.896196 newfstatat(AT_FDCWD, "\x2f\x75\x73\x72\x2f\x6c\x6f\x63\x61\x6c\x2f\x73\x62\x69\x6e\x2f\x73\x68", 0x7fff40802960, 0) = -1 ENOENT (No such file or directory) <0.000008>
+09:24:55.896225 newfstatat(AT_FDCWD, "\x2f\x75\x73\x72\x2f\x6c\x6f\x63\x61\x6c\x2f\x62\x69\x6e\x2f\x73\x68", 0x7fff40802960, 0) = -1 ENOENT (No such file or directory) <0.000007>
+09:24:55.896252 newfstatat(AT_FDCWD, "\x2f\x75\x73\x72\x2f\x73\x62\x69\x6e\x2f\x73\x68", 0x7fff40802960, 0) = -1 ENOENT (No such file or directory) <0.000007>
+09:24:55.896279 newfstatat(AT_FDCWD, "\x2f\x75\x73\x72\x2f\x62\x69\x6e\x2f\x73\x68", {st_dev=makedev(0x103, 0x1), st_ino=4209061, st_mode=S_IFREG|0755, st_nlink=1, st_uid=1000, st_gid=1000, st_blksize=4096, st_blocks=256, st_size=129784, st_atime=1754726141 /* 2025-08-09T07:55:41.744366368+0000 */, st_atime_nsec=744366368, st_mtime=1711874846 /* 2024-03-31T08:47:26+0000 */, st_mtime_nsec=0, st_ctime=1754726268 /* 2025-08-09T07:57:48.899758630+0000 */, st_ctime_nsec=899758630}, 0) = 0 <0.000010>
+09:24:55.896327 geteuid()               = 0 <0.000006>
+09:24:55.896349 getegid()               = 0 <0.000005>
+09:24:55.896390 getuid()                = 0 <0.000006>
+09:24:55.896413 getgid()                = 0 <0.000006>
+09:24:55.896436 access("\x2f\x75\x73\x72\x2f\x62\x69\x6e\x2f\x73\x68", X_OK) = 0 <0.000007>
+09:24:55.896462 statx(AT_FDCWD, "\x2f\x75\x73\x72\x2f\x62\x69\x6e\x2f\x73\x68", AT_STATX_DONT_SYNC, STATX_TYPE, {stx_mask=STATX_TYPE|STATX_MODE|STATX_NLINK|STATX_UID|STATX_GID|STATX_ATIME|STATX_INO|STATX_SIZE|STATX_BLOCKS|STATX_MNT_ID, stx_blksize=4096, stx_attributes=0, stx_nlink=1, stx_uid=1000, stx_gid=1000, stx_mode=S_IFREG|0755, stx_ino=4209061, stx_size=129784, stx_blocks=256, stx_attributes_mask=STATX_ATTR_COMPRESSED|STATX_ATTR_IMMUTABLE|STATX_ATTR_APPEND|STATX_ATTR_NODUMP|STATX_ATTR_ENCRYPTED|STATX_ATTR_AUTOMOUNT|STATX_ATTR_MOUNT_ROOT|STATX_ATTR_VERITY|STATX_ATTR_DAX, stx_atime={tv_sec=1754726141, tv_nsec=744366368} /* 2025-08-09T07:55:41.744366368+0000 */, stx_rdev_major=0, stx_rdev_minor=0, stx_dev_major=259, stx_dev_minor=1, stx_mnt_id=0x483}) = 0 <0.000007>
+09:24:55.896500 setsid()                = 1 <0.000015>
+09:24:55.896530 sethostname("\x79\x6f\x75\x6b\x69", 5) = 0 <0.000032>
+09:24:55.896616 umask(022)              = 000 <0.000009>
+09:24:55.896660 prctl(PR_CAPBSET_DROP, CAP_CHOWN) = 0 <0.000011>
+09:24:55.896690 prctl(PR_CAPBSET_DROP, CAP_DAC_OVERRIDE) = 0 <0.000006>
+09:24:55.896713 prctl(PR_CAPBSET_DROP, CAP_DAC_READ_SEARCH) = 0 <0.000007>
+09:24:55.896734 prctl(PR_CAPBSET_DROP, CAP_FOWNER) = 0 <0.000007>
+09:24:55.896758 prctl(PR_CAPBSET_DROP, CAP_FSETID) = 0 <0.000006>
+09:24:55.896785 prctl(PR_CAPBSET_DROP, CAP_SETGID) = 0 <0.000006>
+09:24:55.896806 prctl(PR_CAPBSET_DROP, CAP_SETUID) = 0 <0.000006>
+09:24:55.896829 prctl(PR_CAPBSET_DROP, CAP_SETPCAP) = 0 <0.000006>
+09:24:55.896850 prctl(PR_CAPBSET_DROP, CAP_LINUX_IMMUTABLE) = 0 <0.000006>
+09:24:55.896872 prctl(PR_CAPBSET_DROP, CAP_NET_BROADCAST) = 0 <0.000009>
+09:24:55.896896 prctl(PR_CAPBSET_DROP, CAP_NET_ADMIN) = 0 <0.000006>
+09:24:55.896918 prctl(PR_CAPBSET_DROP, CAP_NET_RAW) = 0 <0.000006>
+09:24:55.896938 prctl(PR_CAPBSET_DROP, CAP_IPC_LOCK) = 0 <0.000006>
+09:24:55.896958 prctl(PR_CAPBSET_DROP, CAP_IPC_OWNER) = 0 <0.000006>
+09:24:55.896980 prctl(PR_CAPBSET_DROP, CAP_SYS_MODULE) = 0 <0.000006>
+09:24:55.897001 prctl(PR_CAPBSET_DROP, CAP_SYS_RAWIO) = 0 <0.000006>
+09:24:55.897022 prctl(PR_CAPBSET_DROP, CAP_SYS_CHROOT) = 0 <0.000006>
+09:24:55.897043 prctl(PR_CAPBSET_DROP, CAP_SYS_PTRACE) = 0 <0.000008>
+09:24:55.897066 prctl(PR_CAPBSET_DROP, CAP_SYS_PACCT) = 0 <0.000006>
+09:24:55.897087 prctl(PR_CAPBSET_DROP, CAP_SYS_ADMIN) = 0 <0.000006>
+09:24:55.897109 prctl(PR_CAPBSET_DROP, CAP_SYS_BOOT) = 0 <0.000006>
+09:24:55.897129 prctl(PR_CAPBSET_DROP, CAP_SYS_NICE) = 0 <0.000007>
+09:24:55.897151 prctl(PR_CAPBSET_DROP, CAP_SYS_RESOURCE) = 0 <0.000006>
+09:24:55.897207 prctl(PR_CAPBSET_DROP, CAP_SYS_TIME) = 0 <0.000010>
+09:24:55.897236 prctl(PR_CAPBSET_DROP, CAP_SYS_TTY_CONFIG) = 0 <0.000006>
+09:24:55.897257 prctl(PR_CAPBSET_DROP, CAP_MKNOD) = 0 <0.000024>
+09:24:55.897303 prctl(PR_CAPBSET_DROP, CAP_LEASE) = 0 <0.000007>
+09:24:55.897327 prctl(PR_CAPBSET_DROP, CAP_AUDIT_CONTROL) = 0 <0.000006>
+09:24:55.897363 prctl(PR_CAPBSET_DROP, CAP_SETFCAP) = 0 <0.000009>
+09:24:55.897400 prctl(PR_CAPBSET_DROP, CAP_MAC_OVERRIDE) = 0 <0.000006>
+09:24:55.897423 prctl(PR_CAPBSET_DROP, CAP_MAC_ADMIN) = 0 <0.000017>
+09:24:55.897468 prctl(PR_CAPBSET_DROP, CAP_SYSLOG) = 0 <0.000008>
+09:24:55.897492 prctl(PR_CAPBSET_DROP, CAP_WAKE_ALARM) = 0 <0.000006>
+09:24:55.897530 prctl(PR_CAPBSET_DROP, CAP_BLOCK_SUSPEND) = 0 <0.000007>
+09:24:55.897557 prctl(PR_CAPBSET_DROP, CAP_AUDIT_READ) = 0 <0.000007>
+09:24:55.897579 prctl(PR_CAPBSET_DROP, CAP_PERFMON) = 0 <0.000007>
+09:24:55.897620 prctl(PR_CAPBSET_DROP, CAP_BPF) = 0 <0.000006>
+09:24:55.897643 prctl(PR_CAPBSET_DROP, CAP_CHECKPOINT_RESTORE) = 0 <0.000006>
+09:24:55.897666 prctl(PR_SET_KEEPCAPS, 1) = 0 <0.000008>
+09:24:55.897712 setresgid(0, 0, 0)      = 0 <0.000006>
+09:24:55.897734 setresuid(0, 0, 0)      = 0 <0.000006>
+09:24:55.897755 capset({version=_LINUX_CAPABILITY_VERSION_3, pid=0}, {effective=1<<CAP_KILL|1<<CAP_NET_BIND_SERVICE|1<<CAP_AUDIT_WRITE, permitted=1<<CAP_KILL|1<<CAP_NET_BIND_SERVICE|1<<CAP_AUDIT_WRITE, inheritable=1<<CAP_KILL|1<<CAP_NET_BIND_SERVICE|1<<CAP_AUDIT_WRITE}) = 0 <0.000008>
+09:24:55.897803 prctl(PR_CAP_AMBIENT, PR_CAP_AMBIENT_CLEAR_ALL, 0, 0, 0) = 0 <0.000011>
+09:24:55.897840 prctl(PR_CAP_AMBIENT, PR_CAP_AMBIENT_RAISE, CAP_KILL, 0, 0) = 0 <0.000006>
+09:24:55.897871 prctl(PR_CAP_AMBIENT, PR_CAP_AMBIENT_RAISE, CAP_NET_BIND_SERVICE, 0, 0) = 0 <0.000018>
+09:24:55.897913 prctl(PR_CAP_AMBIENT, PR_CAP_AMBIENT_RAISE, CAP_AUDIT_WRITE, 0, 0) = 0 <0.000007>
+09:24:55.897937 prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) = 0 <0.000006>
+09:24:55.897978 rt_sigprocmask(SIG_UNBLOCK, ~[RTMIN RT_1], NULL, 8) = 0 <0.000008>
+09:24:55.898011 rt_sigaction(SIGHUP, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000007>
+09:24:55.898057 rt_sigaction(SIGINT, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000007>
+09:24:55.898085 rt_sigaction(SIGQUIT, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.898110 rt_sigaction(SIGILL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000007>
+09:24:55.898156 rt_sigaction(SIGTRAP, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.898180 rt_sigaction(SIGABRT, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000022>
+09:24:55.898229 rt_sigaction(SIGBUS, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.898255 rt_sigaction(SIGFPE, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000005>
+09:24:55.898284 rt_sigaction(SIGKILL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = -1 EINVAL (Invalid argument) <0.000012>
+09:24:55.898320 rt_sigaction(SIGUSR1, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.898345 rt_sigaction(SIGSEGV, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000005>
+09:24:55.898391 rt_sigaction(SIGUSR2, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000007>
+09:24:55.898420 rt_sigaction(SIGPIPE, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.898445 rt_sigaction(SIGALRM, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.898489 rt_sigaction(SIGTERM, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000005>
+09:24:55.898512 rt_sigaction(SIGSTKFLT, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.898554 rt_sigaction(SIGCHLD, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000009>
+09:24:55.898585 rt_sigaction(SIGCONT, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000005>
+09:24:55.898608 rt_sigaction(SIGSTOP, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = -1 EINVAL (Invalid argument) <0.000007>
+09:24:55.898654 rt_sigaction(SIGTSTP, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.898679 rt_sigaction(SIGTTIN, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000005>
+09:24:55.898720 rt_sigaction(SIGTTOU, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000008>
+09:24:55.898749 rt_sigaction(SIGURG, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.898773 rt_sigaction(SIGXCPU, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.898797 rt_sigaction(SIGXFSZ, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.898821 rt_sigaction(SIGVTALRM, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.898845 rt_sigaction(SIGPROF, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.898867 rt_sigaction(SIGWINCH, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.898891 rt_sigaction(SIGIO, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000005>
+09:24:55.898914 rt_sigaction(SIGPWR, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.898938 rt_sigaction(SIGSYS, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000005>
+09:24:55.898961 rt_sigaction(SIGRT_2, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.898985 rt_sigaction(SIGRT_3, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899010 rt_sigaction(SIGRT_4, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899037 rt_sigaction(SIGRT_5, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899062 rt_sigaction(SIGRT_6, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899085 rt_sigaction(SIGRT_7, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899108 rt_sigaction(SIGRT_8, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899131 rt_sigaction(SIGRT_9, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899156 rt_sigaction(SIGRT_10, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899179 rt_sigaction(SIGRT_11, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000005>
+09:24:55.899202 rt_sigaction(SIGRT_12, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000005>
+09:24:55.899225 rt_sigaction(SIGRT_13, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899249 rt_sigaction(SIGRT_14, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899274 rt_sigaction(SIGRT_15, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899298 rt_sigaction(SIGRT_16, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899324 rt_sigaction(SIGRT_17, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899348 rt_sigaction(SIGRT_18, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899408 rt_sigaction(SIGRT_19, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899434 rt_sigaction(SIGRT_20, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899457 rt_sigaction(SIGRT_21, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000005>
+09:24:55.899480 rt_sigaction(SIGRT_22, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000005>
+09:24:55.899502 rt_sigaction(SIGRT_23, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000005>
+09:24:55.899526 rt_sigaction(SIGRT_24, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000005>
+09:24:55.899549 rt_sigaction(SIGRT_25, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899572 rt_sigaction(SIGRT_26, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899596 rt_sigaction(SIGRT_27, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899620 rt_sigaction(SIGRT_28, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899645 rt_sigaction(SIGRT_29, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000005>
+09:24:55.899667 rt_sigaction(SIGRT_30, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899693 rt_sigaction(SIGRT_31, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000005>
+09:24:55.899716 rt_sigaction(SIGRT_32, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7c0bf6845330}, NULL, 8) = 0 <0.000006>
+09:24:55.899745 write(5, "\x00\x00\x00\x00\x00\x00\x00\x00", 8) = 8 <0.000022>
+09:24:55.899806 close(5)                = 0 <0.000036>
+09:24:55.899862 close_range(3, 4294967295, 0) = 0 <0.000016>
+09:24:55.899914 execve("\x2f\x75\x73\x72\x2f\x62\x69\x6e\x2f\x73\x68", ["\x73\x68"], ["\x50\x41\x54\x48\x3d\x2f\x75\x73\x72\x2f\x6c\x6f\x63\x61\x6c\x2f\x73\x62\x69\x6e\x3a\x2f\x75\x73\x72\x2f\x6c\x6f\x63\x61\x6c\x2f\x62\x69\x6e\x3a\x2f\x75\x73\x72\x2f\x73\x62\x69\x6e\x3a\x2f\x75\x73\x72\x2f\x62\x69\x6e\x3a\x2f\x73\x62\x69\x6e\x3a\x2f\x62\x69\x6e", "\x54\x45\x52\x4d\x3d\x78\x74\x65\x72\x6d", "\x48\x4f\x4d\x45\x3d\x2f\x72\x6f\x6f\x74"]) = 0 <0.000469>
+09:24:55.900493 brk(NULL)               = 0x5c59c5dae000 <0.000017>
+09:24:55.900637 mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7d3540e8e000 <0.000022>
+09:24:55.900697 access("\x2f\x65\x74\x63\x2f\x6c\x64\x2e\x73\x6f\x2e\x70\x72\x65\x6c\x6f\x61\x64", R_OK) = -1 ENOENT (No such file or directory) <0.000018>
+09:24:55.900757 openat(AT_FDCWD, "\x2f\x65\x74\x63\x2f\x6c\x64\x2e\x73\x6f\x2e\x63\x61\x63\x68\x65", O_RDONLY|O_CLOEXEC) = 3 <0.000020>
+09:24:55.900813 fstat(3, {st_dev=makedev(0x103, 0x1), st_ino=4208886, st_mode=S_IFREG|0644, st_nlink=1, st_uid=1000, st_gid=1000, st_blksize=4096, st_blocks=16, st_size=5067, st_atime=1754726141 /* 2025-08-09T07:55:41.657405233+0000 */, st_atime_nsec=657405233, st_mtime=1752502482 /* 2025-07-14T14:14:42+0000 */, st_mtime_nsec=0, st_ctime=1754726268 /* 2025-08-09T07:57:48.981759057+0000 */, st_ctime_nsec=981759057}) = 0 <0.000019>
+09:24:55.900881 mmap(NULL, 5067, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7d3540e8c000 <0.000020>
+09:24:55.900919 close(3)                = 0 <0.000022>
+09:24:55.900990 openat(AT_FDCWD, "\x2f\x6c\x69\x62\x2f\x78\x38\x36\x5f\x36\x34\x2d\x6c\x69\x6e\x75\x78\x2d\x67\x6e\x75\x2f\x6c\x69\x62\x63\x2e\x73\x6f\x2e\x36", O_RDONLY|O_CLOEXEC) = 3 <0.000026>
+09:24:55.901059 read(3, "\x7f\x45\x4c\x46\x02\x01\x01\x03\x00\x00\x00\x00\x00\x00\x00\x00\x03\x00\x3e\x00\x01\x00\x00\x00\x90\xa3\x02\x00\x00\x00\x00\x00\x40\x00\x00\x00\x00\x00\x00\x00\x10\x5e\x20\x00\x00\x00\x00\x00\x00\x00\x00\x00\x40\x00\x38\x00\x0e\x00\x40\x00\x40\x00\x3f\x00\x06\x00\x00\x00\x04\x00\x00\x00\x40\x00\x00\x00\x00\x00\x00\x00\x40\x00\x00\x00\x00\x00\x00\x00\x40\x00\x00\x00\x00\x00\x00\x00\x10\x03\x00\x00\x00\x00\x00\x00\x10\x03\x00\x00\x00\x00\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x04\x00\x00\x00\xa0\x67\x1d\x00\x00\x00\x00\x00\xa0\x67\x1d\x00\x00\x00\x00\x00\xa0\x67\x1d\x00\x00\x00\x00\x00\x1c\x00\x00\x00\x00\x00\x00\x00\x1c\x00\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x90\x73\x02\x00\x00\x00\x00\x00\x90\x73\x02\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x05\x00\x00\x00\x00\x80\x02\x00\x00\x00\x00\x00\x00\x80\x02\x00\x00\x00\x00\x00\x00\x80\x02\x00\x00\x00\x00\x00\xb9\x7c\x18\x00\x00\x00\x00\x00\xb9\x7c\x18\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x04\x00\x00\x00\x00\x00\x1b\x00\x00\x00\x00\x00\x00\x00\x1b\x00\x00\x00\x00\x00\x00\x00\x1b\x00\x00\x00\x00\x00\x82\xe0\x04\x00\x00\x00\x00\x00\x82\xe0\x04\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x06\x00\x00\x00\x60\xec\x1f\x00\x00\x00\x00\x00\x60\xfc\x1f\x00\x00\x00\x00\x00\x60\xfc\x1f\x00\x00\x00\x00\x00\x68\x4a\x00\x00\x00\x00\x00\x00\x30\x21\x01\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x06\x00\x00\x00\x40\x19\x20\x00\x00\x00\x00\x00\x40\x29\x20\x00\x00\x00\x00\x00\x40\x29\x20\x00\x00\x00\x00\x00\x40\x02\x00\x00\x00\x00\x00\x00\x40\x02\x00\x00\x00\x00\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x04\x00\x00\x00\x50\x03\x00\x00\x00\x00\x00\x00\x50\x03\x00\x00\x00\x00\x00\x00\x50\x03\x00\x00\x00\x00\x00\x00\x30\x00\x00\x00\x00\x00\x00\x00\x30\x00\x00\x00\x00\x00\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x04\x00\x00\x00\x80\x03\x00\x00\x00\x00\x00\x00\x80\x03\x00\x00\x00\x00\x00\x00\x80\x03\x00\x00\x00\x00\x00\x00\x44\x00\x00\x00\x00\x00\x00\x00\x44\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x04\x00\x00\x00\x60\xec\x1f\x00\x00\x00\x00\x00\x60\xfc\x1f\x00\x00\x00\x00\x00\x60\xfc\x1f\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x88\x00\x00\x00\x00\x00\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x53\xe5\x74\x64\x04\x00\x00\x00\x50\x03\x00\x00\x00\x00\x00\x00\x50\x03\x00\x00\x00\x00\x00\x00\x50\x03\x00\x00\x00\x00\x00\x00\x30\x00\x00\x00\x00\x00\x00\x00\x30\x00\x00\x00\x00\x00\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x50\xe5\x74\x64\x04\x00\x00\x00\xbc\x67\x1d\x00\x00\x00\x00\x00\xbc\x67\x1d\x00\x00\x00\x00\x00\xbc\x67\x1d\x00\x00\x00\x00\x00\x6c\x76\x00\x00\x00\x00\x00\x00\x6c\x76\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x51\xe5\x74\x64\x06\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x52\xe5\x74\x64\x04\x00\x00\x00\x60\xec\x1f\x00\x00\x00\x00\x00\x60\xfc\x1f\x00\x00\x00\x00\x00\x60\xfc\x1f\x00\x00\x00\x00\x00\xa0\x33\x00\x00\x00\x00\x00\x00", 832) = 832 <0.000023>
+09:24:55.901122 pread64(3, "\x06\x00\x00\x00\x04\x00\x00\x00\x40\x00\x00\x00\x00\x00\x00\x00\x40\x00\x00\x00\x00\x00\x00\x00\x40\x00\x00\x00\x00\x00\x00\x00\x10\x03\x00\x00\x00\x00\x00\x00\x10\x03\x00\x00\x00\x00\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x04\x00\x00\x00\xa0\x67\x1d\x00\x00\x00\x00\x00\xa0\x67\x1d\x00\x00\x00\x00\x00\xa0\x67\x1d\x00\x00\x00\x00\x00\x1c\x00\x00\x00\x00\x00\x00\x00\x1c\x00\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x90\x73\x02\x00\x00\x00\x00\x00\x90\x73\x02\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x05\x00\x00\x00\x00\x80\x02\x00\x00\x00\x00\x00\x00\x80\x02\x00\x00\x00\x00\x00\x00\x80\x02\x00\x00\x00\x00\x00\xb9\x7c\x18\x00\x00\x00\x00\x00\xb9\x7c\x18\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x04\x00\x00\x00\x00\x00\x1b\x00\x00\x00\x00\x00\x00\x00\x1b\x00\x00\x00\x00\x00\x00\x00\x1b\x00\x00\x00\x00\x00\x82\xe0\x04\x00\x00\x00\x00\x00\x82\xe0\x04\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x06\x00\x00\x00\x60\xec\x1f\x00\x00\x00\x00\x00\x60\xfc\x1f\x00\x00\x00\x00\x00\x60\xfc\x1f\x00\x00\x00\x00\x00\x68\x4a\x00\x00\x00\x00\x00\x00\x30\x21\x01\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x06\x00\x00\x00\x40\x19\x20\x00\x00\x00\x00\x00\x40\x29\x20\x00\x00\x00\x00\x00\x40\x29\x20\x00\x00\x00\x00\x00\x40\x02\x00\x00\x00\x00\x00\x00\x40\x02\x00\x00\x00\x00\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x04\x00\x00\x00\x50\x03\x00\x00\x00\x00\x00\x00\x50\x03\x00\x00\x00\x00\x00\x00\x50\x03\x00\x00\x00\x00\x00\x00\x30\x00\x00\x00\x00\x00\x00\x00\x30\x00\x00\x00\x00\x00\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x04\x00\x00\x00\x80\x03\x00\x00\x00\x00\x00\x00\x80\x03\x00\x00\x00\x00\x00\x00\x80\x03\x00\x00\x00\x00\x00\x00\x44\x00\x00\x00\x00\x00\x00\x00\x44\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x04\x00\x00\x00\x60\xec\x1f\x00\x00\x00\x00\x00\x60\xfc\x1f\x00\x00\x00\x00\x00\x60\xfc\x1f\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x88\x00\x00\x00\x00\x00\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x53\xe5\x74\x64\x04\x00\x00\x00\x50\x03\x00\x00\x00\x00\x00\x00\x50\x03\x00\x00\x00\x00\x00\x00\x50\x03\x00\x00\x00\x00\x00\x00\x30\x00\x00\x00\x00\x00\x00\x00\x30\x00\x00\x00\x00\x00\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x50\xe5\x74\x64\x04\x00\x00\x00\xbc\x67\x1d\x00\x00\x00\x00\x00\xbc\x67\x1d\x00\x00\x00\x00\x00\xbc\x67\x1d\x00\x00\x00\x00\x00\x6c\x76\x00\x00\x00\x00\x00\x00\x6c\x76\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x51\xe5\x74\x64\x06\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x52\xe5\x74\x64\x04\x00\x00\x00\x60\xec\x1f\x00\x00\x00\x00\x00\x60\xfc\x1f\x00\x00\x00\x00\x00\x60\xfc\x1f\x00\x00\x00\x00\x00\xa0\x33\x00\x00\x00\x00\x00\x00\xa0\x33\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00", 784, 64) = 784 <0.000018>
+09:24:55.901188 fstat(3, {st_dev=makedev(0x103, 0x1), st_ino=4209695, st_mode=S_IFREG|0755, st_nlink=1, st_uid=1000, st_gid=1000, st_blksize=4096, st_blocks=4152, st_size=2125328, st_atime=1754726142 /* 2025-08-09T07:55:42.230098863+0000 */, st_atime_nsec=230098863, st_mtime=1752079667 /* 2025-07-09T16:47:47+0000 */, st_mtime_nsec=0, st_ctime=1754726268 /* 2025-08-09T07:57:48.930758792+0000 */, st_ctime_nsec=930758792}) = 0 <0.000018>
+09:24:55.901256 pread64(3, "\x06\x00\x00\x00\x04\x00\x00\x00\x40\x00\x00\x00\x00\x00\x00\x00\x40\x00\x00\x00\x00\x00\x00\x00\x40\x00\x00\x00\x00\x00\x00\x00\x10\x03\x00\x00\x00\x00\x00\x00\x10\x03\x00\x00\x00\x00\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00\x04\x00\x00\x00\xa0\x67\x1d\x00\x00\x00\x00\x00\xa0\x67\x1d\x00\x00\x00\x00\x00\xa0\x67\x1d\x00\x00\x00\x00\x00\x1c\x00\x00\x00\x00\x00\x00\x00\x1c\x00\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x90\x73\x02\x00\x00\x00\x00\x00\x90\x73\x02\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x05\x00\x00\x00\x00\x80\x02\x00\x00\x00\x00\x00\x00\x80\x02\x00\x00\x00\x00\x00\x00\x80\x02\x00\x00\x00\x00\x00\xb9\x7c\x18\x00\x00\x00\x00\x00\xb9\x7c\x18\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x04\x00\x00\x00\x00\x00\x1b\x00\x00\x00\x00\x00\x00\x00\x1b\x00\x00\x00\x00\x00\x00\x00\x1b\x00\x00\x00\x00\x00\x82\xe0\x04\x00\x00\x00\x00\x00\x82\xe0\x04\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x06\x00\x00\x00\x60\xec\x1f\x00\x00\x00\x00\x00\x60\xfc\x1f\x00\x00\x00\x00\x00\x60\xfc\x1f\x00\x00\x00\x00\x00\x68\x4a\x00\x00\x00\x00\x00\x00\x30\x21\x01\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x06\x00\x00\x00\x40\x19\x20\x00\x00\x00\x00\x00\x40\x29\x20\x00\x00\x00\x00\x00\x40\x29\x20\x00\x00\x00\x00\x00\x40\x02\x00\x00\x00\x00\x00\x00\x40\x02\x00\x00\x00\x00\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x04\x00\x00\x00\x50\x03\x00\x00\x00\x00\x00\x00\x50\x03\x00\x00\x00\x00\x00\x00\x50\x03\x00\x00\x00\x00\x00\x00\x30\x00\x00\x00\x00\x00\x00\x00\x30\x00\x00\x00\x00\x00\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x04\x00\x00\x00\x80\x03\x00\x00\x00\x00\x00\x00\x80\x03\x00\x00\x00\x00\x00\x00\x80\x03\x00\x00\x00\x00\x00\x00\x44\x00\x00\x00\x00\x00\x00\x00\x44\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x07\x00\x00\x00\x04\x00\x00\x00\x60\xec\x1f\x00\x00\x00\x00\x00\x60\xfc\x1f\x00\x00\x00\x00\x00\x60\xfc\x1f\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x88\x00\x00\x00\x00\x00\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x53\xe5\x74\x64\x04\x00\x00\x00\x50\x03\x00\x00\x00\x00\x00\x00\x50\x03\x00\x00\x00\x00\x00\x00\x50\x03\x00\x00\x00\x00\x00\x00\x30\x00\x00\x00\x00\x00\x00\x00\x30\x00\x00\x00\x00\x00\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x50\xe5\x74\x64\x04\x00\x00\x00\xbc\x67\x1d\x00\x00\x00\x00\x00\xbc\x67\x1d\x00\x00\x00\x00\x00\xbc\x67\x1d\x00\x00\x00\x00\x00\x6c\x76\x00\x00\x00\x00\x00\x00\x6c\x76\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\x00\x00\x00\x00\x51\xe5\x74\x64\x06\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x10\x00\x00\x00\x00\x00\x00\x00\x52\xe5\x74\x64\x04\x00\x00\x00\x60\xec\x1f\x00\x00\x00\x00\x00\x60\xfc\x1f\x00\x00\x00\x00\x00\x60\xfc\x1f\x00\x00\x00\x00\x00\xa0\x33\x00\x00\x00\x00\x00\x00\xa0\x33\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00", 784, 64) = 784 <0.000007>
+09:24:55.901300 mmap(NULL, 2170256, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7d3540c00000 <0.000021>
+09:24:55.901355 mmap(0x7d3540c28000, 1605632, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x28000) = 0x7d3540c28000 <0.000086>
+09:24:55.901471 mmap(0x7d3540db0000, 323584, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1b0000) = 0x7d3540db0000 <0.000026>
+09:24:55.901531 mmap(0x7d3540dff000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1fe000) = 0x7d3540dff000 <0.000023>
+09:24:55.901591 mmap(0x7d3540e05000, 52624, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7d3540e05000 <0.000035>
+09:24:55.901671 close(3)                = 0 <0.000015>
+09:24:55.901732 mmap(NULL, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7d3540e89000 <0.000037>
+09:24:55.901809 arch_prctl(ARCH_SET_FS, 0x7d3540e89740) = 0 <0.000006>
+09:24:55.901830 set_tid_address(0x7d3540e89a10) = 1 <0.000005>
+09:24:55.901852 set_robust_list(0x7d3540e89a20, 24) = 0 <0.000005>
+09:24:55.901873 rseq(0x7d3540e8a060, 0x20, 0, 0x53053053) = 0 <0.000006>
+09:24:55.901974 mprotect(0x7d3540dff000, 16384, PROT_READ) = 0 <0.000015>
+09:24:55.902044 mprotect(0x5c59a6a93000, 8192, PROT_READ) = 0 <0.000014>
+09:24:55.902080 mprotect(0x7d3540ecc000, 8192, PROT_READ) = 0 <0.000009>
+09:24:55.902129 prlimit64(0, RLIMIT_STACK, NULL, {rlim_cur=8192*1024, rlim_max=RLIM64_INFINITY}) = 0 <0.000006>
+09:24:55.902169 munmap(0x7d3540e8c000, 5067) = 0 <0.000011>
+09:24:55.902219 getuid()                = 0 <0.000006>
+09:24:55.902241 getgid()                = 0 <0.000005>
+09:24:55.902262 getpid()                = 1 <0.000006>
+09:24:55.902293 rt_sigaction(SIGCHLD, {sa_handler=0x5c59a6a88cd0, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER, sa_restorer=0x7d3540c45330}, NULL, 8) = 0 <0.000006>
+09:24:55.902323 geteuid()               = 0 <0.000006>
+09:24:55.902353 getrandom("\xa3\x15\x33\x29\xf0\xbe\x7f\xe9", 8, GRND_NONBLOCK) = 8 <0.000007>
+09:24:55.902413 brk(NULL)               = 0x5c59c5dae000 <0.000006>
+09:24:55.902453 brk(0x5c59c5dcf000)     = 0x5c59c5dcf000 <0.000020>
+09:24:55.902518 getppid()               = 0 <0.000030>
+09:24:55.902599 getcwd("\x2f", 4096)    = 2 <0.000029>
+09:24:55.902664 ioctl(0, TCGETS, {c_iflag=ICRNL|IXON|IXANY|IMAXBEL|IUTF8, c_oflag=NL0|CR0|TAB0|BS0|VT0|FF0|OPOST|ONLCR, c_cflag=B38400|CS8|CREAD, c_lflag=ISIG|ICANON|ECHO|ECHOE|ECHOK|IEXTEN|ECHOCTL|ECHOKE, c_line=N_TTY, c_cc=[[VINTR]=0x3, [VQUIT]=0x1c, [VERASE]=0x7f, [VKILL]=0x15, [VEOF]=0x4, [VTIME]=0, [VMIN]=0x1, [VSWTC]=0, [VSTART]=0x11, [VSTOP]=0x13, [VSUSP]=0x1a, [VEOL]=0xff, [VREPRINT]=0x12, [VDISCARD]=0xf, [VWERASE]=0x17, [VLNEXT]=0x16, [VEOL2]=0xff, [17]=0, [18]=0]}) = 0 <0.000022>
+09:24:55.902745 ioctl(1, TCGETS, {c_iflag=ICRNL|IXON|IXANY|IMAXBEL|IUTF8, c_oflag=NL0|CR0|TAB0|BS0|VT0|FF0|OPOST|ONLCR, c_cflag=B38400|CS8|CREAD, c_lflag=ISIG|ICANON|ECHO|ECHOE|ECHOK|IEXTEN|ECHOCTL|ECHOKE, c_line=N_TTY, c_cc=[[VINTR]=0x3, [VQUIT]=0x1c, [VERASE]=0x7f, [VKILL]=0x15, [VEOF]=0x4, [VTIME]=0, [VMIN]=0x1, [VSWTC]=0, [VSTART]=0x11, [VSTOP]=0x13, [VSUSP]=0x1a, [VEOL]=0xff, [VREPRINT]=0x12, [VDISCARD]=0xf, [VWERASE]=0x17, [VLNEXT]=0x16, [VEOL2]=0xff, [17]=0, [18]=0]}) = 0 <0.000017>
+09:24:55.902808 geteuid()               = 0 <0.000017>
+09:24:55.902854 getegid()               = 0 <0.000015>
+09:24:55.902901 rt_sigaction(SIGINT, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000016>
+09:24:55.902961 rt_sigaction(SIGINT, {sa_handler=0x5c59a6a88cd0, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER, sa_restorer=0x7d3540c45330}, NULL, 8) = 0 <0.000027>
+09:24:55.903027 rt_sigaction(SIGQUIT, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000006>
+09:24:55.903063 rt_sigaction(SIGQUIT, {sa_handler=SIG_IGN, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER, sa_restorer=0x7d3540c45330}, NULL, 8) = 0 <0.000022>
+09:24:55.903131 rt_sigaction(SIGTERM, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0 <0.000017>
+09:24:55.903182 rt_sigaction(SIGTERM, {sa_handler=SIG_IGN, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER, sa_restorer=0x7d3540c45330}, NULL, 8) = 0 <0.000017>
+09:24:55.903229 openat(AT_FDCWD, "\x2f\x64\x65\x76\x2f\x74\x74\x79", O_RDWR) = -1 ENXIO (No such device or address) <0.000031>
+09:24:55.903297 ioctl(2, TCGETS, {c_iflag=ICRNL|IXON|IXANY|IMAXBEL|IUTF8, c_oflag=NL0|CR0|TAB0|BS0|VT0|FF0|OPOST|ONLCR, c_cflag=B38400|CS8|CREAD, c_lflag=ISIG|ICANON|ECHO|ECHOE|ECHOK|IEXTEN|ECHOCTL|ECHOKE, c_line=N_TTY, c_cc=[[VINTR]=0x3, [VQUIT]=0x1c, [VERASE]=0x7f, [VKILL]=0x15, [VEOF]=0x4, [VTIME]=0, [VMIN]=0x1, [VSWTC]=0, [VSTART]=0x11, [VSTOP]=0x13, [VSUSP]=0x1a, [VEOL]=0xff, [VREPRINT]=0x12, [VDISCARD]=0xf, [VWERASE]=0x17, [VLNEXT]=0x16, [VEOL2]=0xff, [17]=0, [18]=0]}) = 0 <0.000023>
+09:24:55.903363 fcntl(2, F_DUPFD, 10)   = 10 <0.000026>
+09:24:55.903437 close(-1)               = -1 EBADF (Bad file descriptor) <0.000015>
+09:24:55.903483 fcntl(10, F_SETFD, FD_CLOEXEC) = 0 <0.000015>
+09:24:55.903532 ioctl(10, TIOCGPGRP, 0x7fffce719b44) = -1 ENOTTY (Inappropriate ioctl for device) <0.000016>
+09:24:55.903586 write(2, "\x73\x68\x3a\x20\x30\x3a\x20", 7) = 7 <0.000083>
+09:24:55.903737 write(2, "\x63\x61\x6e\x27\x74\x20\x61\x63\x63\x65\x73\x73\x20\x74\x74\x79\x3b\x20\x6a\x6f\x62\x20\x63\x6f\x6e\x74\x72\x6f\x6c\x20\x74\x75\x72\x6e\x65\x64\x20\x6f\x66\x66", 40) = 40 <0.000050>
+09:24:55.903834 write(2, "\x0a", 1)     = 1 <0.000043>
+09:24:55.903940 close(10)               = 0 <0.000008>
+09:24:55.903980 write(2, "\x23\x20", 2) = 2 <0.000030>
+09:24:55.904035 read(0, "\x65\x78\x69\x74\x0a", 8192) = 5 <3.106267>
+09:24:59.010429 exit_group(0)           = ?
+09:24:59.011162 +++ exited with 0 +++

@@ -71,9 +71,10 @@ pub fn container_init_process(
         let _ = prctl::set_no_new_privileges(true);
     }
 
-    use nix::sys::stat::{makedev, mknod, Mode, SFlag};
     use std::fs::create_dir_all;
     use std::path::Path;
+
+    use nix::sys::stat::{makedev, mknod, Mode, SFlag};
 
     let host_kvm = Path::new("/dev/kvm");
     let container_kvm = ctx.rootfs.join("dev/kvm");

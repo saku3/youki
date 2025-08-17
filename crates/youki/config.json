@@ -133,17 +133,6 @@
   "hostname": "youki",
   "annotations": {},
   "linux": {
-    "resources": {
-      "devices": [
-        {
-          "allow": true,
-          "type": "c",
-          "major": 10,
-          "minor": 232,
-          "access": "rwm"
-        }
-      ]
-    },
     "namespaces": [
       {
         "type": "pid"

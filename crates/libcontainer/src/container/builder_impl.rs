@@ -1,7 +1,7 @@
 use std::fs;
 use std::io::Write;
 use std::os::fd::{AsRawFd, OwnedFd};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::rc::Rc;
 
 use libcgroups::common::CgroupManager;
@@ -84,8 +84,6 @@ impl ContainerBuilderImpl {
     }
 
     fn run_container(&mut self) -> Result<Pid, LibcontainerError> {
-        tracing::debug!("ここでやっと?");
-        let _  = self.executor.pre_exec(&self.spec);
         let linux = self.spec.linux().as_ref().ok_or(MissingSpecError::Linux)?;
         let cgroups_path = utils::get_cgroup_path(linux.cgroups_path(), &self.container_id);
         let cgroup_config = libcgroups::common::CgroupConfig {
@@ -260,7 +258,7 @@ impl ContainerBuilderImpl {
     // むしろ、executorでspecの値はわかるのだからこの関数を利用する必要はなさそう
     fn write_config_to_rootfs(
         &self,
-        rootfs: &PathBuf,
+        rootfs: &Path,
         json_spec: &str,
     ) -> Result<(), LibcontainerError> {
         let krun_config_file = ".krun_config.json";
