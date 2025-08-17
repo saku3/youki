@@ -84,6 +84,7 @@ impl ContainerBuilderImpl {
     }
 
     fn run_container(&mut self) -> Result<Pid, LibcontainerError> {
+        let _ = self.executor.pre_exec();
         let linux = self.spec.linux().as_ref().ok_or(MissingSpecError::Linux)?;
         let cgroups_path = utils::get_cgroup_path(linux.cgroups_path(), &self.container_id);
         let cgroup_config = libcgroups::common::CgroupConfig {
@@ -108,8 +109,7 @@ impl ContainerBuilderImpl {
         let json_spec = serde_json::to_string_pretty(&*self.spec).map_err(|e| {
             LibcontainerError::Other(format!("failed to serialize spec to JSON: {}", e))
         })?;
-        println!("spec as JSON:\n{}", json_spec);
-        self.write_config_to_rootfs(&self.rootfs, &json_spec)?;
+        self.write_krun_config(&self.rootfs, &json_spec)?;
 
         // If Out-of-memory score adjustment is set in specification.  set the score
         // value for the current process check
@@ -255,12 +255,8 @@ impl ContainerBuilderImpl {
         Ok(())
     }
 
-    // むしろ、executorでspecの値はわかるのだからこの関数を利用する必要はなさそう
-    fn write_config_to_rootfs(
-        &self,
-        rootfs: &Path,
-        json_spec: &str,
-    ) -> Result<(), LibcontainerError> {
+    // executorでやるのはread-onlyになっているので難しい
+    fn write_krun_config(&self, rootfs: &Path, json_spec: &str) -> Result<(), LibcontainerError> {
         let krun_config_file = ".krun_config.json";
         let config_path = rootfs.join(krun_config_file);
         println!("writing .krun_config.json to: {}", config_path.display());

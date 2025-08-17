@@ -70,52 +70,6 @@ pub fn container_init_process(
     if let Some(true) = ctx.process.no_new_privileges() {
         let _ = prctl::set_no_new_privileges(true);
     }
-
-    use std::fs::create_dir_all;
-    use std::path::Path;
-
-    use nix::sys::stat::{makedev, mknod, Mode, SFlag};
-
-    let host_kvm = Path::new("/dev/kvm");
-    let container_kvm = ctx.rootfs.join("dev/kvm");
-
-    tracing::debug!("create kvm");
-    if container_kvm.exists() {
-        fs::remove_file(&container_kvm).ok();
-    }
-    if !container_kvm.exists() {
-        tracing::debug!("mknod kvm");
-        let parent = container_kvm.parent().ok_or_else(|| {
-            tracing::error!("Failed to get parent directory of {:?}", container_kvm);
-            InitProcessError::Other("Invalid container_kvm path: has no parent".into())
-        })?;
-
-        if let Err(e) = create_dir_all(parent) {
-            tracing::error!(
-                ?e,
-                ?parent,
-                "Failed to create directory for container KVM device at {:?}",
-                container_kvm
-            );
-            return Err(InitProcessError::Io(e));
-        }
-
-        let dev = makedev(10, 232);
-        if let Err(e) = mknod(
-            &container_kvm,
-            SFlag::S_IFCHR, // キャラクタデバイス
-            Mode::from_bits_truncate(0o666),
-            dev,
-        ) {
-            tracing::error!(
-                ?e,
-                path = ?container_kvm,
-                "Failed to create /dev/kvm via mknod"
-            );
-            return Err(InitProcessError::NixOther(e));
-        }
-    }
-
     if matches!(args.container_type, ContainerType::InitContainer) {
         // create_container hook needs to be called after the namespace setup, but
         // before pivot_root is called. This runs in the container namespaces.
@@ -175,6 +129,27 @@ pub fn container_init_process(
             InitProcessError::AppArmor(err)
         })?;
     }
+
+    use std::path::Path;
+
+    use nix::sys::stat::Mode;
+    tracing::debug!("mknod kvm");
+    use crate::rootfs::device::Device;
+    let dev = Device::new();
+    use oci_spec::runtime::{LinuxDeviceBuilder, LinuxDeviceType};
+
+    let kvm = LinuxDeviceBuilder::default()
+        .typ(LinuxDeviceType::C)
+        .path(PathBuf::from("/dev/kvm"))
+        .major(10)
+        .minor(232)
+        .file_mode(0o666u32)
+        .uid(0u32)
+        .gid(0u32)
+        .build()
+        .unwrap();
+
+    let _ = dev.create_devices(Path::new("/"), std::slice::from_ref(&kvm), false);
 
     if ctx.rootfs_ro {
         ctx.syscall

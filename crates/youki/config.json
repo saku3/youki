@@ -131,7 +131,9 @@
     "noNewPrivileges": true
   },
   "hostname": "youki",
-  "annotations": {},
+  "annotations": {
+    "run.oci.handler": "krun"
+  },
   "linux": {
     "namespaces": [
       {
