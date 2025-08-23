@@ -13,6 +13,7 @@ pub mod rootfs;
 pub mod seccomp;
 pub mod signal;
 pub mod syscall;
+pub mod krun;
 pub mod test_utils;
 pub mod tty;
 pub mod user_ns;

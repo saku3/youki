@@ -28,7 +28,7 @@ impl Executor for DefaultExecutor {
         #[cfg(not(feature = "libkrun"))]
         {
             tracing::debug!("libkrun feature is not enabled; skipping pre_exec");
-            return Ok(());
+            Ok(())
         }
     }
 

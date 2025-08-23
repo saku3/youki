@@ -14,7 +14,7 @@ const LIBKRUN_NAME: &str = "libkrun.so.1";
 static LIBKRUN: Lazy<Option<Arc<Library>>> =
     Lazy::new(|| unsafe { Library::new(LIBKRUN_NAME).ok().map(Arc::new) });
 
-// Lazy, mutable ctx_id holder
+// Lazy, mutable ctx_id
 static CTX_ID: Lazy<Mutex<Option<c_int>>> = Lazy::new(|| Mutex::new(None));
 
 fn get_libkrun() -> Arc<Library> {

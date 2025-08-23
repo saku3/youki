@@ -173,7 +173,6 @@ impl ContainerBuilder {
     /// .with_root_path("/run/containers/youki").expect("invalid root path");
     /// ```
     pub fn with_root_path<P: Into<PathBuf>>(mut self, path: P) -> Result<Self, LibcontainerError> {
-        tracing::debug!("これも流石にuser_nsとかより前");
         let path = path.into();
         self.root_path = path.canonicalize_safely().map_err(|err| {
             tracing::error!(?path, ?err, "failed to canonicalize root path");
@@ -265,7 +264,6 @@ impl ContainerBuilder {
     /// .with_executor(DefaultExecutor{});
     /// ```
     pub fn with_executor(mut self, executor: impl Executor + 'static) -> Self {
-        tracing::debug!("当然libcontainer::user_nsより前に実行される");
         self.executor = Box::new(executor);
         self
     }

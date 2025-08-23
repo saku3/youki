@@ -1,7 +1,7 @@
 use std::fs;
 use std::io::Write;
 use std::os::fd::{AsRawFd, OwnedFd};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::rc::Rc;
 
 use libcgroups::common::CgroupManager;
@@ -109,7 +109,11 @@ impl ContainerBuilderImpl {
         let json_spec = serde_json::to_string_pretty(&*self.spec).map_err(|e| {
             LibcontainerError::Other(format!("failed to serialize spec to JSON: {}", e))
         })?;
-        self.write_krun_config(&self.rootfs, &json_spec)?;
+
+        if let Err(e) = crate::krun::write_krun_config(&self.rootfs, &json_spec) {
+            tracing::warn!("failed to write .krun_config.json: {e}");
+            // TODO エラーを返す
+        };
 
         // If Out-of-memory score adjustment is set in specification.  set the score
         // value for the current process check
@@ -251,21 +255,6 @@ impl ContainerBuilderImpl {
                 errors.join(";")
             )));
         }
-
-        Ok(())
-    }
-
-    // executorでやるのはread-onlyになっているので難しい
-    fn write_krun_config(&self, rootfs: &Path, json_spec: &str) -> Result<(), LibcontainerError> {
-        let krun_config_file = ".krun_config.json";
-        let config_path = rootfs.join(krun_config_file);
-        println!("writing .krun_config.json to: {}", config_path.display());
-
-        // TODO
-        // 安全にやる必要がある
-        // https://github.com/containers/crun/blob/main/src/libcrun/handlers/krun.c#L397
-        fs::write(&config_path, json_spec)
-            .map_err(|e| LibcontainerError::Other(format!("fs::write failed: {}", e)))?;
 
         Ok(())
     }
