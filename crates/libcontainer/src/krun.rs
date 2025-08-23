@@ -4,7 +4,7 @@ use std::path::Path;
 #[derive(Debug, thiserror::Error)]
 pub enum KrunError {
     #[error("{0}")]
-    Other(String), 
+    Other(String),
 }
 
 type Result<T> = std::result::Result<T, KrunError>;

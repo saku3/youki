@@ -110,10 +110,8 @@ impl ContainerBuilderImpl {
             LibcontainerError::Other(format!("failed to serialize spec to JSON: {}", e))
         })?;
 
-        if let Err(e) = crate::krun::write_krun_config(&self.rootfs, &json_spec) {
-            tracing::warn!("failed to write .krun_config.json: {e}");
-            // TODO エラーを返す
-        };
+        crate::krun::write_krun_config(&self.rootfs, &json_spec)
+            .map_err(|e| LibcontainerError::Other(format!("write_krun_config: {e}")))?;
 
         // If Out-of-memory score adjustment is set in specification.  set the score
         // value for the current process check
