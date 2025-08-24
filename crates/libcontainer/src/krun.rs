@@ -16,13 +16,12 @@ pub enum KrunError {
 
 type Result<T> = std::result::Result<T, KrunError>;
 
-// executorでやるのはread-onlyになっているので難しい
 pub fn write_krun_config(rootfs: &Path, json_spec: &str) -> Result<()> {
     let krun_config_file = ".krun_config.json";
     let config_path = rootfs.join(krun_config_file);
     println!("writing .krun_config.json to: {}", config_path.display());
 
-    // TODO safely
+    // TODO atomic write
     // https://github.com/containers/crun/blob/main/src/libcrun/handlers/krun.c#L397
     fs::write(&config_path, json_spec)
         .map_err(|e| KrunError::Other(format!("fs::write failed: {}", e)))?;
@@ -30,7 +29,7 @@ pub fn write_krun_config(rootfs: &Path, json_spec: &str) -> Result<()> {
     Ok(())
 }
 
-// add /dev/kvm to device
+// add /dev/kvm to linux.device
 pub fn libkrun_modify_spec_device(spec: &mut Spec) -> Result<()> {
     let mut linux = match spec.linux().clone() {
         Some(l) => l,
@@ -38,15 +37,25 @@ pub fn libkrun_modify_spec_device(spec: &mut Spec) -> Result<()> {
             .build()
             .map_err(|e| KrunError::Other(format!("build default linux section: {e}")))?,
     };
-    let mut devices: Vec<LinuxDevice> = linux.devices().clone().unwrap_or_default().to_vec();
+
+    let (kvm_major, kvm_minor) = match stat_dev_numbers("/dev/kvm") {
+        Ok(v) => v,
+        Err(e) if e.kind() == io::ErrorKind::NotFound => {
+            spec.set_linux(Some(linux));
+            return Ok(());
+        }
+        Err(e) => return Err(KrunError::Other(format!("stat `/dev/kvm`: {e}"))),
+    };
+
+    let mut devices: Vec<LinuxDevice> = linux.devices().clone().unwrap_or_default();
 
     let already = devices.iter().any(|d| d.path() == Path::new("/dev/kvm"));
     if !already {
         let kvm_node = LinuxDeviceBuilder::default()
             .typ(LinuxDeviceType::C)
             .path(PathBuf::from("/dev/kvm"))
-            .major(10)
-            .minor(232)
+            .major(kvm_major)
+            .minor(kvm_minor)
             .file_mode(0o666u32)
             .uid(0u32)
             .gid(0u32)
@@ -54,51 +63,45 @@ pub fn libkrun_modify_spec_device(spec: &mut Spec) -> Result<()> {
             .map_err(|e| KrunError::Other(format!("build linux.devices /dev/kvm: {e}")))?;
         devices.push(kvm_node);
         linux.set_devices(Some(devices));
-        spec.set_linux(Some(linux));
     }
+
+    spec.set_linux(Some(linux));
     Ok(())
 }
 
+// Add an allow rule for /dev/kvm to linux.resources.devices
+// if resources.devices is None or empty, it's effectively permissive, so skip.
 pub fn libkrun_modify_spec(spec: &mut Spec) -> Result<()> {
-    let Some(linux) = spec.linux() else {
-        return Ok(());
+    let mut linux = match spec.linux() {
+        Some(l) => l.clone(),
+        None => return Ok(()),
     };
-    let mut linux = linux.clone();
-
-    let Some(mut res) = linux.resources().clone() else {
-        return Ok(());
+    let mut res = match linux.resources() {
+        Some(r) => r.clone(),
+        None => return Ok(()),
     };
-
-    let mut device_cgroups: Vec<LinuxDeviceCgroup> = res.devices().clone().unwrap_or_default();
-
-    let mut has_kvm = true;
+    let mut device_cgroups: Vec<LinuxDeviceCgroup> = match res.devices() {
+        Some(v) if !v.is_empty() => v.clone(),
+        _ => return Ok(()),
+    };
 
     let (kvm_major, kvm_minor) = match stat_dev_numbers("/dev/kvm") {
         Ok(v) => v,
-        Err(e) if e.kind() == io::ErrorKind::NotFound => {
-            has_kvm = false;
-            (0, 0)
-        }
-        Err(e) => {
-            tracing::error!(?e, "failed to stat /dev/kvm");
-            return Err(KrunError::Other(format!("stat `/dev/kvm`: {e}")));
-        }
+        Err(e) if e.kind() == io::ErrorKind::NotFound => return Ok(()),
+        Err(e) => return Err(KrunError::Other(format!("stat `/dev/kvm`: {e}"))),
     };
 
-    if has_kvm {
-        device_cgroups.push(make_oci_spec_dev(
-            LinuxDeviceType::A,
-            kvm_major,
-            kvm_minor,
-            true,
-            "rwm",
-        ));
-    }
-
+    device_cgroups.push(make_oci_spec_dev(
+        LinuxDeviceType::C,
+        kvm_major,
+        kvm_minor,
+        true,
+        "rwm",
+    ));
     res.set_devices(Some(device_cgroups));
     linux.set_resources(Some(res));
-
     spec.set_linux(Some(linux));
+
     Ok(())
 }
 
