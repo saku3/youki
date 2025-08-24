@@ -4,12 +4,6 @@ on:
   schedule:
   - cron: "0 0 * * *"
   workflow_dispatch:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
   runc-integration-tests:
@@ -22,25 +16,12 @@ jobs:
 
       - name: Install just
         uses: taiki-e/install-action@just
-
-      - name: Install runc and youki requirements
+      - name: install runc and youki  requirements
         run: |
           sudo apt update
           sudo apt -y install libseccomp-dev sshfs uidmap \
                pkg-config libsystemd-dev build-essential libelf-dev \
                libclang-dev libssl-dev
-
-      - name: Install bpftrace (and headers if available)
-        run: |
-          sudo apt -y install bpftrace || true
-          sudo apt -y install "linux-headers-$(uname -r)" || true
-
-      - name: Prepare kernel tracing env
-        run: |
-          sudo mount -t debugfs none /sys/kernel/debug || true
-          echo 0 | sudo tee /proc/sys/kernel/kptr_restrict
-          sudo sysctl -w kernel.perf_event_paranoid=1 || true
-
       - name: Build youki
         run: just youki-release
 
@@ -49,16 +30,8 @@ jobs:
           go-version: '1.23.x'
           cache: true
 
-      - name: Add execute permission
+      - name: Add the permission to run
         run: chmod +x ./youki
-
-      - name: Start bpftrace alongside tests
-        env:
-          BPFTRACE_STRLEN: "256"
-        run: |
-          just hack-bpftrace > bpftrace.log 2>&1 &
-          echo $! > bpftrace.pid
-
       - name: Setup Bats and bats libs
         uses: bats-core/bats-action@3.0.1
         with:
@@ -67,29 +40,9 @@ jobs:
           assert-install: false
           detik-install: false
           file-install: false
-
       - name: Allow userns for runc
+        # https://github.com/opencontainers/runc/pull/4286
         run: |
           sed "s;^profile runc /usr/sbin/;profile runc-test $(pwd)/tests/runc/src/github.com/opencontainers/runc/;" < /etc/apparmor.d/runc | sudo apparmor_parser
-
       - name: Runc integration test
-        continue-on-error: true       
-        run: |
-          bash tests/runc/runc_integration_test.sh ./youki tests/runc/runc_test_pattern_full_dont_hang | tee runc_integration_test.log
-
-      - name: Stop bpftrace (if still running)
-        if: always()                   
-        run: |
-          if [ -f bpftrace.pid ]; then
-            sudo kill -INT "$(cat bpftrace.pid)" || true
-            wait "$(cat bpftrace.pid)" || true
-          fi
-
-      - name: Upload logs
-        if: always()                  
-        uses: actions/upload-artifact@v4
-        with:
-          name: runc-integration-with-bpftrace
-          path: |
-            runc_integration_test.log
-            bpftrace.log
+        run: tests/runc/runc_integration_test.sh
