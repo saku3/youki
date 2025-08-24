@@ -1,9 +1,9 @@
 use nix::errno::Errno;
 use nix::sys::stat::{major, minor, stat};
-use oci_spec::runtime::{LinuxDeviceCgroup, LinuxDeviceCgroupBuilder, LinuxDeviceType, Spec};
+use oci_spec::runtime::{LinuxDevice, LinuxDeviceCgroup, LinuxDeviceCgroupBuilder, LinuxDeviceType, LinuxDeviceBuilder, Spec};
 use std::fs;
 use std::io;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, thiserror::Error)]
 pub enum KrunError {
@@ -27,7 +27,6 @@ pub fn write_krun_config(rootfs: &Path, json_spec: &str) -> Result<()> {
     Ok(())
 }
 
-/// linux device cgroup
 pub fn libkrun_modify_spec(spec: &mut Spec) -> Result<()> {
     let Some(linux) = spec.linux() else {
         return Ok(());
@@ -38,7 +37,7 @@ pub fn libkrun_modify_spec(spec: &mut Spec) -> Result<()> {
         return Ok(());
     };
 
-    let mut devices: Vec<LinuxDeviceCgroup> = res.devices().clone().unwrap_or_default();
+    let mut device_cgroups: Vec<LinuxDeviceCgroup> = res.devices().clone().unwrap_or_default();
 
     let mut has_kvm = true;
 
@@ -55,7 +54,7 @@ pub fn libkrun_modify_spec(spec: &mut Spec) -> Result<()> {
     };
 
     if has_kvm {
-        devices.push(make_oci_spec_dev(
+        device_cgroups.push(make_oci_spec_dev(
             LinuxDeviceType::A,
             kvm_major,
             kvm_minor,
@@ -64,10 +63,30 @@ pub fn libkrun_modify_spec(spec: &mut Spec) -> Result<()> {
         ));
     }
 
-    res.set_devices(Some(devices));
+    res.set_devices(Some(device_cgroups));
     linux.set_resources(Some(res));
-    spec.set_linux(Some(linux));
 
+    // add /dev/kvm to device
+    let mut devices: Vec<LinuxDevice> =
+        linux.devices().as_ref().unwrap().to_vec();
+
+    let already = devices.iter().any(|d| d.path() == Path::new("/dev/kvm"));
+    if !already {
+        let kvm_node = LinuxDeviceBuilder::default()
+            .typ(LinuxDeviceType::C)
+            .path(PathBuf::from("/dev/kvm"))
+            .major(kvm_major)
+            .minor(kvm_minor)
+            .file_mode(0o666u32)
+            .uid(0u32)
+            .gid(0u32)
+            .build()
+            .map_err(|e| KrunError::Other(format!("build linux.devices /dev/kvm: {e}")))?;
+        devices.push(kvm_node);
+        linux.set_devices(Some(devices));
+    }
+
+    spec.set_linux(Some(linux));
     Ok(())
 }
 
@@ -96,9 +115,10 @@ fn stat_dev_numbers(path: &str) -> std::io::Result<(i64, i64)> {
     }
 }
 
+
+
 // use std::path::Path;
 
-// tracing::debug!("mknod kvm");
 // use crate::rootfs::device::Device;
 // let dev = Device::new();
 // use oci_spec::runtime::{LinuxDeviceBuilder, LinuxDeviceType};
