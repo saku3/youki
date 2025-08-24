@@ -1,10 +1,7 @@
+use oci_spec::runtime::Spec;
+use std::fs;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
-use std::{fs, io};
-
-use nix::errno::Errno;
-use nix::sys::stat::{major, minor, stat};
-use oci_spec::runtime::{LinuxDeviceCgroup, LinuxDeviceCgroupBuilder, LinuxDeviceType, Spec};
 use user_ns::UserNamespaceConfig;
 
 use super::builder::ContainerBuilder;
@@ -152,13 +149,23 @@ impl InitContainerBuilder {
         let source_spec_path = self.bundle.join("config.json");
         let mut spec = Spec::load(source_spec_path)?;
         Self::validate_spec(&spec)?;
-        Self::libkrun_modify_spec(&mut spec)?;
-        // println!("{:?}", spec);
 
         spec.canonicalize_rootfs(&self.bundle).map_err(|err| {
             tracing::error!(bundle = ?self.bundle, "failed to canonicalize rootfs: {}", err);
             err
         })?;
+
+        let json_spec = serde_json::to_string_pretty(&spec).map_err(|e| {
+            LibcontainerError::Other(format!("failed to serialize spec to JSON: {}", e))
+        })?;
+
+        crate::krun::libkrun_modify_spec(&mut spec)
+            .map_err(|e| LibcontainerError::Other(format!("libkrun_modify_spec: {e}")))?;
+        crate::krun::write_krun_config(
+            spec.root().as_ref().ok_or(MissingSpecError::Root)?.path(),
+            &json_spec,
+        )
+        .map_err(|e| LibcontainerError::Other(format!("write_krun_config: {e}")))?;
 
         Ok(spec)
     }
@@ -219,76 +226,5 @@ impl InitContainerBuilder {
         )?;
         container.save()?;
         Ok(container)
-    }
-
-    // linux device cgroup
-    fn libkrun_modify_spec(spec: &mut Spec) -> Result<(), LibcontainerError> {
-        println!("libkrun_modify_spec");
-
-        let Some(linux) = spec.linux() else {
-            return Ok(());
-        };
-        let mut linux = linux.clone();
-        let Some(mut res) = linux.resources().clone() else {
-            return Ok(());
-        };
-        println!("libkrun_modify_spec device");
-
-        let mut devices: Vec<LinuxDeviceCgroup> = res.devices().clone().unwrap_or_else(Vec::new);
-
-        let mut has_kvm = true;
-
-        let (kvm_major, kvm_minor) = match Self::stat_dev_numbers("/dev/kvm") {
-            Ok(v) => v,
-            Err(e) if e.kind() == io::ErrorKind::NotFound => {
-                has_kvm = false;
-                (0, 0)
-            }
-            Err(e) => {
-                tracing::error!(?e, "failed to parse io priority class");
-                return Err(LibcontainerError::Other(format!("stat `/dev/kvm`: {e}")));
-            }
-        };
-
-        if has_kvm {
-            devices.push(Self::make_oci_spec_dev(
-                LinuxDeviceType::A,
-                kvm_major,
-                kvm_minor,
-                true,
-                "rwm",
-            ));
-        }
-
-        res.set_devices(Some(devices));
-        linux.set_resources(Some(res));
-        spec.set_linux(Some(linux));
-
-        Ok(())
-    }
-
-    fn make_oci_spec_dev(
-        dev_type: LinuxDeviceType,
-        major_num: i64,
-        minor_num: i64,
-        allow: bool,
-        access: &str,
-    ) -> LinuxDeviceCgroup {
-        LinuxDeviceCgroupBuilder::default()
-            .allow(allow)
-            .typ(dev_type)
-            .major(major_num)
-            .minor(minor_num)
-            .access(access.to_string())
-            .build()
-            .expect("device cgroup build")
-    }
-
-    fn stat_dev_numbers(path: &str) -> Result<(i64, i64), io::Error> {
-        match stat(Path::new(path)) {
-            Ok(st) => Ok((major(st.st_rdev) as i64, minor(st.st_rdev) as i64)),
-            Err(Errno::ENOENT) => Err(io::Error::new(io::ErrorKind::NotFound, "not found")),
-            Err(e) => Err(io::Error::new(io::ErrorKind::Other, e)),
-        }
     }
 }

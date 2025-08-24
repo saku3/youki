@@ -122,34 +122,13 @@ pub fn container_init_process(
             sysctl(kernel_params)?;
         }
     }
-
+    use nix::sys::stat::Mode;
     if let Some(profile) = ctx.process.apparmor_profile() {
         apparmor::apply_profile(profile).map_err(|err| {
             tracing::error!(?err, "failed to apply apparmor profile");
             InitProcessError::AppArmor(err)
         })?;
     }
-
-    use std::path::Path;
-
-    use nix::sys::stat::Mode;
-    tracing::debug!("mknod kvm");
-    use crate::rootfs::device::Device;
-    let dev = Device::new();
-    use oci_spec::runtime::{LinuxDeviceBuilder, LinuxDeviceType};
-
-    let kvm = LinuxDeviceBuilder::default()
-        .typ(LinuxDeviceType::C)
-        .path(PathBuf::from("/dev/kvm"))
-        .major(10)
-        .minor(232)
-        .file_mode(0o666u32)
-        .uid(0u32)
-        .gid(0u32)
-        .build()
-        .unwrap();
-
-    let _ = dev.create_devices(Path::new("/"), std::slice::from_ref(&kvm), false);
 
     if ctx.rootfs_ro {
         ctx.syscall
