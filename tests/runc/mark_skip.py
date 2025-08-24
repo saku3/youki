@@ -21,7 +21,7 @@ def needs_skip(line: str, keys: set[str]) -> bool:
     if SKIP_PREFIX_RE.match(line):
         return False  # 既に [skip] 付与済み
     content = line.strip()
-    return content in keys
+    return content not in keys
 
 def mark_file(src: Path, ref: Path, in_place: bool = False, out: Path | None = None) -> None:
     keys = load_keys(ref)
