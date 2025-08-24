@@ -19,7 +19,7 @@ sudo make test-binaries
 readarray -t TEST_NAMES < "$PATTERN_FILE"
 for name in "${TEST_NAMES[@]}"; do
   if [[ $name =~ ^\[skip\] ]]; then
-    echo "skip: $name" >&2
+    echo "skip: $name"
     continue
   fi
 
