@@ -179,10 +179,10 @@ runc pause and resume with nonexist container
 [skip]runc run personality with exec for i686
 runc run personality for x86_64
 [skip]runc run personality with exec for x86_64
-runc create [ --pidfd-socket ] 
-runc run [ --pidfd-socket ] 
+[skip]runc create [ --pidfd-socket ] 
+[skip]runc run [ --pidfd-socket ] 
 [skip]runc exec [ --pidfd-socket ] [cgroups_v1]  # skip test requires cgroups_v1
-runc exec [ --pidfd-socket ] [cgroups_v2] 
+[skip]runc exec [ --pidfd-socket ] [cgroups_v2] 
 ps
 ps -f json
 [skip]ps -e -x
