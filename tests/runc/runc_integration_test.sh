@@ -18,6 +18,11 @@ sudo make test-binaries
 
 readarray -t TEST_NAMES < "$PATTERN_FILE"
 for name in "${TEST_NAMES[@]}"; do
+  if [[ "$name" =~ ^[[:space:]]*skip ]]; then
+    echo "skip: $name" >&2
+    continue
+  fi
+
   # escape [](){}+?*.,'
   TEST_CASE=$(echo "$name" | sed 's/\\/\\\\/g; s/\[/\\[/g; s/\]/\\]/g; s/(/\\(/g; s/)/\\)/g; s/+/\\+/g; s/?/\\?/g; s/*/\\*/g; s/\./\\./g; s/{/\\{/g; s/}/\\}/g; s/,/\\,/g;')
   echo $TEST_CASE

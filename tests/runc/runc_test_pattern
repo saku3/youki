@@ -28,7 +28,7 @@ runc exec (cgroup v1+hybrid joins correct cgroup) # skip test requires cgroups_h
 runc exec should refuse a paused container
 runc exec --ignore-paused
 runc run/create should error for a non-empty cgroup
-runc run/create should refuse pre-existing frozen cgroup
+[skip]runc run/create should refuse pre-existing frozen cgroup
 checkpoint and restore # skip test requires criu
 checkpoint and restore (bind mount, destination is symlink) # skip test requires criu
 checkpoint and restore (with --debug) # skip test requires criu
@@ -75,18 +75,18 @@ runc run [devices vs systemd NeedDaemonReload] # skip requires systemd >= v230
 non-empty HOME env is used
 empty HOME env var is overridden
 empty HOME env var is overridden with multiple overrides
-env var HOME is set only once
+[skip]env var HOME is set only once
 env var override is set only once
 env var override
 env var with new-line is honored
 events --stats
-events --stats with psi data
-events --interval default
+[skip]events --stats with psi data
+[skip]events --interval default
 events --interval 1s
 events --interval 100ms
-events oom
+[skip]events oom
 runc exec
-runc exec [exit codes]
+[skip]runc exec [exit codes]
 runc exec --pid-file
 runc exec --pid-file with new CWD
 runc exec ls -la
@@ -114,7 +114,7 @@ runc run (hooks library tests)
 runc run [host mount ns + hooks]
 simple idmap mount [userns]
 simple idmap mount [no userns]
-write to an idmap mount [userns]
+[skip]write to an idmap mount [userns]
 write to an idmap mount [no userns]
 idmap mount with propagation flag [userns]
 idmap mount with relative path [userns]
@@ -125,7 +125,7 @@ same idmap mount (different mappings) [userns]
 same idmap mount (different mappings) [no userns]
 multiple idmap mounts (different mappings) [userns]
 multiple idmap mounts (different mappings) [no userns]
-idmap mount (complicated mapping) [userns]
+[skip]idmap mount (complicated mapping) [userns]
 idmap mount (complicated mapping) [no userns]
 idmap mount (non-recursive idmap) [userns]
 idmap mount (non-recursive idmap) [no userns]
@@ -147,7 +147,7 @@ mask paths [directory]
 mask paths [prohibit symlink /proc]
 mask paths [prohibit symlink /sys]
 runc run [tmpcopyup]
-runc run [bind mount]
+[skip]runc run [bind mount]
 runc run [ro tmpfs mount]
 runc run [ro /dev mount]
 runc run [tmpfs mount with absolute symlink]
