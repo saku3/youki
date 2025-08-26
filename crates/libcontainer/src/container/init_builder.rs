@@ -155,19 +155,8 @@ impl InitContainerBuilder {
             err
         })?;
 
-        let json_spec = serde_json::to_string_pretty(&spec).map_err(|e| {
-            LibcontainerError::Other(format!("failed to serialize spec to JSON: {}", e))
-        })?;
-
-        crate::krun::libkrun_modify_spec_device(&mut spec)
-            .map_err(|e| LibcontainerError::Other(format!("libkrun_modify_spec_device: {e}")))?;
-        crate::krun::libkrun_modify_spec(&mut spec)
-            .map_err(|e| LibcontainerError::Other(format!("libkrun_modify_spec: {e}")))?;
-        crate::krun::write_krun_config(
-            spec.root().as_ref().ok_or(MissingSpecError::Root)?.path(),
-            &json_spec,
-        )
-        .map_err(|e| LibcontainerError::Other(format!("write_krun_config: {e}")))?;
+        crate::krun::configure_for_libkrun(&mut spec)
+            .map_err(|e| LibcontainerError::Other(format!("libkrun configuration failed: {e}")))?;
 
         Ok(spec)
     }

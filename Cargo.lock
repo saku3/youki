@@ -2064,7 +2064,6 @@ dependencies = [
  "fastrand",
  "libc",
  "libcgroups",
- "libloading",
  "libseccomp",
  "nc",
  "nix 0.29.0",

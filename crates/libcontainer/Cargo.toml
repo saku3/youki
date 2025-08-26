@@ -52,7 +52,6 @@ thiserror = "2.0.14"
 tracing = { version = "0.1.41", features = ["attributes"] }
 safe-path = "0.1.0"
 nc = "0.9.6"
-libloading = "0.8"
 
 [dev-dependencies]
 oci-spec = { version = "~0.8.2", features = ["proptests", "runtime"] }

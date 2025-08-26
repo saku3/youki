@@ -7,6 +7,7 @@ use oci_spec::runtime::{
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
+use crate::error::MissingSpecError;
 
 #[derive(Debug, thiserror::Error)]
 pub enum KrunError {
@@ -15,19 +16,6 @@ pub enum KrunError {
 }
 
 type Result<T> = std::result::Result<T, KrunError>;
-
-pub fn write_krun_config(rootfs: &Path, json_spec: &str) -> Result<()> {
-    let krun_config_file = ".krun_config.json";
-    let config_path = rootfs.join(krun_config_file);
-    println!("writing .krun_config.json to: {}", config_path.display());
-
-    // TODO atomic write
-    // https://github.com/containers/crun/blob/main/src/libcrun/handlers/krun.c#L397
-    fs::write(&config_path, json_spec)
-        .map_err(|e| KrunError::Other(format!("fs::write failed: {}", e)))?;
-
-    Ok(())
-}
 
 // add /dev/kvm to linux.device
 pub fn libkrun_modify_spec_device(spec: &mut Spec) -> Result<()> {
@@ -130,21 +118,34 @@ fn stat_dev_numbers(path: &str) -> std::io::Result<(i64, i64)> {
     }
 }
 
-// use std::path::Path;
+pub fn write_krun_config(rootfs: &Path, json_spec: &str) -> Result<()> {
+    let krun_config_file = ".krun_config.json";
+    let config_path = rootfs.join(krun_config_file);
+    println!("writing .krun_config.json to: {}", config_path.display());
 
-// use crate::rootfs::device::Device;
-// let dev = Device::new();
-// use oci_spec::runtime::{LinuxDeviceBuilder, LinuxDeviceType};
+    // TODO atomic write
+    // https://github.com/containers/crun/blob/main/src/libcrun/handlers/krun.c#L397
+    fs::write(&config_path, json_spec)
+        .map_err(|e| KrunError::Other(format!("fs::write failed: {}", e)))?;
 
-// let kvm = LinuxDeviceBuilder::default()
-//     .typ(LinuxDeviceType::C)
-//     .path(PathBuf::from("/dev/kvm"))
-//     .major(10)
-//     .minor(232)
-//     .file_mode(0o666u32)
-//     .uid(0u32)
-//     .gid(0u32)
-//     .build()
-//     .unwrap();
+    Ok(())
+}
 
-// let _ = dev.create_devices(Path::new("/"), std::slice::from_ref(&kvm), false);
+pub fn configure_for_libkrun(spec: &mut Spec) -> Result<()> {
+    let rootfs = spec
+        .root()
+        .as_ref()
+        .ok_or(MissingSpecError::Root)
+        .map_err(|e| KrunError::Other(format!("Missing root in spec: {e:?}")))?
+        .path()
+        .to_path_buf();
+    libkrun_modify_spec_device(spec)
+        .map_err(|e| KrunError::Other(format!("libkrun_modify_spec_device: {e}")))?;
+    libkrun_modify_spec(spec).map_err(|e| KrunError::Other(format!("libkrun_modify_spec: {e}")))?;
+
+    let json_spec = serde_json::to_string_pretty(&spec)
+        .map_err(|e| KrunError::Other(format!("failed to serialize spec to JSON: {}", e)))?;
+    write_krun_config(&rootfs, &json_spec)
+        .map_err(|e| KrunError::Other(format!("write_krun_config: {e}")))?;
+    Ok(())
+}
