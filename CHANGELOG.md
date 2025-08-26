@@ -1,5 +1,7 @@
 # Changelog
 
+## [v0.0.2](https://github.com/saku3/youki/compare/v0.0.1...v0.0.2) - 2025-08-26
+
 ## [v0.5.5](https://github.com/youki-dev/youki/compare/v0.5.4...v0.5.5) - 2025-08-14
 ### 💪 Improvements
 - fix(3198): fix difference in how commands are passed after exec and ps by @tommady in https://github.com/youki-dev/youki/pull/3201
