@@ -1,7 +1,8 @@
-use oci_spec::runtime::Spec;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
+
+use oci_spec::runtime::Spec;
 use user_ns::UserNamespaceConfig;
 
 use super::builder::ContainerBuilder;

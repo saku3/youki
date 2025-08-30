@@ -6,6 +6,7 @@ use std::{env, fs, mem};
 use nc;
 use nix::mount::{MntFlags, MsFlags};
 use nix::sched::CloneFlags;
+use nix::sys::stat::Mode;
 use nix::unistd::{self, close, dup2, setsid, Gid, Uid};
 use oci_spec::runtime::{
     IOPriorityClass, LinuxIOPriority, LinuxNamespaceType, LinuxSchedulerFlag, LinuxSchedulerPolicy,
@@ -122,7 +123,7 @@ pub fn container_init_process(
             sysctl(kernel_params)?;
         }
     }
-    use nix::sys::stat::Mode;
+
     if let Some(profile) = ctx.process.apparmor_profile() {
         apparmor::apply_profile(profile).map_err(|err| {
             tracing::error!(?err, "failed to apply apparmor profile");
