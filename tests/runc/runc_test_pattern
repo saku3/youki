@@ -84,7 +84,7 @@ env var override
 [skip]events --interval default # This test hangs when running with Youki
 [skip]events --interval 1s
 [skip]events --interval 100ms
-[skip]events oom # This test hangs when running with Youki
+events oom
 runc exec
 [skip]runc exec [exit codes] # This test hangs when running with Youki
 runc exec --pid-file
