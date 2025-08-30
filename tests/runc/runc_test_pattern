@@ -28,7 +28,7 @@ runc run (cgroup v2 resources.unified override)
 [skip]runc exec should refuse a paused container
 [skip]runc exec --ignore-paused
 [skip]runc run/create should error for a non-empty cgroup
-[skip]runc run/create should refuse pre-existing frozen cgroup # This test hangs when running with Youki
+runc run/create should refuse pre-existing frozen cgroup # This test hangs when running with Youki
 [skip]checkpoint and restore # skip test requires criu
 [skip]checkpoint and restore (bind mount, destination is symlink) # skip test requires criu
 [skip]checkpoint and restore (with --debug) # skip test requires criu
