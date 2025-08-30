@@ -1,20 +1,19 @@
 use std::ffi::CString;
 use std::os::raw::{c_char, c_int};
-use std::sync::{Arc, Mutex};
-
-use libcontainer::oci_spec::runtime::{    LinuxBuilder, LinuxDevice, LinuxDeviceBuilder, LinuxDeviceCgroup, LinuxDeviceCgroupBuilder,
-    LinuxDeviceType, Spec};
-use libcontainer::workload::{Executor, ExecutorError, ExecutorValidationError, EMPTY};
-use libloading::{Library, Symbol};
-use once_cell::sync::Lazy;
-
 use std::path::{Path, PathBuf};
+use std::sync::{Arc, Mutex};
 use std::{fs, io};
 
+use libcontainer::error::MissingSpecError;
+use libcontainer::oci_spec::runtime::{
+    LinuxBuilder, LinuxDevice, LinuxDeviceBuilder, LinuxDeviceCgroup, LinuxDeviceCgroupBuilder,
+    LinuxDeviceType, Spec,
+};
+use libcontainer::workload::{Executor, ExecutorError, ExecutorValidationError, EMPTY};
+use libloading::{Library, Symbol};
 use nix::errno::Errno;
 use nix::sys::stat::{major, minor, stat};
-
-use libcontainer::error::MissingSpecError;
+use once_cell::sync::Lazy;
 
 const EXECUTOR_NAME: &str = "libkrun";
 const LIBKRUN_NAME: &str = "libkrun.so.1";
@@ -55,7 +54,7 @@ pub struct LibkrunExecutor {}
 
 impl Executor for LibkrunExecutor {
     fn pre_exec(&self, spec: Spec) -> Result<Spec, ExecutorError> {
-        let spec = configure_for_libkrun(spec)
+        let spec = configure_spec_for_libkrun(spec)
             .map_err(|e| ExecutorError::Other(format!("configure_for_libkrun: {e}")))?;
 
         let lib = get_libkrun();
@@ -148,8 +147,6 @@ pub enum KrunError {
     Other(String),
 }
 
-// type Result<T> = std::result::Result<T, KrunError>;
-
 // add /dev/kvm to linux.device
 pub fn libkrun_modify_spec_device(spec: &mut Spec) -> Result<(), KrunError> {
     let mut linux = match spec.linux().clone() {
@@ -179,7 +176,7 @@ pub fn libkrun_modify_spec_device(spec: &mut Spec) -> Result<(), KrunError> {
             kvm_minor,
             0o666u32,
             0u32,
-            0u32
+            0u32,
         ));
         linux.set_devices(Some(devices));
     }
@@ -245,7 +242,7 @@ pub fn write_krun_config(rootfs: &Path, json_spec: &str) -> Result<(), KrunError
     Ok(())
 }
 
-pub fn configure_for_libkrun(mut spec: Spec) -> Result<Spec, KrunError> {
+pub fn configure_spec_for_libkrun(mut spec: Spec) -> Result<Spec, KrunError> {
     let use_krun = {
         spec.annotations()
             .as_ref()
@@ -267,7 +264,7 @@ pub fn configure_for_libkrun(mut spec: Spec) -> Result<Spec, KrunError> {
         .to_path_buf();
     libkrun_modify_spec_device(&mut spec)
         .map_err(|e| KrunError::Other(format!("libkrun_modify_spec_device: {e:?}")))?;
-    libkrun_modify_spec_resource_device(&mut  spec)
+    libkrun_modify_spec_resource_device(&mut spec)
         .map_err(|e| KrunError::Other(format!("libkrun_modify_spec: {e:?}")))?;
 
     let json_spec = serde_json::to_string_pretty(&spec)
@@ -302,7 +299,7 @@ fn make_oci_spec_device(
     file_mode: u32,
     uid: u32,
     gid: u32,
-) -> LinuxDevice{
+) -> LinuxDevice {
     LinuxDeviceBuilder::default()
         .typ(dev_type)
         .path(path.into())
@@ -313,5 +310,4 @@ fn make_oci_spec_device(
         .gid(gid)
         .build()
         .expect("device node build")
-        // .map_err(|e| KrunError::Other(format!("build linux.devices node: {e}")))
 }
