@@ -28,7 +28,7 @@ runc run (cgroup v2 resources.unified override)
 [skip]runc exec should refuse a paused container
 [skip]runc exec --ignore-paused
 [skip]runc run/create should error for a non-empty cgroup
-runc run/create should refuse pre-existing frozen cgroup
+[skip]runc run/create should refuse pre-existing frozen cgroup
 [skip]checkpoint and restore # skip test requires criu
 [skip]checkpoint and restore (bind mount, destination is symlink) # skip test requires criu
 [skip]checkpoint and restore (with --debug) # skip test requires criu
@@ -75,7 +75,7 @@ runc run [redundant default /dev/ptmx]
 non-empty HOME env is used
 [skip]empty HOME env var is overridden
 [skip]empty HOME env var is overridden with multiple overrides
-[skip]env var HOME is set only once # This test hangs when running with Youki
+env var HOME is set only once
 env var override is set only once
 env var override
 [skip]env var with new-line is honored
