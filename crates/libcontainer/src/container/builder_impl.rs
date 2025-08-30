@@ -105,6 +105,7 @@ impl ContainerBuilderImpl {
         // user namespace in the case that the path is located in paths only
         // root can access.
         let notify_listener = NotifyListener::new(&self.notify_path)?;
+
         // If Out-of-memory score adjustment is set in specification.  set the score
         // value for the current process check
         // https://dev.to/rrampage/surviving-the-linux-oom-killer-2ki9 for some more
