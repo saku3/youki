@@ -65,9 +65,9 @@ impl InitContainerBuilder {
     pub fn build(self) -> Result<Container, LibcontainerError> {
         let spec = self.load_spec()?;
 
-        let spec = crate::krun::configure_for_libkrun(spec)
-            .map_err(|e| LibcontainerError::Other(format!("libkrun configuration failed: {e}")))?;
-        let _ = self.base.executor.pre_exec();
+        // let spec = crate::krun::configure_for_libkrun(spec)
+        //     .map_err(|e| LibcontainerError::Other(format!("libkrun configuration failed: {e}")))?;
+        let spec = self.base.executor.pre_exec(spec)?;
 
         let container_dir = self.create_container_dir()?;
 

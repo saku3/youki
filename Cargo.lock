@@ -6127,6 +6127,7 @@ dependencies = [
  "serial_test",
  "tabwriter",
  "tempfile",
+ "thiserror 2.0.14",
  "tracing",
  "tracing-journald",
  "tracing-subscriber",
