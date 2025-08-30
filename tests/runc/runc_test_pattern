@@ -28,7 +28,7 @@ runc run (cgroup v2 resources.unified override)
 [skip]runc exec should refuse a paused container
 [skip]runc exec --ignore-paused
 [skip]runc run/create should error for a non-empty cgroup
-[skip]runc run/create should refuse pre-existing frozen cgroup
+[skip]runc run/create should refuse pre-existing frozen cgroup # This test hangs when running with Youki
 [skip]checkpoint and restore # skip test requires criu
 [skip]checkpoint and restore (bind mount, destination is symlink) # skip test requires criu
 [skip]checkpoint and restore (with --debug) # skip test requires criu
@@ -75,18 +75,18 @@ runc run [redundant default /dev/ptmx]
 non-empty HOME env is used
 [skip]empty HOME env var is overridden
 [skip]empty HOME env var is overridden with multiple overrides
-[skip]env var HOME is set only once
+[skip]env var HOME is set only once # This test hangs when running with Youki
 env var override is set only once
 env var override
 [skip]env var with new-line is honored
 [skip]events --stats
-[skip]events --stats with psi data
-[skip]events --interval default
+[skip]events --stats with psi data # This test hangs when running with Youki
+[skip]events --interval default # This test hangs when running with Youki
 [skip]events --interval 1s
 [skip]events --interval 100ms
-[skip]events oom
+[skip]events oom # This test hangs when running with Youki
 runc exec
-[skip]runc exec [exit codes]
+[skip]runc exec [exit codes] # This test hangs when running with Youki
 runc exec --pid-file
 runc exec --pid-file with new CWD
 [skip]runc exec ls -la
@@ -114,7 +114,7 @@ runc run [hook's argv is preserved]
 runc run [host mount ns + hooks]
 [skip]simple idmap mount [userns]
 [skip]simple idmap mount [no userns]
-[skip]write to an idmap mount [userns]
+[skip]write to an idmap mount [userns] # This test hangs when running with Youki
 [skip]write to an idmap mount [no userns]
 [skip]idmap mount with propagation flag [userns]
 [skip]idmap mount with relative path [userns]
@@ -125,7 +125,7 @@ runc run [host mount ns + hooks]
 [skip]same idmap mount (different mappings) [no userns]
 [skip]multiple idmap mounts (different mappings) [userns]
 [skip]multiple idmap mounts (different mappings) [no userns]
-[skip]idmap mount (complicated mapping) [userns]
+[skip]idmap mount (complicated mapping) [userns] # This test hangs when running with Youki
 [skip]idmap mount (complicated mapping) [no userns]
 [skip]idmap mount (non-recursive idmap) [userns]
 [skip]idmap mount (non-recursive idmap) [no userns]
@@ -147,7 +147,7 @@ kill KILL [shared pidns]
 [skip]mask paths [prohibit symlink /proc]
 [skip]mask paths [prohibit symlink /sys]
 [skip]runc run [tmpcopyup]
-[skip]runc run [bind mount]
+[skip]runc run [bind mount] # This test hangs when running with Youki
 runc run [ro tmpfs mount]
 [skip]runc run [ro /dev mount]
 runc run [tmpfs mount with absolute symlink]
