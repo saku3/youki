@@ -113,7 +113,19 @@ pub fn write_krun_config(rootfs: &Path, json_spec: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn configure_for_libkrun(spec: &mut Spec) -> Result<()> {
+pub fn configure_for_libkrun(mut spec: Spec) -> Result<Spec> {
+    let use_krun = {
+        spec.annotations()
+            .as_ref()
+            .and_then(|a| a.get("run.oci.handler"))
+            .map(|v| v == "krun")
+            .unwrap_or(false)
+    };
+
+    if !use_krun {
+        return Ok(spec);
+    }
+
     let rootfs = spec
         .root()
         .as_ref()
@@ -121,16 +133,16 @@ pub fn configure_for_libkrun(spec: &mut Spec) -> Result<()> {
         .map_err(|e| KrunError::Other(format!("Missing root in spec: {e:?}")))?
         .path()
         .to_path_buf();
-    libkrun_modify_spec_device(spec)
+    libkrun_modify_spec_device(&mut spec)
         .map_err(|e| KrunError::Other(format!("libkrun_modify_spec_device: {e}")))?;
-    libkrun_modify_spec_resource_device(spec)
+    libkrun_modify_spec_resource_device(&mut  spec)
         .map_err(|e| KrunError::Other(format!("libkrun_modify_spec: {e}")))?;
 
     let json_spec = serde_json::to_string_pretty(&spec)
         .map_err(|e| KrunError::Other(format!("failed to serialize spec to JSON: {}", e)))?;
     write_krun_config(&rootfs, &json_spec)
         .map_err(|e| KrunError::Other(format!("write_krun_config: {e}")))?;
-    Ok(())
+    Ok(spec)
 }
 
 fn make_oci_spec_dev_cgroup(

@@ -84,7 +84,6 @@ impl ContainerBuilderImpl {
     }
 
     fn run_container(&mut self) -> Result<Pid, LibcontainerError> {
-        let _ = self.executor.pre_exec();
         let linux = self.spec.linux().as_ref().ok_or(MissingSpecError::Linux)?;
         let cgroups_path = utils::get_cgroup_path(linux.cgroups_path(), &self.container_id);
         let cgroup_config = libcgroups::common::CgroupConfig {

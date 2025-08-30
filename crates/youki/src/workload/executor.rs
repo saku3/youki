@@ -69,12 +69,6 @@ impl Executor for DefaultExecutor {
                 }
             }
         }
-        // #[cfg(feature = "libkrun")]
-        // match super::libkrun::get_executor().exec(spec) {
-        //     Ok(_) => return Ok(()),
-        //     Err(ExecutorError::CantHandle(_)) => (),
-        //     Err(err) => return Err(err),
-        // }
 
         // Leave the default executor as the last option, which executes normal
         // container workloads.
