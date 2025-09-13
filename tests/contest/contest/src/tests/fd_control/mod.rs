@@ -5,7 +5,8 @@ use anyhow::{anyhow, Context, Result};
 use oci_spec::runtime::{ProcessBuilder, Spec, SpecBuilder};
 use test_framework::{test_result, ConditionalTest, Test, TestGroup, TestResult};
 
-use crate::utils::{is_runtime_runc, test_inside_container, CreateOptions};
+use crate::utils::support::is_runtime_runc;
+use crate::utils::{test_inside_container, CreateOptions};
 
 fn create_spec() -> Result<Spec> {
     SpecBuilder::default()
