@@ -93,7 +93,6 @@ pub fn set_config<P: AsRef<Path>>(project_path: P, config: &Spec) -> Result<()> 
     Ok(())
 }
 
-#[allow(dead_code)]
 pub fn is_runtime_runc() -> bool {
     match std::env::var("RUNTIME_KIND") {
         Err(_) => false,
