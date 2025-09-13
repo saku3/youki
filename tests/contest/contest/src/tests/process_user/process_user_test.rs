@@ -3,8 +3,8 @@ use oci_spec::runtime::{ProcessBuilder, Spec, SpecBuilder, UserBuilder};
 use rand::Rng;
 use test_framework::{test_result, ConditionalTest, TestGroup, TestResult};
 
+use crate::utils::test_inside_container;
 use crate::utils::test_utils::CreateOptions;
-use crate::utils::{is_runtime_runc, test_inside_container};
 
 // Generates a Vec<u32> with a random number of elements (between 5 and 15),
 // where each element is a random u32 value between 0 and 65535.
@@ -69,7 +69,7 @@ pub fn get_process_user_test() -> TestGroup {
     // The current CI for Youki uses runc 1.1, so this will be skipped.
     let test2 = ConditionalTest::new(
         "process_user_duplicate_gids_test",
-        Box::new(|| !is_runtime_runc()),
+        Box::new(|| true),
         Box::new(process_user_test_duplicate_gids),
     );
     process_user_test_group.add(vec![Box::new(test1), Box::new(test2)]);

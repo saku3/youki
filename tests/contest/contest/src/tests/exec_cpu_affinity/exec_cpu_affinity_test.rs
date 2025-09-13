@@ -4,9 +4,9 @@ use anyhow::{anyhow, Context, Result};
 use oci_spec::runtime::{ExecCPUAffinityBuilder, ProcessBuilder, Spec, SpecBuilder};
 use regex::Regex;
 use serde_json::{json, Value};
-use test_framework::{test_result, ConditionalTest, TestGroup, TestResult};
+use test_framework::{test_result, Test, TestGroup, TestResult};
 
-use crate::utils::{exec_container, is_runtime_runc, start_container, test_outside_container};
+use crate::utils::{exec_container, start_container, test_outside_container};
 
 fn create_spec(initial: Option<&str>, fin: Option<&str>) -> Result<Spec> {
     let mut builder = ExecCPUAffinityBuilder::default();
@@ -170,19 +170,16 @@ fn test_cpu_affinity_from_config_json() -> TestResult {
 pub fn get_exec_cpu_affinity_test() -> TestGroup {
     let mut exec_cpu_affinity_test_group = TestGroup::new("exec_cpu_affinity");
 
-    let test_cpu_affinity_only_initial_set_from_process_json = ConditionalTest::new(
+    let test_cpu_affinity_only_initial_set_from_process_json = Test::new(
         "test_cpu_affinity_only_initial_set_from_process_json",
-        Box::new(|| !is_runtime_runc()),
         Box::new(test_cpu_affinity_only_initial_set_from_process_json),
     );
-    let test_cpu_affinity_initial_and_final_set_from_process_json = ConditionalTest::new(
+    let test_cpu_affinity_initial_and_final_set_from_process_json = Test::new(
         "test_cpu_affinity_initial_and_final_set_from_process_json",
-        Box::new(|| !is_runtime_runc()),
         Box::new(test_cpu_affinity_initial_and_final_set_from_process_json),
     );
-    let test_cpu_affinity_from_config_json = ConditionalTest::new(
+    let test_cpu_affinity_from_config_json = Test::new(
         "test_cpu_affinity_from_config_json",
-        Box::new(|| !is_runtime_runc()),
         Box::new(test_cpu_affinity_from_config_json),
     );
     exec_cpu_affinity_test_group.add(vec![
