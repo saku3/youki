@@ -73,6 +73,9 @@ pub fn container_init_process(
         let _ = prctl::set_no_new_privileges(true);
     }
 
+    main_sender.hook_request()?;
+    init_receiver.wait_for_hook_done()?;
+
     if matches!(args.container_type, ContainerType::InitContainer) {
         // create_container hook needs to be called after the namespace setup, but
         // before pivot_root is called. This runs in the container namespaces.

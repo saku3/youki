@@ -94,6 +94,12 @@ impl MainSender {
 
         Ok(())
     }
+
+    pub fn hook_request(&self) -> Result<(), ChannelError> {
+        // self.sender.send(Message::HookRequest)?;
+        tracing::debug!("hook_request");
+        Ok(())
+    }
 }
 
 pub struct MainReceiver {
@@ -301,6 +307,11 @@ impl InitReceiver {
                 received: msg,
             }),
         }
+    }
+
+    pub fn wait_for_hook_done(&self) -> Result<(), ChannelError> {
+        tracing::debug!("wait_for_hook_done");
+        Ok(())
     }
 
     pub fn close(&self) -> Result<(), ChannelError> {
