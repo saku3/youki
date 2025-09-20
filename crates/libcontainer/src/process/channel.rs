@@ -89,6 +89,12 @@ impl MainSender {
         Ok(())
     }
 
+    pub fn hook_request(&mut self) -> Result<(), ChannelError> {
+        self.sender.send(Message::HookRequest)?;
+        tracing::debug!("hook_request");
+        Ok(())
+    }
+
     pub fn close(&self) -> Result<(), ChannelError> {
         self.sender.close()?;
 
@@ -192,6 +198,24 @@ impl MainReceiver {
         }
     }
 
+    pub fn wait_for_hook_request(&mut self) -> Result<(), ChannelError> {
+        tracing::debug!("wait_for_hook_request");
+        let msg = self
+            .receiver
+            .recv()
+            .map_err(|e| ChannelError::ReceiveError {
+                msg: "waiting for hook request".to_string(),
+                source: e,
+            })?;
+        match msg {
+            Message::HookRequest => Ok(()),
+            other => Err(ChannelError::UnexpectedMessage {
+                expected: Message::HookRequest,
+                received: other,
+            }),
+        }
+    }
+
     pub fn close(&self) -> Result<(), ChannelError> {
         self.receiver.close()?;
 
@@ -273,6 +297,12 @@ impl InitSender {
         Ok(())
     }
 
+    pub fn hook_done(&mut self) -> Result<(), ChannelError> {
+        tracing::debug!("hook_done");
+        self.sender.send(Message::HookDone)?;
+        Ok(())
+    }
+
     pub fn close(&self) -> Result<(), ChannelError> {
         self.sender.close()?;
 
@@ -298,6 +328,24 @@ impl InitReceiver {
             Message::SeccompNotifyDone => Ok(()),
             msg => Err(ChannelError::UnexpectedMessage {
                 expected: Message::SeccompNotifyDone,
+                received: msg,
+            }),
+        }
+    }
+
+    pub fn wait_for_hook_done(&mut self) -> Result<(), ChannelError> {
+        tracing::debug!("wait_for_hook_done");
+        let msg = self
+            .receiver
+            .recv()
+            .map_err(|e| ChannelError::ReceiveError {
+                msg: "waiting for hook done".to_string(),
+                source: e,
+            })?;
+        match msg {
+            Message::HookDone => Ok(()),
+            msg => Err(ChannelError::UnexpectedMessage {
+                expected: Message::HookDone,
                 received: msg,
             }),
         }
