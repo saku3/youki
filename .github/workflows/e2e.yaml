@@ -94,6 +94,16 @@ jobs:
         run: |
           sudo -E make RUNC_FLAVOR=crun TEST_RUNTIME=io.containerd.runc.v2 TESTFLAGS="-timeout 40m -v" integration \
             2>&1 | tee /tmp/integration.log
+      - name: Save containerd journal
+        if: always()
+        run: sudo journalctl -u containerd --no-pager --since "3 hours ago" > /var/log/containerd-journal.log || true
+
+      - name: Upload journals
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: journals
+          path: /var/log/containerd-journal.log
 
       - name: Upload log
         if: always()
