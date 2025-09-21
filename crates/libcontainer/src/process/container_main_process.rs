@@ -201,7 +201,12 @@ pub fn container_main_process(container_args: &mut ContainerArgs) -> Result<(Pid
     let hook_err = match hook_result {
         Ok(()) => None,
         Err(e) => {
-            tracing::error!("hook failed: {e}");
+            use anyhow::Chain;
+            tracing::error!(error = ?e, "hook failed");
+            tracing::error!(%e, "hook failed");
+            for (i, cause) in Chain::new(&e).enumerate() {
+                tracing::error!(%cause, cause_index = i, "hook cause");
+            }
             Some(e)
         }
     };
