@@ -159,7 +159,9 @@ pub fn container_main_process(container_args: &mut ContainerArgs) -> Result<(Pid
         }
     }
 
-    main_receiver.wait_for_hook_request()?;
+    if matches!(container_args.container_type, ContainerType::InitContainer) {
+        main_receiver.wait_for_hook_request()?;
+    }
 
     // if file to write the pid to is specified, write pid of the child
     if let Some(pid_file) = &container_args.pid_file {
@@ -211,7 +213,9 @@ pub fn container_main_process(container_args: &mut ContainerArgs) -> Result<(Pid
         }
     };
 
-    init_sender.hook_done()?;
+    if matches!(container_args.container_type, ContainerType::InitContainer) {
+        init_sender.hook_done()?;
+    }
 
     if let Some(e) = hook_err {
         return Err(e);
