@@ -127,7 +127,7 @@ pub fn run_hooks(
                     }
                 }
             } else {
-                hook_process.wait();
+                hook_process.wait()
             };
 
             match res {
