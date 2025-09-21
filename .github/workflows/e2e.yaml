@@ -98,7 +98,7 @@ jobs:
       - name: Save youki journal
         if: always()
         run: |
-          sudo journalctl SYSLOG_IDENTIFIER=runc --no-pager --since "3 hours ago" -r | sudo tee /var/log/containerd-journal.log >/dev/null || true
+          sudo journalctl SYSLOG_IDENTIFIER=youki --no-pager --since "3 hours ago" -r | sudo tee /var/log/containerd-journal.log >/dev/null || true
 
       - name: Upload journals
         if: always()
