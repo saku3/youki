@@ -70,6 +70,8 @@ pub fn run_hooks(
                 .env_clear()
                 .envs(envs)
                 .stdin(process::Stdio::piped())
+                .stdout(process::Stdio::piped())
+                .stderr(process::Stdio::piped())
                 .spawn()
                 .map_err(HookError::CommandExecute)?;
             let hook_process_pid = Pid::from_raw(hook_process.id() as i32);
@@ -125,7 +127,17 @@ pub fn run_hooks(
                     }
                 }
             } else {
-                hook_process.wait()
+                // hook_process.wait()
+                match hook_process.wait_with_output() {
+                    Ok(out) => {
+                        if !out.status.success() {
+                            let errtxt = String::from_utf8_lossy(&out.stderr);
+                            tracing::error!("hook failed: status={:?}, stderr:\n{}", out.status, errtxt);
+                        }
+                        Ok(out.status)
+                    }
+                    Err(e) => Err(e),
+                }
             };
 
             match res {
