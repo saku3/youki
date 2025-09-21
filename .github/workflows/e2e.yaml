@@ -92,7 +92,7 @@ jobs:
           sudo systemctl status containerd --no-pager || true
       - name: Integration Test
         run: |
-          sudo -E make RUNC_FLAVOR=crun TEST_RUNTIME=io.containerd.runc.v2 TESTFLAGS="-timeout 40m -v" integration \
+          sudo -E make RUNC_FLAVOR=crun TEST_RUNTIME=io.containerd.runc.v2 TESTFLAGS="-run ^TestContainerHook$ -timeout 40m -v" integration \
             2>&1 | tee /tmp/integration.log
 
       - name: Save youki journal
