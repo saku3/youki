@@ -127,17 +127,7 @@ pub fn run_hooks(
                     }
                 }
             } else {
-                // hook_process.wait()
-                match hook_process.wait_with_output() {
-                    Ok(out) => {
-                        if !out.status.success() {
-                            let errtxt = String::from_utf8_lossy(&out.stderr);
-                            tracing::error!("hook failed: status={:?}, stderr:\n{}", out.status, errtxt);
-                        }
-                        Ok(out.status)
-                    }
-                    Err(e) => Err(e),
-                }
+                hook_process.wait();
             };
 
             match res {
