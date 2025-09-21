@@ -94,9 +94,12 @@ jobs:
         run: |
           sudo -E make RUNC_FLAVOR=crun TEST_RUNTIME=io.containerd.runc.v2 TESTFLAGS="-timeout 40m -v" integration \
             2>&1 | tee /tmp/integration.log
-      - name: Save containerd journal
+
+      - name: Save youki journal
         if: always()
-        run: sudo journalctl -u containerd --no-pager --since "3 hours ago" | sudo tee /var/log/containerd-journal.log >/dev/null || true
+        run: |
+          sudo journalctl SYSLOG_IDENTIFIER=runc --no-pager --since "3 hours ago" -r \
+            | sudo tee /var/log/youki-journal.log >/dev/null || true
 
       - name: Upload journals
         if: always()

@@ -209,9 +209,9 @@ impl MainReceiver {
             })?;
         match msg {
             Message::HookRequest => Ok(()),
-            other => Err(ChannelError::UnexpectedMessage {
+            msg => Err(ChannelError::UnexpectedMessage {
                 expected: Message::HookRequest,
-                received: other,
+                received: msg,
             }),
         }
     }
