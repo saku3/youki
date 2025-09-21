@@ -73,20 +73,7 @@ pub fn container_init_process(
         let _ = prctl::set_no_new_privileges(true);
     }
 
-    main_sender.hook_request()?;
-    init_receiver.wait_for_hook_done()?;
-
     if matches!(args.container_type, ContainerType::InitContainer) {
-        // create_container hook needs to be called after the namespace setup, but
-        // before pivot_root is called. This runs in the container namespaces.
-        if let Some(hooks) = ctx.hooks {
-            hooks::run_hooks(hooks.create_container().as_ref(), ctx.container, None).map_err(
-                |err| {
-                    tracing::error!(?err, "failed to run create container hooks");
-                    InitProcessError::Hooks(err)
-                },
-            )?;
-        }
         let in_user_ns = utils::is_in_new_userns().map_err(InitProcessError::Io)?;
         let bind_service = ctx.ns.get(LinuxNamespaceType::User)?.is_some() || in_user_ns;
         let rootfs = RootFS::new();
@@ -101,6 +88,20 @@ pub fn container_init_process(
                 tracing::error!(?err, "failed to prepare rootfs");
                 InitProcessError::RootFS(err)
             })?;
+
+        main_sender.hook_request()?;
+        init_receiver.wait_for_hook_done()?;
+
+        // create_container hook needs to be called after the namespace setup, but
+        // before pivot_root is called. This runs in the container namespaces.
+        if let Some(hooks) = ctx.hooks {
+            hooks::run_hooks(hooks.create_container().as_ref(), ctx.container, None).map_err(
+                |err| {
+                    tracing::error!(?err, "failed to run create container hooks");
+                    InitProcessError::Hooks(err)
+                },
+            )?;
+        }
 
         // Entering into the rootfs jail. If mount namespace is specified, then
         // we use pivot_root, but if we are on the host mount namespace, we will
