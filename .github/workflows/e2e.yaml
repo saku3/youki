@@ -31,7 +31,7 @@ jobs:
           echo "CARGO=cross" >> ${GITHUB_ENV}
           echo "TARGET=${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}" >> ${GITHUB_ENV}
       - name: Build youki
-        run: just youki-dev
+        run: just youki-release
       - name: Upload youki binary
         if: ${{ matrix.arch == 'x86_64' }}
         uses: actions/upload-artifact@v4
@@ -75,44 +75,8 @@ jobs:
           sudo chmod 755 youki
           sudo cp youki /usr/bin/runc
           runc --version
-      - name: Configure containerd debug
-        run: |
-          sudo mkdir -p /etc/containerd
-          cat <<EOF | sudo tee /etc/containerd/config.toml >/dev/null
-          version = 2
-          disabled_plugins = []
-          [debug]
-            level = "debug"
-          [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-            runtime_type = "io.containerd.runc.v2"
-            [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
-              BinaryName = "/usr/bin/runc"
-          EOF
-          sudo systemctl restart containerd
-          sudo systemctl status containerd --no-pager || true
       - name: Integration Test
-        run: |
-          sudo -E make RUNC_FLAVOR=crun TEST_RUNTIME=io.containerd.runc.v2 TESTFLAGS="-timeout 40m -v" TESTFLAGS_PARALLEL=1 integration \
-            2>&1 | tee /tmp/integration.log
-
-      - name: Save youki journal
-        if: always()
-        run: |
-          sudo journalctl SYSLOG_IDENTIFIER=youki --no-pager --since "3 hours ago" -r | sudo tee /var/log/containerd-journal.log >/dev/null || true
-
-      - name: Upload journals
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: journals
-          path: /var/log/containerd-journal.log
-
-      - name: Upload log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: integration-log
-          path: /tmp/integration.log
+        run: sudo make RUNC_FLAVOR=crun TEST_RUNTIME=io.containerd.runc.v2 TESTFLAGS="-timeout 40m" integration
 
   k8s-tests:
     runs-on: ubuntu-24.04
