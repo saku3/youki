@@ -96,7 +96,7 @@ jobs:
             2>&1 | tee /tmp/integration.log
       - name: Save containerd journal
         if: always()
-        run: sudo journalctl -u containerd --no-pager --since "3 hours ago" > /var/log/containerd-journal.log || true
+        run: sudo journalctl -u containerd --no-pager --since "3 hours ago" | sudo tee /var/log/containerd-journal.log >/dev/null || true
 
       - name: Upload journals
         if: always()
