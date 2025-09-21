@@ -91,7 +91,16 @@ jobs:
           sudo systemctl restart containerd
           sudo systemctl status containerd --no-pager || true
       - name: Integration Test
-        run: sudo make RUNC_FLAVOR=crun TEST_RUNTIME=io.containerd.runc.v2 TESTFLAGS="-timeout 40m" integration
+        run: |
+          sudo -E make RUNC_FLAVOR=crun TEST_RUNTIME=io.containerd.runc.v2 TESTFLAGS="-timeout 40m -v" integration \
+            2>&1 | tee /tmp/integration.log
+
+      - name: Upload log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-log
+          path: /tmp/integration.log
 
   k8s-tests:
     runs-on: ubuntu-24.04
