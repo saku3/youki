@@ -75,6 +75,21 @@ jobs:
           sudo chmod 755 youki
           sudo cp youki /usr/bin/runc
           runc --version
+      - name: Configure containerd debug
+        run: |
+          sudo mkdir -p /etc/containerd
+          cat <<EOF | sudo tee /etc/containerd/config.toml >/dev/null
+          version = 2
+          disabled_plugins = []
+          [debug]
+            level = "debug"
+          [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+            runtime_type = "io.containerd.runc.v2"
+            [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+              BinaryName = "/usr/bin/runc"
+          EOF
+          sudo systemctl restart containerd
+          sudo systemctl status containerd --no-pager || true
       - name: Integration Test
         run: sudo make RUNC_FLAVOR=crun TEST_RUNTIME=io.containerd.runc.v2 TESTFLAGS="-timeout 40m" integration
 
