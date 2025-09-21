@@ -182,8 +182,6 @@ pub fn container_main_process(container_args: &mut ContainerArgs) -> Result<(Pid
             .map_err(|_e| ProcessError::UpdateStateError)?;
     }
 
-    main_receiver.wait_for_hook_request()?;
-
     let hook_result = (|| {
         if matches!(container_args.container_type, ContainerType::InitContainer) {
             if let Some(hooks) = container_args.spec.hooks() {
