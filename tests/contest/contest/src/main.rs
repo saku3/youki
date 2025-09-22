@@ -121,7 +121,7 @@ fn main() -> Result<()> {
     let cgroup_v1_absolute_network = cgroups::network::absolute_network::get_test_group();
     let cgroup_v1_relative_network = cgroups::network::relative_network::get_test_group();
     let seccomp = get_seccomp_test();
-    let _seccomp_notify = get_seccomp_notify_test();
+    let seccomp_notify = get_seccomp_notify_test();
     let ro_paths = get_ro_paths_test();
     let hostname = get_hostname_test();
     let mounts_recursive = get_mounts_recursive_test();
@@ -163,7 +163,7 @@ fn main() -> Result<()> {
     tm.add_test_group(Box::new(cgroup_v1_blkio));
     tm.add_test_group(Box::new(cgroup_v1_relative_network));
     tm.add_test_group(Box::new(seccomp));
-    // tm.add_test_group(Box::new(seccomp_notify));
+    tm.add_test_group(Box::new(seccomp_notify));
     tm.add_test_group(Box::new(ro_paths));
     tm.add_test_group(Box::new(hostname));
     tm.add_test_group(Box::new(mounts_recursive));

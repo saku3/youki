@@ -126,6 +126,77 @@ pub fn container_main_process(container_args: &mut ContainerArgs) -> Result<(Pid
     let mut need_to_clean_up_intel_rdt_subdirectory = false;
 
     if let Some(linux) = container_args.spec.linux() {
+        // #[cfg(feature = "libseccomp")]
+        // if let Some(seccomp) = linux.seccomp() {
+        //     let state = crate::container::ContainerProcessState {
+        //         oci_version: container_args.spec.version().to_string(),
+        //         // runc hardcode the `seccompFd` name for fds.
+        //         fds: vec![String::from("seccompFd")],
+        //         pid: init_pid.as_raw(),
+        //         metadata: seccomp.listener_metadata().to_owned().unwrap_or_default(),
+        //         state: container_args
+        //             .container
+        //             .as_ref()
+        //             .ok_or(ProcessError::ContainerStateRequired)?
+        //             .state
+        //             .clone(),
+        //     };
+        //     crate::process::seccomp_listener::sync_seccomp(
+        //         seccomp,
+        //         &state,
+        //         &mut init_sender,
+        //         &mut main_receiver,
+        //     )?;
+        // }
+
+        if let Some(intel_rdt) = linux.intel_rdt() {
+            let container_id = container_args
+                .container
+                .as_ref()
+                .map(|container| container.id());
+            need_to_clean_up_intel_rdt_subdirectory =
+                setup_intel_rdt(container_id, &init_pid, intel_rdt)?;
+        }
+    }
+
+    // if file to write the pid to is specified, write pid of the child
+    if let Some(pid_file) = &container_args.pid_file {
+        if let Err(err) = fs::write(pid_file, format!("{init_pid}")) {
+            tracing::warn!("failed to write pid to file: {err}");
+        }
+    }
+
+    if let Some(container) = &mut container_args.container {
+        // update status and pid of the container process
+        container
+            .set_status(ContainerStatus::Created)
+            .set_creator(nix::unistd::geteuid().as_raw())
+            .set_pid(init_pid.as_raw())
+            .set_clean_up_intel_rdt_directory(need_to_clean_up_intel_rdt_subdirectory)
+            .save()
+            .map_err(|_e| ProcessError::UpdateStateError)?;
+    }
+
+    if matches!(container_args.container_type, ContainerType::InitContainer) {
+        main_receiver.wait_for_hook_request()?;
+
+        if let Some(hooks) = container_args.spec.hooks() {
+            #[allow(deprecated)]
+            hooks::run_hooks(
+                hooks.prestart().as_ref(),
+                container_args.container.as_ref(),
+                None,
+            )?;
+            hooks::run_hooks(
+                hooks.create_runtime().as_ref(),
+                container_args.container.as_ref(),
+                None,
+            )?;
+        }
+        init_sender.hook_done()?;
+    }
+
+    if let Some(linux) = container_args.spec.linux() {
         #[cfg(feature = "libseccomp")]
         if let Some(seccomp) = linux.seccomp() {
             let state = crate::container::ContainerProcessState {
@@ -148,77 +219,6 @@ pub fn container_main_process(container_args: &mut ContainerArgs) -> Result<(Pid
                 &mut main_receiver,
             )?;
         }
-
-        if let Some(intel_rdt) = linux.intel_rdt() {
-            let container_id = container_args
-                .container
-                .as_ref()
-                .map(|container| container.id());
-            need_to_clean_up_intel_rdt_subdirectory =
-                setup_intel_rdt(container_id, &init_pid, intel_rdt)?;
-        }
-    }
-
-    if matches!(container_args.container_type, ContainerType::InitContainer) {
-        main_receiver.wait_for_hook_request()?;
-    }
-
-    // if file to write the pid to is specified, write pid of the child
-    if let Some(pid_file) = &container_args.pid_file {
-        if let Err(err) = fs::write(pid_file, format!("{init_pid}")) {
-            tracing::warn!("failed to write pid to file: {err}");
-        }
-    }
-
-    if let Some(container) = &mut container_args.container {
-        // update status and pid of the container process
-        container
-            .set_status(ContainerStatus::Created)
-            .set_creator(nix::unistd::geteuid().as_raw())
-            .set_pid(init_pid.as_raw())
-            .set_clean_up_intel_rdt_directory(need_to_clean_up_intel_rdt_subdirectory)
-            .save()
-            .map_err(|_e| ProcessError::UpdateStateError)?;
-    }
-
-    let hook_result = (|| {
-        if matches!(container_args.container_type, ContainerType::InitContainer) {
-            if let Some(hooks) = container_args.spec.hooks() {
-                #[allow(deprecated)]
-                hooks::run_hooks(
-                    hooks.prestart().as_ref(),
-                    container_args.container.as_ref(),
-                    None,
-                )?;
-                hooks::run_hooks(
-                    hooks.create_runtime().as_ref(),
-                    container_args.container.as_ref(),
-                    None,
-                )?;
-            }
-        }
-        Ok(())
-    })();
-
-    let hook_err = match hook_result {
-        Ok(()) => None,
-        Err(e) => {
-            use anyhow::Chain;
-            tracing::error!(error = ?e, "hook failed");
-            tracing::error!(%e, "hook failed");
-            for (i, cause) in Chain::new(&e).enumerate() {
-                tracing::error!(%cause, cause_index = i, "hook cause");
-            }
-            Some(e)
-        }
-    };
-
-    if matches!(container_args.container_type, ContainerType::InitContainer) {
-        init_sender.hook_done()?;
-    }
-
-    if let Some(e) = hook_err {
-        return Err(e);
     }
 
     // We don't need to send anything to the init process after this point, so
