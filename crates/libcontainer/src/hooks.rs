@@ -70,6 +70,8 @@ pub fn run_hooks(
                 .env_clear()
                 .envs(envs)
                 .stdin(process::Stdio::piped())
+                .stdout(process::Stdio::piped())
+                .stderr(process::Stdio::piped())
                 .spawn()
                 .map_err(HookError::CommandExecute)?;
             let hook_process_pid = Pid::from_raw(hook_process.id() as i32);

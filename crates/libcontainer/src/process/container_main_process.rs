@@ -196,8 +196,8 @@ pub fn container_main_process(container_args: &mut ContainerArgs) -> Result<(Pid
         init_sender.hook_done()?;
     }
 
+    #[cfg(feature = "libseccomp")]
     if let Some(linux) = container_args.spec.linux() {
-        #[cfg(feature = "libseccomp")]
         if let Some(seccomp) = linux.seccomp() {
             let state = crate::container::ContainerProcessState {
                 oci_version: container_args.spec.version().to_string(),

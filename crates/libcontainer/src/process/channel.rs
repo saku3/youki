@@ -91,7 +91,6 @@ impl MainSender {
 
     pub fn hook_request(&mut self) -> Result<(), ChannelError> {
         self.sender.send(Message::HookRequest)?;
-        tracing::debug!("hook_request");
         Ok(())
     }
 
@@ -199,7 +198,6 @@ impl MainReceiver {
     }
 
     pub fn wait_for_hook_request(&mut self) -> Result<(), ChannelError> {
-        tracing::debug!("wait_for_hook_request");
         let msg = self
             .receiver
             .recv()
@@ -298,7 +296,6 @@ impl InitSender {
     }
 
     pub fn hook_done(&mut self) -> Result<(), ChannelError> {
-        tracing::debug!("hook_done");
         self.sender.send(Message::HookDone)?;
         Ok(())
     }
@@ -334,7 +331,6 @@ impl InitReceiver {
     }
 
     pub fn wait_for_hook_done(&mut self) -> Result<(), ChannelError> {
-        tracing::debug!("wait_for_hook_done");
         let msg = self
             .receiver
             .recv()
