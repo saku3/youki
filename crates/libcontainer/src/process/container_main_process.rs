@@ -148,8 +148,18 @@ pub fn container_main_process(container_args: &mut ContainerArgs) -> Result<(Pid
                 container.set_pid(init_pid.as_raw());
 
                 #[allow(deprecated)]
-                hooks::run_hooks(hooks.prestart().as_ref(), Some(&*container), None)?;
-                hooks::run_hooks(hooks.create_runtime().as_ref(), Some(&*container), None)?;
+                hooks::run_hooks(hooks.prestart().as_ref(), Some(&*container), None).map_err(
+                    |err| {
+                        tracing::error!("failed to run pre start hooks: {}", err);
+                        err
+                    },
+                )?;
+
+                hooks::run_hooks(hooks.create_runtime().as_ref(), Some(&*container), None)
+                    .map_err(|err| {
+                        tracing::error!("failed to run create runtime hooks: {}", err);
+                        err
+                    })?;
             }
         }
         init_sender.hook_done()?;
