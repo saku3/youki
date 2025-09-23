@@ -34,8 +34,6 @@ pub enum ProcessError {
     SyscallOther(#[source] SyscallError),
     #[error("failed hooks")]
     Hooks(#[from] crate::hooks::HookError),
-    #[error("failed to persist container state")]
-    UpdateStateError,
 }
 
 type Result<T> = std::result::Result<T, ProcessError>;
