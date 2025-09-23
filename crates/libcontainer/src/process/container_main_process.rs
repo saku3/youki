@@ -147,20 +147,11 @@ pub fn container_main_process(container_args: &mut ContainerArgs) -> Result<(Pid
 
         if let Some(hooks) = container_args.spec.hooks() {
             if let Some(container) = container_args.container.as_mut() {
-                container
-                    .set_pid(init_pid.as_raw());
+                container.set_pid(init_pid.as_raw());
 
                 #[allow(deprecated)]
-                hooks::run_hooks(
-                    hooks.prestart().as_ref(),
-                    Some(&*container),
-                    None,
-                )?;
-                hooks::run_hooks(
-                    hooks.create_runtime().as_ref(),
-                    Some(&*container),
-                    None,
-                )?;
+                hooks::run_hooks(hooks.prestart().as_ref(), Some(&*container), None)?;
+                hooks::run_hooks(hooks.create_runtime().as_ref(), Some(&*container), None)?;
             }
         }
         init_sender.hook_done()?;

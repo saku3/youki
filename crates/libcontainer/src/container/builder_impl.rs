@@ -168,13 +168,13 @@ impl ContainerBuilderImpl {
             pid_file: self.pid_file.to_owned(),
         };
 
-        let (init_pid, need_to_clean_up_intel_rdt_dir)  = process::container_main_process::container_main_process(
-            &mut container_args,
-        )
-        .map_err(|err| {
-            tracing::error!("failed to run container process {}", err);
-            LibcontainerError::MainProcess(err)
-        })?;
+        let (init_pid, need_to_clean_up_intel_rdt_dir) =
+            process::container_main_process::container_main_process(&mut container_args).map_err(
+                |err| {
+                    tracing::error!("failed to run container process {}", err);
+                    LibcontainerError::MainProcess(err)
+                },
+            )?;
 
         if let Some(container) = &mut self.container {
             // update status and pid of the container process
