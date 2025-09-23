@@ -3,7 +3,6 @@ use std::fs;
 use nix::sys::wait::{WaitStatus, waitpid};
 use nix::unistd::Pid;
 
-use crate::container::ContainerStatus;
 use crate::hooks;
 use crate::process::args::{ContainerArgs, ContainerType};
 use crate::process::fork::{self, CloneCb};
@@ -143,32 +142,26 @@ pub fn container_main_process(container_args: &mut ContainerArgs) -> Result<(Pid
         }
     }
 
-    if let Some(container) = &mut container_args.container {
-        // update status and pid of the container process
-        container
-            .set_status(ContainerStatus::Created)
-            .set_creator(nix::unistd::geteuid().as_raw())
-            .set_pid(init_pid.as_raw())
-            .set_clean_up_intel_rdt_directory(need_to_clean_up_intel_rdt_subdirectory)
-            .save()
-            .map_err(|_e| ProcessError::UpdateStateError)?;
-    }
-
     if matches!(container_args.container_type, ContainerType::InitContainer) {
         main_receiver.wait_for_hook_request()?;
 
         if let Some(hooks) = container_args.spec.hooks() {
-            #[allow(deprecated)]
-            hooks::run_hooks(
-                hooks.prestart().as_ref(),
-                container_args.container.as_ref(),
-                None,
-            )?;
-            hooks::run_hooks(
-                hooks.create_runtime().as_ref(),
-                container_args.container.as_ref(),
-                None,
-            )?;
+            if let Some(container) = container_args.container.as_mut() {
+                container
+                    .set_pid(init_pid.as_raw());
+
+                #[allow(deprecated)]
+                hooks::run_hooks(
+                    hooks.prestart().as_ref(),
+                    Some(&*container),
+                    None,
+                )?;
+                hooks::run_hooks(
+                    hooks.create_runtime().as_ref(),
+                    Some(&*container),
+                    None,
+                )?;
+            }
         }
         init_sender.hook_done()?;
     }

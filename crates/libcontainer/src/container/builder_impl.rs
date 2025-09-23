@@ -8,7 +8,7 @@ use libcgroups::common::CgroupManager;
 use nix::unistd::Pid;
 use oci_spec::runtime::Spec;
 
-use super::Container;
+use super::{Container, ContainerStatus};
 use crate::error::{CreateContainerError, LibcontainerError, MissingSpecError};
 use crate::notify_socket::NotifyListener;
 use crate::process::args::{ContainerArgs, ContainerType};
@@ -165,16 +165,26 @@ impl ContainerBuilderImpl {
             stdout: self.stdout.as_ref().map(|x| x.as_raw_fd()),
             stderr: self.stderr.as_ref().map(|x| x.as_raw_fd()),
             as_sibling: self.as_sibling,
-            pid_file: self.pid_file.clone(),
+            pid_file: self.pid_file.to_owned(),
         };
 
-        let (init_pid, _) = process::container_main_process::container_main_process(
+        let (init_pid, need_to_clean_up_intel_rdt_dir)  = process::container_main_process::container_main_process(
             &mut container_args,
         )
         .map_err(|err| {
             tracing::error!("failed to run container process {}", err);
             LibcontainerError::MainProcess(err)
         })?;
+
+        if let Some(container) = &mut self.container {
+            // update status and pid of the container process
+            container
+                .set_status(ContainerStatus::Created)
+                .set_creator(nix::unistd::geteuid().as_raw())
+                .set_pid(init_pid.as_raw())
+                .set_clean_up_intel_rdt_directory(need_to_clean_up_intel_rdt_dir)
+                .save()?;
+        }
 
         Ok(init_pid)
     }
