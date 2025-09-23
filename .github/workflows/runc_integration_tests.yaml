@@ -53,12 +53,4 @@ jobs:
       - name: Runc integration test
         run: |
           mkdir -p logs
-          tests/runc/runc_integration_test.sh > logs/runc_integration_test.log 2>&1
-
-      - name: Upload test logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: runc-integration-logs-${{ github.run_id }}
-          path: logs/
-          retention-days: 14
+          tests/runc/runc_integration_test.sh
