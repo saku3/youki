@@ -7,15 +7,16 @@ use nc;
 use nix::mount::{MntFlags, MsFlags};
 use nix::sched::CloneFlags;
 use nix::sys::stat::Mode;
-use nix::unistd::{self, close, dup2, setsid, Gid, Uid};
+use nix::unistd::{self, Gid, Uid, close, dup2, setsid};
 use oci_spec::runtime::{
-    IOPriorityClass, LinuxIOPriority, LinuxNamespaceType, LinuxSchedulerFlag, LinuxSchedulerPolicy,
-    Scheduler, Spec, User,
+    IOPriorityClass, LinuxIOPriority, LinuxNamespaceType, LinuxPersonalityDomain,
+    LinuxSchedulerFlag, LinuxSchedulerPolicy, Scheduler, Spec, User,
 };
 
+use super::Result;
 use super::context::InitContext;
 use super::error::InitProcessError;
-use super::Result;
+use crate::config::PersonalityDomain;
 use crate::error::MissingSpecError;
 use crate::namespaces::Namespaces;
 use crate::process::args::{ContainerArgs, ContainerType};
@@ -73,16 +74,6 @@ pub fn container_init_process(
     }
 
     if matches!(args.container_type, ContainerType::InitContainer) {
-        // create_container hook needs to be called after the namespace setup, but
-        // before pivot_root is called. This runs in the container namespaces.
-        if let Some(hooks) = ctx.hooks {
-            hooks::run_hooks(hooks.create_container().as_ref(), ctx.container, None).map_err(
-                |err| {
-                    tracing::error!(?err, "failed to run create container hooks");
-                    InitProcessError::Hooks(err)
-                },
-            )?;
-        }
         let in_user_ns = utils::is_in_new_userns().map_err(InitProcessError::Io)?;
         let bind_service = ctx.ns.get(LinuxNamespaceType::User)?.is_some() || in_user_ns;
         let rootfs = RootFS::new();
@@ -97,6 +88,23 @@ pub fn container_init_process(
                 tracing::error!(?err, "failed to prepare rootfs");
                 InitProcessError::RootFS(err)
             })?;
+
+        // send a request to the main process to run prestart and create_runtime hooks.
+        // prestart and create_runtime hook needs to be called after the namespace setup, but
+        // before pivot_root is called. This runs in the runtime(not container) namespaces.
+        main_sender.hook_request()?;
+        init_receiver.wait_for_hook_request_done()?;
+
+        // create_container hook needs to be called after the namespace setup, but
+        // before pivot_root is called. This runs in the container namespaces.
+        if let Some(hooks) = ctx.hooks {
+            hooks::run_hooks(hooks.create_container().as_ref(), ctx.container, None).map_err(
+                |err| {
+                    tracing::error!(?err, "failed to run create container hooks");
+                    InitProcessError::Hooks(err)
+                },
+            )?;
+        }
 
         // Entering into the rootfs jail. If mount namespace is specified, then
         // we use pivot_root, but if we are on the host mount namespace, we will
@@ -123,6 +131,26 @@ pub fn container_init_process(
         if let Some(kernel_params) = ctx.linux.sysctl() {
             sysctl(kernel_params)?;
         }
+    }
+
+    if let Some(personality) = ctx.linux.personality() {
+        if let Some(flags) = personality.flags() {
+            if !flags.is_empty() {
+                tracing::error!("personality flag has not supported at this time");
+                return Err(InitProcessError::UnsupportedPersonalityFlag);
+            }
+        }
+
+        let domain = match personality.domain() {
+            // https://github.com/opencontainers/runtime-spec/blob/main/config-linux.md#personality
+            LinuxPersonalityDomain::PerLinux => PersonalityDomain::Linux,
+            LinuxPersonalityDomain::PerLinux32 => PersonalityDomain::Linux32,
+        };
+
+        ctx.syscall.personality(domain).map_err(|err| {
+            tracing::error!(?err, "failed to set linux personality ");
+            InitProcessError::SyscallOther(err)
+        })?;
     }
 
     if let Some(profile) = ctx.process.apparmor_profile() {
@@ -1116,12 +1144,14 @@ mod tests {
             Err(SyscallError::Nix(nix::errno::Errno::ENOTDIR))
         });
 
-        assert!(masked_path(
-            Path::new("/proc/self"),
-            &Some("default".to_string()),
-            syscall.as_ref()
-        )
-        .is_ok());
+        assert!(
+            masked_path(
+                Path::new("/proc/self"),
+                &Some("default".to_string()),
+                syscall.as_ref()
+            )
+            .is_ok()
+        );
 
         let got = mocks.get_mount_args();
         let want = MountArgs {

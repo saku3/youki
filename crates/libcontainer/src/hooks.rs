@@ -70,6 +70,8 @@ pub fn run_hooks(
                 .env_clear()
                 .envs(envs)
                 .stdin(process::Stdio::piped())
+                .stdout(process::Stdio::piped())
+                .stderr(process::Stdio::piped())
                 .spawn()
                 .map_err(HookError::CommandExecute)?;
             let hook_process_pid = Pid::from_raw(hook_process.id() as i32);
@@ -146,7 +148,7 @@ pub fn run_hooks(
 mod test {
     use std::{env, fs};
 
-    use anyhow::{bail, Context, Result};
+    use anyhow::{Context, Result, bail};
     use oci_spec::runtime::HookBuilder;
     use serial_test::serial;
 
@@ -250,7 +252,9 @@ mod test {
         let hooks = Some(vec![hook]);
         match run_hooks(hooks.as_ref(), Some(&default_container), None) {
             Ok(_) => {
-                bail!("The test expects the hook to error out with timeout. Should not execute cleanly");
+                bail!(
+                    "The test expects the hook to error out with timeout. Should not execute cleanly"
+                );
             }
             Err(HookError::Timeout) => {}
             Err(err) => {

@@ -1,11 +1,11 @@
-use std::fs::File;
-use std::io::Read;
+use std::fs::{File, OpenOptions};
+use std::io::{Read, Write};
 
 use anyhow::anyhow;
 use oci_spec::runtime::{Hook, HookBuilder, HooksBuilder, ProcessBuilder, Spec, SpecBuilder};
 use test_framework::{Test, TestGroup, TestResult};
 
-use crate::utils::test_utils::{start_container, CreateOptions};
+use crate::utils::test_utils::{CreateOptions, start_container};
 use crate::utils::{create_container, delete_container, generate_uuid, prepare_bundle, set_config};
 
 const HOOK_OUTPUT_FILE: &str = "output";
@@ -16,6 +16,16 @@ fn create_hook_output_file() {
 
 fn delete_hook_output_file() {
     std::fs::remove_file(HOOK_OUTPUT_FILE).expect("fail to remove hook output file");
+}
+
+#[allow(dead_code)]
+fn append_log(line: &str) {
+    let p = std::fs::canonicalize(HOOK_OUTPUT_FILE).expect("canonicalize output");
+    let mut f = OpenOptions::new()
+        .append(true)
+        .open(p)
+        .expect("open for append");
+    writeln!(f, "{}", line).expect("append log");
 }
 
 fn write_log_hook(content: &str) -> Hook {
@@ -43,16 +53,28 @@ fn get_spec() -> Spec {
         .hooks(
             HooksBuilder::default()
                 .prestart(vec![
-                    write_log_hook("pre-start1 called"),
-                    write_log_hook("pre-start2 called"),
+                    write_log_hook("pre-start-1 called"),
+                    write_log_hook("pre-start-2 called"),
+                ])
+                .create_runtime(vec![
+                    write_log_hook("create-runtime-1 called"),
+                    write_log_hook("create-runtime-2 called"),
+                ])
+                .create_container(vec![
+                    write_log_hook("create-container-1 called"),
+                    write_log_hook("create-container-2 called"),
+                ])
+                .start_container(vec![
+                    write_log_hook("start-container-1 called"),
+                    write_log_hook("start-container-2 called"),
                 ])
                 .poststart(vec![
-                    write_log_hook("post-start1 called"),
-                    write_log_hook("post-start2 called"),
+                    write_log_hook("post-start-1 called"),
+                    write_log_hook("post-start-2 called"),
                 ])
                 .poststop(vec![
-                    write_log_hook("post-stop1 called"),
-                    write_log_hook("post-stop2 called"),
+                    write_log_hook("post-stop-1 called"),
+                    write_log_hook("post-stop-2 called"),
                 ])
                 .build()
                 .expect("could not build hooks"),
@@ -71,12 +93,22 @@ fn get_test(test_name: &'static str) -> Test {
             let id_str = id.to_string();
             let bundle = prepare_bundle().unwrap();
             set_config(&bundle, &spec).unwrap();
+
+            // append_log("before-create");
             create_container(&id_str, &bundle, &CreateOptions::default())
                 .unwrap()
                 .wait()
                 .unwrap();
+            // append_log("after-create");
+
+            // append_log("before-start");
             start_container(&id_str, &bundle).unwrap().wait().unwrap();
+            // append_log("after-start");
+
+            // append_log("before-delete");
             delete_container(&id_str, &bundle).unwrap().wait().unwrap();
+            // append_log("after-delete");
+
             let log = {
                 let mut output = File::open("output").expect("cannot open hook log");
                 let mut log = String::new();
@@ -86,10 +118,38 @@ fn get_test(test_name: &'static str) -> Test {
                 log
             };
             delete_hook_output_file();
-            if log != "pre-start1 called\npre-start2 called\npost-start1 called\npost-start2 called\npost-stop1 called\npost-stop2 called\n" {
+            // let expected = "before-create\n\
+            //         pre-start-1 called\n\
+            //         pre-start-2 called\n\
+            //         create-runtime-1 called\n\
+            //         create-runtime-2 called\n\
+            //         create-container-1 called\n\
+            //         create-container-2 called\n\
+            //         post-start-1 called\n\
+            //         post-start-2 called\n\
+            //         after-create\n\
+            //         before-start\n\
+            //         after-start\n\
+            //         before-delete\n\
+            //         post-stop-1 called\n\
+            //         post-stop-2 called\n\
+            //         after-delete\n";
+            let expected = "pre-start-1 called\n\
+                    pre-start-2 called\n\
+                    create-runtime-1 called\n\
+                    create-runtime-2 called\n\
+                    create-container-1 called\n\
+                    create-container-2 called\n\
+                    post-start-1 called\n\
+                    post-start-2 called\n\
+                    post-stop-1 called\n\
+                    post-stop-2 called\n";
+            if log != expected {
                 return TestResult::Failed(anyhow!(
-                        "error : hooks must be called in the listed order, {log:?}"
-                        ));
+                    "error: hooks must be called in the listed order.\n\
+                    got:\n{log}\n\
+                    expected:\n{expected}"
+                ));
             }
             TestResult::Passed
         }),
