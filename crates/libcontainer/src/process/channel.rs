@@ -330,7 +330,7 @@ impl InitReceiver {
         }
     }
 
-    pub fn wait_for_hook_done(&mut self) -> Result<(), ChannelError> {
+    pub fn wait_for_hook_request_done(&mut self) -> Result<(), ChannelError> {
         let msg = self
             .receiver
             .recv()

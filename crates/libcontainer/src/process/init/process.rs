@@ -89,8 +89,11 @@ pub fn container_init_process(
                 InitProcessError::RootFS(err)
             })?;
 
+        // send a request to the main process to run prestart and create_runtime hooks.
+        // prestart and create_runtime hook needs to be called after the namespace setup, but
+        // before pivot_root is called. This runs in the runtime(not container) namespaces.
         main_sender.hook_request()?;
-        init_receiver.wait_for_hook_done()?;
+        init_receiver.wait_for_hook_request_done()?;
 
         // create_container hook needs to be called after the namespace setup, but
         // before pivot_root is called. This runs in the container namespaces.
