@@ -37,7 +37,8 @@ pub fn run_hooks(
     cwd: Option<&Path>,
 ) -> Result<()> {
     let state = &(container.ok_or(HookError::MissingContainerState)?.state);
-
+    tracing::debug!("run_hooks hook: {:?}", hooks);    
+    tracing::debug!("run_hooks state: {:?}", state);
     if let Some(hooks) = hooks {
         for hook in hooks {
             let mut hook_command = process::Command::new(hook.path());
