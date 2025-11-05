@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.0.1](https://github.com/saku3/youki/commits/v0.0.1) - 2025-11-05
+### Other Changes
+- setup runc integration test by @saku3 in https://github.com/saku3/youki/pull/13
+
 ## [v0.5.6](https://github.com/youki-dev/youki/compare/v0.5.5...v0.5.6) - 2025-10-24
 ### 💪 Improvements
 - fix(3197): fix youki version command Part of Enhancing Compatibility with runc by @tommady in https://github.com/youki-dev/youki/pull/3200
