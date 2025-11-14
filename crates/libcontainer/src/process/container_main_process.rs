@@ -38,7 +38,7 @@ pub enum ProcessError {
 
 type Result<T> = std::result::Result<T, ProcessError>;
 
-pub fn container_main_process(container_args: &mut ContainerArgs) -> Result<(Pid, bool)> {
+pub fn container_main_process(container_args: &ContainerArgs) -> Result<(Pid, bool)> {
     // We use a set of channels to communicate between parent and child process.
     // Each channel is uni-directional. Because we will pass these channel to
     // cloned process, we have to be deligent about closing any unused channel.
@@ -143,17 +143,17 @@ pub fn container_main_process(container_args: &mut ContainerArgs) -> Result<(Pid
     if matches!(container_args.container_type, ContainerType::InitContainer) {
         if let Some(hooks) = container_args.spec.hooks() {
             main_receiver.wait_for_hook_request()?;
-            if let Some(container) = container_args.container.as_mut() {
+            if let Some(mut container) = container_args.container.clone() {
                 container.set_pid(init_pid.as_raw());
 
-                hooks::run_hooks(hooks.prestart().as_ref(), Some(&*container), None).map_err(
+                hooks::run_hooks(hooks.prestart().as_ref(), Some(&container), None).map_err(
                     |err| {
                         tracing::error!("failed to run prestart hooks: {}", err);
                         err
                     },
                 )?;
 
-                hooks::run_hooks(hooks.create_runtime().as_ref(), Some(&*container), None)
+                hooks::run_hooks(hooks.create_runtime().as_ref(), Some(&container), None)
                     .map_err(|err| {
                         tracing::error!("failed to run create runtime hooks: {}", err);
                         err

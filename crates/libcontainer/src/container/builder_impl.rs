@@ -147,7 +147,7 @@ impl ContainerBuilderImpl {
         // This container_args will be passed to the container processes,
         // therefore we will have to move all the variable by value. Since self
         // is a shared reference, we have to clone these variables here.
-        let mut container_args = ContainerArgs {
+        let container_args = ContainerArgs {
             container_type: self.container_type,
             syscall: self.syscall,
             spec: Rc::clone(&self.spec),
@@ -169,7 +169,7 @@ impl ContainerBuilderImpl {
         };
 
         let (init_pid, need_to_clean_up_intel_rdt_dir) =
-            process::container_main_process::container_main_process(&mut container_args).map_err(
+            process::container_main_process::container_main_process(&container_args).map_err(
                 |err| {
                     tracing::error!("failed to run container process {}", err);
                     LibcontainerError::MainProcess(err)
