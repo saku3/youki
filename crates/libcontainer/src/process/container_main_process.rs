@@ -153,11 +153,12 @@ pub fn container_main_process(container_args: &ContainerArgs) -> Result<(Pid, bo
                     },
                 )?;
 
-                hooks::run_hooks(hooks.create_runtime().as_ref(), Some(&container), None)
-                    .map_err(|err| {
+                hooks::run_hooks(hooks.create_runtime().as_ref(), Some(&container), None).map_err(
+                    |err| {
                         tracing::error!("failed to run create runtime hooks: {}", err);
                         err
-                    })?;
+                    },
+                )?;
             }
             init_sender.hook_done()?;
         }
