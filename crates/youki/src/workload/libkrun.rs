@@ -13,11 +13,11 @@ use libcontainer::oci_spec::runtime::{
     LinuxBuilder, LinuxDevice, LinuxDeviceBuilder, LinuxDeviceCgroup, LinuxDeviceCgroupBuilder,
     LinuxDeviceType, Spec,
 };
-use libcontainer::workload::{Executor, ExecutorError, ExecutorValidationError, EMPTY};
+use libcontainer::workload::{EMPTY, Executor, ExecutorError, ExecutorValidationError};
 use libloading::Library;
 use nix::errno::Errno;
-use nix::fcntl::{open, openat, OFlag};
-use nix::sys::stat::{major, minor, stat, Mode};
+use nix::fcntl::{OFlag, open, openat};
+use nix::sys::stat::{Mode, major, minor, stat};
 
 const EXECUTOR_NAME: &str = "libkrun";
 const KRUN_CONFIG_FILE: &str = ".krun_config.json";
@@ -214,10 +214,10 @@ impl Executor for LibkrunExecutor {
 }
 
 pub fn can_handle(spec: &Spec) -> bool {
-    if let Some(annotations) = spec.annotations() {
-        if let Some(handler) = annotations.get("run.oci.handler") {
-            return handler == "krun";
-        }
+    if let Some(annotations) = spec.annotations()
+        && let Some(handler) = annotations.get("run.oci.handler")
+    {
+        return handler == "krun";
     }
 
     false
@@ -307,7 +307,7 @@ fn stat_dev_numbers(path: &str) -> std::io::Result<(i64, i64)> {
     match stat(Path::new(path)) {
         Ok(st) => Ok((major(st.st_rdev) as i64, minor(st.st_rdev) as i64)),
         Err(Errno::ENOENT) => Err(io::Error::new(io::ErrorKind::NotFound, "not found")),
-        Err(e) => Err(io::Error::new(io::ErrorKind::Other, e)),
+        Err(e) => Err(io::Error::other(e)),
     }
 }
 
