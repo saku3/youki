@@ -1,19 +1,25 @@
 use std::env;
 use std::ffi::OsStr;
-use std::fs::{self, read_dir, File};
+use std::fs::{self, File, read_dir};
 use std::io::{self, BufRead};
 use std::os::linux::fs::MetadataExt;
 use std::os::unix::fs::{FileTypeExt, PermissionsExt};
 use std::path::Path;
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
+use netlink_packet_core::{NLM_F_DUMP, NLM_F_REQUEST, NetlinkMessage, NetlinkPayload};
+use netlink_packet_route::RouteNetlinkMessage;
+use netlink_packet_route::address::AddressMessage;
+use netlink_packet_route::link::{LinkAttribute, LinkMessage};
+use netlink_sys::Socket;
+use netlink_sys::protocols::NETLINK_ROUTE;
 use nix::errno::Errno;
 use nix::libc;
-use nix::mount::{mount, MsFlags};
-use nix::sys::resource::{getrlimit, Resource};
-use nix::sys::stat::{umask, Mode};
+use nix::mount::{MsFlags, mount};
+use nix::sys::resource::{Resource, getrlimit};
+use nix::sys::stat::{Mode, umask};
 use nix::sys::utsname;
-use nix::unistd::{getcwd, getgid, getgroups, getuid, Gid, Uid};
+use nix::unistd::{Gid, Uid, getcwd, getgid, getgroups, getuid};
 use oci_spec::runtime::IOPriorityClass::{self, IoprioClassBe, IoprioClassIdle, IoprioClassRt};
 use oci_spec::runtime::{
     LinuxDevice, LinuxDeviceType, LinuxIdMapping, LinuxSchedulerPolicy, PosixRlimit,
@@ -185,7 +191,10 @@ pub fn validate_mounts_recursive(spec: &Spec) {
                                     if utils::test_file_executable(test_file_path.to_str().unwrap())
                                         .is_ok()
                                     {
-                                        bail!("path {:?} expected to be not executable, found executable", test_file_path);
+                                        bail!(
+                                            "path {:?} expected to be not executable, found executable",
+                                            test_file_path
+                                        );
                                     }
                                     Ok(())
                                 },
@@ -200,7 +209,10 @@ pub fn validate_mounts_recursive(spec: &Spec) {
                                     if let Err(ee) = utils::test_file_executable(
                                         test_file_path.to_str().unwrap(),
                                     ) {
-                                        bail!("path {:?} expected to be executable, found not executable, error: {ee}", test_file_path);
+                                        bail!(
+                                            "path {:?} expected to be executable, found not executable, error: {ee}",
+                                            test_file_path
+                                        );
                                     }
                                     Ok(())
                                 },
@@ -243,14 +255,18 @@ pub fn validate_mounts_recursive(spec: &Spec) {
                             if let Err(e) = utils::test_mount_releatime_option(
                                 mount.destination().to_str().unwrap(),
                             ) {
-                                eprintln!("path expected to be rrelatime, found not rrelatime, error: {e}");
+                                eprintln!(
+                                    "path expected to be rrelatime, found not rrelatime, error: {e}"
+                                );
                             }
                         }
                         "rnorelatime" => {
                             if let Err(e) = utils::test_mount_noreleatime_option(
                                 mount.destination().to_str().unwrap(),
                             ) {
-                                eprintln!("path expected to be rnorelatime, found not rnorelatime, error: {e}");
+                                eprintln!(
+                                    "path expected to be rnorelatime, found not rnorelatime, error: {e}"
+                                );
                             }
                         }
                         "rnoatime" => {
@@ -266,21 +282,27 @@ pub fn validate_mounts_recursive(spec: &Spec) {
                             if let Err(e) = utils::test_mount_rstrictatime_option(
                                 mount.destination().to_str().unwrap(),
                             ) {
-                                eprintln!("path expected to be rstrictatime, found not rstrictatime, error: {e}");
+                                eprintln!(
+                                    "path expected to be rstrictatime, found not rstrictatime, error: {e}"
+                                );
                             }
                         }
                         "rnosymfollow" => {
                             if let Err(e) = utils::test_mount_rnosymfollow_option(
                                 mount.destination().to_str().unwrap(),
                             ) {
-                                eprintln!("path expected to be rnosymfollow, found not rnosymfollow, error: {e}");
+                                eprintln!(
+                                    "path expected to be rnosymfollow, found not rnosymfollow, error: {e}"
+                                );
                             }
                         }
                         "rsymfollow" => {
                             if let Err(e) = utils::test_mount_rsymfollow_option(
                                 mount.destination().to_str().unwrap(),
                             ) {
-                                eprintln!("path expected to be rsymfollow, found not rsymfollow, error: {e}");
+                                eprintln!(
+                                    "path expected to be rsymfollow, found not rsymfollow, error: {e}"
+                                );
                             }
                         }
                         "rsuid" => {
@@ -472,24 +494,24 @@ fn validate_device(device: &LinuxDevice, description: &str) {
         eprintln!("we need the major/minor from the controlling TTY");
     }
 
-    if let Some(expected_uid) = device.uid() {
-        if file_data.st_uid() != expected_uid {
-            eprintln!(
-                "error due to device uid want {}, got {}",
-                expected_uid,
-                file_data.st_uid()
-            );
-        }
+    if let Some(expected_uid) = device.uid()
+        && file_data.st_uid() != expected_uid
+    {
+        eprintln!(
+            "error due to device uid want {}, got {}",
+            expected_uid,
+            file_data.st_uid()
+        );
     }
 
-    if let Some(expected_gid) = device.gid() {
-        if file_data.st_gid() != expected_gid {
-            eprintln!(
-                "error due to device gid want {}, got {}",
-                expected_gid,
-                file_data.st_gid()
-            );
-        }
+    if let Some(expected_gid) = device.gid()
+        && file_data.st_gid() != expected_gid
+    {
+        eprintln!(
+            "error due to device gid want {}, got {}",
+            expected_gid,
+            file_data.st_gid()
+        );
     }
 }
 
@@ -931,10 +953,9 @@ pub fn validate_rootfs_propagation(spec: &Spec) {
                 None::<&str>,
                 MsFlags::MS_BIND | MsFlags::MS_REC,
                 None::<&str>,
-            ) {
-                if e != nix::errno::Errno::EINVAL {
-                    eprintln!("Error occurred during mount: {}", e);
-                }
+            ) && e != nix::errno::Errno::EINVAL
+            {
+                eprintln!("Error occurred during mount: {}", e);
             }
         }
         _ => {
@@ -1004,4 +1025,75 @@ pub fn validate_uid_mappings(spec: &Spec) {
 
     let expected_gid_mappings = linux.gid_mappings().as_ref().unwrap();
     validate_id_mappings(expected_gid_mappings, "/proc/self/gid_map", "gid_mappings");
+}
+
+pub fn validate_net_devices(spec: &Spec) {
+    let mut socket = Socket::new(NETLINK_ROUTE).unwrap();
+    socket.bind_auto().unwrap();
+    let linux = spec.linux().as_ref().unwrap();
+    if let Some(net_devices) = linux.net_devices() {
+        for (name, net_device) in net_devices {
+            let net_device_name = net_device
+                .name()
+                .as_ref()
+                .filter(|d| !d.is_empty())
+                .map_or(name.clone(), |d| d.to_string());
+
+            let mut message = LinkMessage::default();
+            message
+                .attributes
+                .push(LinkAttribute::IfName(net_device_name.clone()));
+
+            let mut req = NetlinkMessage::from(RouteNetlinkMessage::GetLink(message));
+            req.header.flags = NLM_F_REQUEST;
+            req.finalize();
+
+            let mut send_buf = vec![0; req.header.length as usize];
+            req.serialize(&mut send_buf[..]);
+            socket.send(&send_buf[..], 0).unwrap();
+
+            let mut receive_buf = vec![0u8; 4096];
+            let n_received = socket.recv(&mut &mut receive_buf[..], 0).unwrap();
+            let bytes = &receive_buf[..n_received];
+            let rx_packet = <NetlinkMessage<RouteNetlinkMessage>>::deserialize(bytes).unwrap();
+
+            let index = match rx_packet.payload {
+                NetlinkPayload::InnerMessage(RouteNetlinkMessage::NewLink(link)) => {
+                    println!("network device {} is present", net_device_name);
+                    link.header.index
+                }
+                _ => {
+                    eprintln!("network device {} is not present", net_device_name);
+                    continue;
+                }
+            };
+
+            let mut message = AddressMessage::default();
+            message.header.index = index;
+            let mut req = NetlinkMessage::from(RouteNetlinkMessage::GetAddress(message));
+            req.header.flags = NLM_F_REQUEST | NLM_F_DUMP;
+            req.finalize();
+
+            let mut send_buf = vec![0; req.header.length as usize];
+            req.serialize(&mut send_buf[..]);
+            socket.send(&send_buf[..], 0).unwrap();
+
+            let mut receive_buf = vec![0u8; 4096];
+            let n_received = socket.recv(&mut &mut receive_buf[..], 0).unwrap();
+            let bytes = &receive_buf[..n_received];
+            let rx_packet = <NetlinkMessage<RouteNetlinkMessage>>::deserialize(bytes).unwrap();
+
+            match rx_packet.payload {
+                NetlinkPayload::InnerMessage(RouteNetlinkMessage::NewAddress(_address)) => {
+                    println!("address is present for network device {}", net_device_name);
+                }
+                _ => {
+                    eprintln!(
+                        "address is not present for network device {}",
+                        net_device_name
+                    );
+                }
+            }
+        }
+    }
 }

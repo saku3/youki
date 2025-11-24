@@ -23,8 +23,11 @@ use crate::tests::kill::get_kill_test;
 use crate::tests::lifecycle::{ContainerCreate, ContainerLifecycle};
 use crate::tests::linux_masked_paths::get_linux_masked_paths_tests;
 use crate::tests::linux_ns_itype::get_ns_itype_tests;
+use crate::tests::misc_props::get_misc_props_test;
 use crate::tests::mounts_recursive::get_mounts_recursive_test;
+use crate::tests::net_devices::get_net_devices_test;
 use crate::tests::no_pivot::get_no_pivot_test;
+use crate::tests::personality::get_personality_test;
 use crate::tests::pidfile::get_pidfile_test;
 use crate::tests::process::get_process_test;
 use crate::tests::process_capabilities_fail::get_process_capabilities_fail_test;
@@ -123,6 +126,7 @@ fn main() -> Result<()> {
     let seccomp_notify = get_seccomp_notify_test();
     let ro_paths = get_ro_paths_test();
     let hostname = get_hostname_test();
+    let misc_props = get_misc_props_test();
     let mounts_recursive = get_mounts_recursive_test();
     let domainname = get_domainname_tests();
     let intel_rdt = get_intel_rdt_test();
@@ -145,7 +149,9 @@ fn main() -> Result<()> {
     let process_capabilities_fail = get_process_capabilities_fail_test();
     let uid_mappings = get_uid_mappings_test();
     let exec_cpu_affinity = get_exec_cpu_affinity_test();
+    let personality = get_personality_test();
     let prohibit_symlink = get_prohibit_symlink_test();
+    let net_devices = get_net_devices_test();
 
     tm.add_test_group(Box::new(cl));
     tm.add_test_group(Box::new(cc));
@@ -164,6 +170,7 @@ fn main() -> Result<()> {
     tm.add_test_group(Box::new(seccomp_notify));
     tm.add_test_group(Box::new(ro_paths));
     tm.add_test_group(Box::new(hostname));
+    tm.add_test_group(Box::new(misc_props));
     tm.add_test_group(Box::new(mounts_recursive));
     tm.add_test_group(Box::new(domainname));
     tm.add_test_group(Box::new(intel_rdt));
@@ -182,11 +189,12 @@ fn main() -> Result<()> {
     tm.add_test_group(Box::new(fd_control));
     tm.add_test_group(Box::new(kill));
     tm.add_test_group(Box::new(rootfs_propagation));
+    tm.add_test_group(Box::new(net_devices));
     tm.add_test_group(Box::new(process_capabilities_fail));
     tm.add_test_group(Box::new(uid_mappings));
     tm.add_test_group(Box::new(exec_cpu_affinity));
+    tm.add_test_group(Box::new(personality));
     tm.add_test_group(Box::new(prohibit_symlink));
-
     tm.add_test_group(Box::new(io_priority_test));
     tm.add_cleanup(Box::new(cgroups::cleanup_v1));
     tm.add_cleanup(Box::new(cgroups::cleanup_v2));

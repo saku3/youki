@@ -65,6 +65,10 @@ pub enum LibcontainerError {
     #[error[transparent]]
     CreateContainerError(#[from] CreateContainerError),
     #[error(transparent)]
+    NetDevicesError(#[from] crate::utils::NetDevicesError),
+    #[error(transparent)]
+    NetworkError(#[from] crate::network::NetworkError),
+    #[error(transparent)]
     Executor(#[from] crate::workload::ExecutorError),
 
     // Catch all errors that are not covered by the above

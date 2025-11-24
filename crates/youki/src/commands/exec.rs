@@ -4,7 +4,7 @@ use anyhow::Result;
 use libcontainer::container::builder::ContainerBuilder;
 use libcontainer::syscall::syscall::SyscallType;
 use liboci_cli::Exec;
-use nix::sys::wait::{waitpid, WaitStatus};
+use nix::sys::wait::{WaitStatus, waitpid};
 
 use crate::workload::executor::default_executor;
 
@@ -32,7 +32,7 @@ pub fn exec(args: Exec, root_path: PathBuf) -> Result<i32> {
         .with_group(group)
         .build()?;
 
-    // See https://github.com/containers/youki/pull/1252 for a detailed explanation
+    // See https://github.com/youki-dev/youki/pull/1252 for a detailed explanation
     // basically, if there is any error in starting exec, the build above will return error
     // however, if the process does start, and detach is given, we do not wait for it
     // if not detached, then we wait for it using waitpid below
