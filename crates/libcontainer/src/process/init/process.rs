@@ -1017,12 +1017,9 @@ fn set_home_from_path(envs: &mut HashMap<String, String>, dir_home: &Path) {
 mod tests {
     use std::ffi::OsStr;
     use std::fs;
-<<<<<<< HEAD
-    use std::path::Path;
-=======
     use std::os::unix::ffi::OsStrExt;
-    use std::path::PathBuf;
->>>>>>> 4dcdadc6 (Edit the commented content)
+    use std::path::{Path, PathBuf};
+    use std::process::Command;
 
     use anyhow::Result;
     #[cfg(feature = "libseccomp")]
@@ -1030,6 +1027,7 @@ mod tests {
     use nix::unistd::{Uid, User as NixUser};
     use oci_spec::runtime::{LinuxNamespaceBuilder, SpecBuilder, UserBuilder};
     #[cfg(feature = "libseccomp")]
+    use scopeguard::defer;
     use serial_test::serial;
 
     use super::*;
@@ -1369,14 +1367,25 @@ mod tests {
         let mut envs = HashMap::new();
         envs.insert("HOME".to_owned(), "".to_owned());
 
-        let current_uid = Uid::current();
-        let expected = NixUser::from_uid(current_uid)
+        let test_username = format!("testuser_{}", std::process::id());
+        let expected_home = format!("/tmp/{}", test_username);
+        let create_result = Command::new("sudo")
+            .args(["useradd", "-m", "-d", &expected_home, &test_username])
+            .output();
+        assert!(create_result.is_ok());
+        defer! {
+            let _ = Command::new("sudo").args(["userdel", "-r", &test_username]).output();
+        }
+        let test_user = NixUser::from_name(&test_username)
+            .expect("Failed to get user info")
+            .expect("Test user not found");
+
+        let expected = NixUser::from_uid(test_user.uid)
             .ok()
             .flatten()
             .and_then(|user| user.dir.to_str().map(|s| s.to_owned()))
             .unwrap_or_default();
-
-        set_home_env_if_not_exists(&mut envs, current_uid);
+        set_home_env_if_not_exists(&mut envs, test_user.uid);
         assert_eq!(envs.get("HOME"), Some(&expected));
     }
 
@@ -1392,15 +1401,25 @@ mod tests {
     fn test_set_home_env_if_not_exists_not_set_non_root() {
         let mut envs = HashMap::new();
 
-        let current_uid = Uid::current();
-        let expected = NixUser::from_uid(current_uid)
-            .ok()
-            .flatten()
-            .and_then(|user| user.dir.to_str().map(|s| s.to_owned()))
-            .unwrap_or_default();
+        let test_username = format!("testuser_{}", std::process::id());
+        let expected_home = format!("/tmp/{}", test_username);
+        let create_result = Command::new("sudo")
+            .args(["useradd", "-m", "-d", &expected_home, &test_username])
+            .output();
+        if create_result.is_err() {
+            eprintln!("Failed to create test user {}", test_username);
+            eprintln!("error: {:?}", create_result.err());
+        }
+        // assert!(create_result.is_ok());
+        defer! {
+            let _ = Command::new("sudo").args(["userdel", "-r", &test_username]).output();
+        }
 
-        set_home_env_if_not_exists(&mut envs, current_uid);
-        assert_eq!(envs.get("HOME"), Some(&expected));
+        let test_user = NixUser::from_name(&test_username)
+            .expect("Failed to get user info")
+            .expect("Test user not found");
+        set_home_env_if_not_exists(&mut envs, test_user.uid);
+        assert_eq!(envs.get("HOME"), Some(&expected_home));
     }
 
     #[test]
