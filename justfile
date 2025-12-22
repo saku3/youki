@@ -43,7 +43,7 @@ test-basic: test-unit test-doc
 
 # run cargo unit tests
 test-unit:
-    sudo {{ cwd }}/scripts/cargo.sh test --lib --bins --all --all-targets --all-features --no-fail-fast -- --test-threads=1
+    {{ cwd }}/scripts/cargo.sh test --lib --bins --all --all-targets --all-features --no-fail-fast -- --test-threads=1
 
 # run cargo doc tests
 test-doc:

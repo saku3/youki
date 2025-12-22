@@ -132,6 +132,8 @@ jobs:
           echo "TARGET=${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}" >> ${GITHUB_ENV}
       - name: Disable AppArmor restrictions
         run: echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
+      - name: Create user
+        run: sudo useradd -m -d /tmp/user_11 -s /bin/bash user_11
       - name: Run tests
         run: just test-basic
       - name: Run feature tests
