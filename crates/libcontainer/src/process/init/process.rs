@@ -1399,26 +1399,18 @@ mod tests {
 
     #[test]
     fn test_set_home_env_if_not_exists_not_set_non_root() {
-        let mut envs = HashMap::new();
+        let mut envs: HashMap<String, String> = HashMap::new();
 
-        let test_username = format!("testuser_{}", std::process::id());
-        let expected_home = format!("/tmp/{}", test_username);
-        let create_result = Command::new("sudo")
-            .args(["useradd", "-m", "-d", &expected_home, &test_username])
-            .output();
-        if create_result.is_err() {
-            eprintln!("Failed to create test user {}", test_username);
-            eprintln!("error: {:?}", create_result.err());
-        }
-        // assert!(create_result.is_ok());
-        defer! {
-            let _ = Command::new("sudo").args(["userdel", "-r", &test_username]).output();
-        }
+        let test_username = "user_11";
 
-        let test_user = NixUser::from_name(&test_username)
+        let test_user = NixUser::from_name(test_username)
             .expect("Failed to get user info")
-            .expect("Test user not found");
+            .expect("Test user not found (expected user_11 to exist)");
+
+        let expected_home = test_user.dir.to_string_lossy().into_owned();
+
         set_home_env_if_not_exists(&mut envs, test_user.uid);
+
         assert_eq!(envs.get("HOME"), Some(&expected_home));
     }
 
