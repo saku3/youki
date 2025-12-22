@@ -1363,7 +1363,7 @@ mod tests {
     }
 
     #[test]
-    fn test_set_home_env_if_not_exists_already_exists_but_empty_value_non_root() {
+    fn test_set_aaaa() {
         let mut envs = HashMap::new();
         envs.insert("HOME".to_owned(), "".to_owned());
 
@@ -1377,8 +1377,8 @@ mod tests {
             let _ = Command::new("sudo").args(["userdel", "-r", &test_username]).output();
         }
         let test_user = NixUser::from_name(&test_username)
-            .expect("Failed to get user info")
-            .expect("Test user not found");
+            .unwrap_or_else(|e| panic!("Failed to get user info for {}: {:?}", test_username, e))
+            .unwrap_or_else(|| panic!("Test user not found: {}", test_username));
 
         let expected = NixUser::from_uid(test_user.uid)
             .ok()
@@ -1386,6 +1386,28 @@ mod tests {
             .and_then(|user| user.dir.to_str().map(|s| s.to_owned()))
             .unwrap_or_default();
         set_home_env_if_not_exists(&mut envs, test_user.uid);
+        assert_eq!(envs.get("HOME"), Some(&expected));
+    }
+
+    #[test]
+    fn test_set_home_env_if_not_exists_already_exists_but_empty_value_non_root() {
+        let mut envs: HashMap<String, String> = HashMap::new();
+        envs.insert("HOME".to_owned(), "".to_owned());
+
+        let test_username = "user_11";
+
+        let test_user = NixUser::from_name(test_username)
+            .expect("Failed to get user info")
+            .expect("Test user not found (expected user_11 to exist)");
+
+        let expected: String = NixUser::from_uid(test_user.uid)
+            .ok()
+            .flatten()
+            .and_then(|user| user.dir.to_str().map(|s| s.to_owned()))
+            .unwrap_or_default();
+
+        set_home_env_if_not_exists(&mut envs, test_user.uid);
+
         assert_eq!(envs.get("HOME"), Some(&expected));
     }
 
