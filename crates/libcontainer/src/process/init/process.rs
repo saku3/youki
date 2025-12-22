@@ -1019,7 +1019,6 @@ mod tests {
     use std::fs;
     use std::os::unix::ffi::OsStrExt;
     use std::path::{Path, PathBuf};
-    use std::process::Command;
 
     use anyhow::Result;
     #[cfg(feature = "libseccomp")]
@@ -1027,7 +1026,6 @@ mod tests {
     use nix::unistd::{Uid, User as NixUser};
     use oci_spec::runtime::{LinuxNamespaceBuilder, SpecBuilder, UserBuilder};
     #[cfg(feature = "libseccomp")]
-    use scopeguard::defer;
     use serial_test::serial;
 
     use super::*;
