@@ -27,7 +27,7 @@ use crate::network::link::LinkClient;
 use crate::network::network_device::{resolve_device_name, setup_addresses_in_network_namespace};
 use crate::network::wrapper::create_network_client;
 use crate::process::args::{ContainerArgs, ContainerType};
-use crate::process::channel;
+use crate::process::{channel, memory_policy};
 use crate::rootfs::RootFS;
 use crate::rootfs::device::{open_device_fd, verify_dev_null};
 #[cfg(feature = "libseccomp")]
@@ -53,6 +53,8 @@ pub fn container_init_process(
     set_io_priority(ctx.syscall.as_ref(), ctx.process.io_priority())?;
 
     setup_scheduler(ctx.process.scheduler())?;
+
+    memory_policy::setup_memory_policy(ctx.linux.memory_policy(), ctx.syscall.as_ref())?;
 
     // set up tty if specified
     if let Some(csocketfd) = args.console_socket {
@@ -82,16 +84,6 @@ pub fn container_init_process(
     }
 
     if matches!(args.container_type, ContainerType::InitContainer) {
-        // create_container hook needs to be called after the namespace setup, but
-        // before pivot_root is called. This runs in the container namespaces.
-        if let Some(hooks) = ctx.hooks {
-            hooks::run_hooks(hooks.create_container().as_ref(), ctx.container, None).map_err(
-                |err| {
-                    tracing::error!(?err, "failed to run create container hooks");
-                    InitProcessError::Hooks(err)
-                },
-            )?;
-        }
         let in_user_ns = utils::is_in_new_userns().map_err(InitProcessError::Io)?;
         let bind_service = ctx.ns.get(LinuxNamespaceType::User)?.is_some() || in_user_ns;
         let rootfs = RootFS::new();
@@ -106,6 +98,22 @@ pub fn container_init_process(
                 tracing::error!(?err, "failed to prepare rootfs");
                 InitProcessError::RootFS(err)
             })?;
+
+        if let Some(hooks) = ctx.hooks {
+            // send a request to the main process to run prestart and create_runtime hooks.
+            // prestart and create_runtime hook needs to be called after the namespace setup, but
+            // before pivot_root is called. This runs in the runtime(not container) namespaces.
+            main_sender.hook_request()?;
+            init_receiver.wait_for_hook_request_done()?;
+
+            // create_container hook needs to be called after the namespace setup, but
+            // before pivot_root is called. This runs in the container namespaces.
+            hooks::run_hooks(hooks.create_container().as_ref(), ctx.container, None, None)
+                .map_err(|err| {
+                    tracing::error!(?err, "failed to run create container hooks");
+                    InitProcessError::Hooks(err)
+                })?;
+        }
 
         // Entering into the rootfs jail. If mount namespace is specified, then
         // we use pivot_root, but if we are on the host mount namespace, we will
@@ -421,7 +429,7 @@ pub fn container_init_process(
     // before pivot_root is called. This runs in the container namespaces.
     if matches!(args.container_type, ContainerType::InitContainer) {
         if let Some(hooks) = ctx.hooks {
-            hooks::run_hooks(hooks.start_container().as_ref(), ctx.container, None).map_err(
+            hooks::run_hooks(hooks.start_container().as_ref(), ctx.container, None, None).map_err(
                 |err| {
                     tracing::error!(?err, "failed to run start container hooks");
                     err
