@@ -95,6 +95,7 @@ kind-cluster: bin-kind
     docker buildx build -f tests/k8s/Dockerfile --iidfile=tests/k8s/_out/img --load .
     image=$(cat tests/k8s/_out/img)
     bin/kind create cluster --name {{ KIND_CLUSTER_NAME }} --image=$image
+    docker exec -it "kind-${KIND_CLUSTER_NAME}-control-plane" containerd --version
 
 # run youki with kind
 test-kind: kind-cluster
