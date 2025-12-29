@@ -182,7 +182,7 @@ pub fn validate_mounts_recursive(spec: &Spec) {
                                     Ok(())
                                 })
                             {
-                                eprintln!("error in testing rro recursive mounting : {e}");
+                                eprintln!("error in testing rrw recursive mounting : {e}");
                             }
                         }
                         "rnoexec" => {

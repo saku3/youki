@@ -5,6 +5,7 @@ use std::os::unix::fs::symlink;
 use std::os::unix::prelude::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
+use tempfile::TempDir;
 
 use anyhow::Context;
 use nix::libc;
@@ -95,9 +96,20 @@ fn clean_mount(mount_dir: &Path, sub_mount_dir: &Path) {
     fs::remove_dir_all(mount_dir).unwrap();
 }
 
+// Host: <tmp>/rro_dir is a mount (tmpfs)
+// Host: <tmp>/rro_dir/rro_subdir is a submount (tmpfs)
+//
+// mount (rbind): Host: <tmp>/rro_dir -> Container: /mnt
+//
+// In Container:
+// /mnt
+// └── rro_subdir/
+//     └── bar
+//
+// rro makes both /mnt and /mnt/rro_subdir read-only (including submounts).
 fn check_recursive_readonly() -> TestResult {
-    let rro_test_base_dir = PathBuf::from_str("/tmp").unwrap();
-    let rro_dir_path = rro_test_base_dir.join("rro_dir");
+    let rro_test_base_dir = TempDir::new().unwrap();
+    let rro_dir_path = rro_test_base_dir.path().join("rro_dir");
     let rro_subdir_path = rro_dir_path.join("rro_subdir");
     let mount_dest_path = PathBuf::from_str("/mnt").unwrap();
 
@@ -115,6 +127,7 @@ fn check_recursive_readonly() -> TestResult {
 
     let result = test_inside_container(&spec, &CreateOptions::default(), &|_| {
         setup_mount(&rro_dir_path, &rro_subdir_path);
+        std::fs::write(rro_subdir_path.join("bar"), b"bar\n").unwrap();
         Ok(())
     });
 
@@ -426,6 +439,7 @@ fn check_recursive_readwrite() -> TestResult {
 
     let result = test_inside_container(&spec, &CreateOptions::default(), &|_| {
         setup_mount(&rrw_dir_path, &rrw_subdir_path);
+        std::fs::write(rrw_subdir_path.join("bar"), b"bar\n").unwrap();
         Ok(())
     });
 
