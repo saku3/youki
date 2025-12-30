@@ -137,8 +137,8 @@ fn check_recursive_readonly() -> TestResult {
 }
 
 fn check_recursive_nosuid() -> TestResult {
-    let rnosuid_test_base_dir = PathBuf::from_str("/tmp").unwrap();
-    let rnosuid_dir_path = rnosuid_test_base_dir.join("rnosuid_dir");
+    let rnosuid_test_base_dir = TempDir::new().unwrap();
+    let rnosuid_dir_path = rnosuid_test_base_dir.path().join("rnosuid_dir");
     let rnosuid_subdir_path = rnosuid_dir_path.join("rnosuid_subdir");
     let mount_dest_path = PathBuf::from_str("/mnt").unwrap();
     let executable_file_name = "whoami";
@@ -223,7 +223,10 @@ fn check_recursive_nosuid() -> TestResult {
 }
 
 fn check_recursive_rsuid() -> TestResult {
-    let rsuid_dir_path = PathBuf::from_str("/tmp/rsuid_dir").unwrap();
+    let rsuid_base_dir_path = TempDir::new().unwrap();
+    let rsuid_dir_path = rsuid_base_dir_path.path().join("rsuid_dir");
+
+    let rsuid_dir_path = rsuid_dir_path.join("rsuid_dir");
     let mount_dest_path = PathBuf::from_str("/mnt/rsuid_dir").unwrap();
     fs::create_dir_all(rsuid_dir_path.clone()).unwrap();
     scopeguard::defer!(fs::remove_dir_all(rsuid_dir_path.clone()).unwrap());
