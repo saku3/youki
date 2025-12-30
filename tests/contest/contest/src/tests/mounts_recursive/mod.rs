@@ -9,7 +9,7 @@ use std::str::FromStr;
 use anyhow::Context;
 use nix::libc;
 use nix::mount::{MsFlags, mount, umount};
-use nix::sys::stat::Mode;
+use nix::sys::stat::{Mode, SFlag, makedev, mknod};
 use nix::unistd::{Uid, chown};
 use oci_spec::runtime::{
     Capability, LinuxBuilder, LinuxCapabilitiesBuilder, Mount, ProcessBuilder, Spec, SpecBuilder,
@@ -418,21 +418,35 @@ fn check_recursive_rnodev() -> TestResult {
     let rnodev_dir_path = rnodev_base_dir.path().join("rnodev");
     let rnodev_subdir_path = rnodev_dir_path.join("rnodev_subdir");
     let mount_dest_path = PathBuf::from_str("/rnodev").unwrap();
-    fs::create_dir(rnodev_dir_path.clone()).unwrap();
 
     let mount_options = vec!["rbind".to_string(), "rnodev".to_string()];
     let mut mount_spec = Mount::default();
     mount_spec
         .set_destination(mount_dest_path)
         .set_typ(None)
-        .set_source(Some(rnodev_dir_path))
+        .set_source(Some(rnodev_dir_path.clone()))
         .set_options(Some(mount_options));
     let spec = get_spec(
         vec![mount_spec],
         vec!["runtimetest".to_string(), "mounts_recursive".to_string()],
     );
 
-    test_inside_container(&spec, &CreateOptions::default(), &|_| Ok(()))
+    let result = test_inside_container(&spec, &CreateOptions::default(), &|_| {
+        setup_mount(&rnodev_dir_path, &rnodev_subdir_path);
+        let dev = makedev(1, 3);
+        mknod(
+            &rnodev_subdir_path.join("null"),
+            SFlag::S_IFCHR,
+            Mode::from_bits_truncate(0o666),
+            dev,
+        )
+        .expect("create null device");
+        Ok(())
+    });
+
+    clean_mount(&rnodev_dir_path, &rnodev_subdir_path);
+
+    result
 }
 
 // rrw_test

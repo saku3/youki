@@ -158,20 +158,7 @@ pub fn test_dir_not_update_access_time(path: &str) -> Result<(), std::io::Error>
 }
 
 pub fn test_device_access(path: &str) -> Result<(), std::io::Error> {
-    let _ = std::fs::OpenOptions::new()
-        .create(true)
-        .truncate(true)
-        .write(true)
-        .open(PathBuf::from(path).join("null"))?;
-    Ok(())
-}
-
-pub fn test_device_unaccess(path: &str) -> Result<(), std::io::Error> {
-    let _ = std::fs::OpenOptions::new()
-        .create(true)
-        .truncate(true)
-        .write(true)
-        .open(PathBuf::from(path).join("null"))?;
+    OpenOptions::new().read(true).open(path)?;
     Ok(())
 }
 

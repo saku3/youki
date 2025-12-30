@@ -245,10 +245,11 @@ pub fn validate_mounts_recursive(spec: &Spec) {
                             }
                         }
                         "rnodev" => {
+                            let device_path = mount.destination().join("rnodev_subdir/null");
                             let rest =
-                                utils::test_device_unaccess(mount.destination().to_str().unwrap());
+                                utils::test_device_access(&device_path.to_str().unwrap());
                             if rest.is_ok() {
-                                // because /rnodev/null device not access,so rest is err
+                                // because /rnodev/rnodev_subdir/null device not access,so rest is err
                                 eprintln!("error in testing rnodev recursive mounting");
                             }
                         }
