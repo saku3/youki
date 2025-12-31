@@ -215,7 +215,7 @@ pub fn test_mount_releatime_option(path: &str) -> Result<(), std::io::Error> {
 // 1. create test.txt file, get one atime
 // 2. cat a.txt, get two atime; check atime whether update
 // 3. cat a.txt, get three atime, check now two atime whether equal three atime
-pub fn test_mount_noreleatime_option(path: &str) -> Result<(), std::io::Error> {
+pub fn test_mount_norelatime_option(path: &str) -> Result<(), std::io::Error> {
     let test_file_path = PathBuf::from(path).join("noreleatime.txt");
     Command::new("touch")
         .arg(test_file_path.to_str().unwrap())

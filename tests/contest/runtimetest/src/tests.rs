@@ -263,7 +263,7 @@ pub fn validate_mounts_recursive(spec: &Spec) {
                             }
                         }
                         "rnorelatime" => {
-                            if let Err(e) = utils::test_mount_noreleatime_option(
+                            if let Err(e) = utils::test_mount_norelatime_option(
                                 mount.destination().to_str().unwrap(),
                             ) {
                                 eprintln!(
@@ -272,8 +272,9 @@ pub fn validate_mounts_recursive(spec: &Spec) {
                             }
                         }
                         "rnoatime" => {
+                            let subdir_path = mount.destination().join("rnoatime_subdir");
                             if let Err(e) = utils::test_mount_rnoatime_option(
-                                mount.destination().to_str().unwrap(),
+                                subdir_path.to_str().unwrap(),
                             ) {
                                 eprintln!(
                                     "path expected to be rnoatime, found not rnoatime, error: {e}"
