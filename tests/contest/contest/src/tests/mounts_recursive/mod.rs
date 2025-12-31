@@ -345,8 +345,8 @@ fn check_recursive_rexec() -> TestResult {
 fn check_recursive_rdiratime() -> TestResult {
     let rdiratime_base_dir = TempDir::new().unwrap();
     let rdiratime_dir = rdiratime_base_dir.path().join("rdiratime");
+    let rdiratime_subdir = rdiratime_dir.join("rdiratime_subdir");
     let mount_dest_path = PathBuf::from_str("/rdiratime").unwrap();
-    fs::create_dir(rdiratime_dir.clone()).unwrap();
 
     let mount_options = vec!["rbind".to_string(), "rdiratime".to_string()];
     let mut mount_spec = Mount::default();
@@ -360,7 +360,9 @@ fn check_recursive_rdiratime() -> TestResult {
         vec!["runtimetest".to_string(), "mounts_recursive".to_string()],
     );
 
-    let result = test_inside_container(&spec, &CreateOptions::default(), &|_| Ok(()));
+    let result = test_inside_container(&spec, &CreateOptions::default(), &|_| {
+        setup_mount(&rdiratime_dir, &rdiratime_subdir);
+        Ok(())});
     result
 }
 
@@ -368,9 +370,9 @@ fn check_recursive_rdiratime() -> TestResult {
 // If set in attr_set, prevents updating access time for directories on this mount
 fn check_recursive_rnodiratime() -> TestResult {
     let rdiratime_base_dir = TempDir::new().unwrap();
-    let rnodiratime_dir = rdiratime_base_dir.path().join("rnodiratime");
-    let mount_dest_path = PathBuf::from_str("/rnodiratime").unwrap();
-    fs::create_dir(rnodiratime_dir.clone()).unwrap();
+    let rnodiratime_dir = rdiratime_base_dir.path().join("rnodiratime_dir");
+    let rnodiratime_subdir = rnodiratime_dir.join("rnodiratime_subdir");
+    let mount_dest_path = PathBuf::from_str("/rnodiratime_dir").unwrap();
 
     let mount_options = vec!["rbind".to_string(), "rnodiratime".to_string()];
     let mut mount_spec = Mount::default();
@@ -384,7 +386,10 @@ fn check_recursive_rnodiratime() -> TestResult {
         vec!["runtimetest".to_string(), "mounts_recursive".to_string()],
     );
 
-    let result = test_inside_container(&spec, &CreateOptions::default(), &|_| Ok(()));
+    let result = test_inside_container(&spec, &CreateOptions::default(), &|_| {
+        setup_mount(&rnodiratime_dir, &rnodiratime_subdir);
+        Ok(())
+    });
     result
 }
 
@@ -428,7 +433,7 @@ fn check_recursive_rdev() -> TestResult {
 // rnodev_test
 // Host: <tmp>/rnodev is a mount (tmpfs)
 // Host: <tmp>/rnodev/rnodev_subdir is a submount (tmpfs)
-// Host: mknod <tmp>/rnodev/rnodev_subdir/null 
+// Host: mknod <tmp>/rnodev/rnodev_subdir/null
 // rnodev disables device-node interpretation recursively; opening /rnodev/rnodev_subdir/null should fail.
 fn check_recursive_rnodev() -> TestResult {
     let rnodev_base_dir = TempDir::new().unwrap();
@@ -546,8 +551,8 @@ fn check_recursive_rnorelatime() -> TestResult {
 fn check_recursive_rnoatime() -> TestResult {
     let rnoatime_base_dir = TempDir::new().unwrap();
     let rnoatime_dir_path = rnoatime_base_dir.path().join("rnoatime_dir");
-    let rnoatime_subdir_path = rnoatime_dir_path.join("rnoatime_dir");
-    let mount_dest_path = PathBuf::from_str("/rnoatime").unwrap();
+    let rnoatime_subdir_path = rnoatime_dir_path.join("rnoatime_subdir");
+    let mount_dest_path = PathBuf::from_str("/rnoatime_dir").unwrap();
 
     let mount_options = vec!["rbind".to_string(), "rnoatime".to_string()];
     let mut mount_spec = Mount::default();
@@ -563,7 +568,8 @@ fn check_recursive_rnoatime() -> TestResult {
 
     let result = test_inside_container(&spec, &CreateOptions::default(), &|_| {
         setup_mount(&rnoatime_dir_path, &rnoatime_subdir_path);
-        Ok(())});
+        Ok(())
+    });
     result
 }
 

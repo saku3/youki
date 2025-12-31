@@ -222,32 +222,34 @@ pub fn validate_mounts_recursive(spec: &Spec) {
                             }
                         }
                         "rdiratime" => {
+                            let sub_dir = mount.destination().join("rdiratime_subdir");
                             let rest = utils::test_dir_update_access_time(
-                                mount.destination().to_str().unwrap(),
+                                sub_dir.to_str().unwrap(),
                             );
                             if let Err(e) = rest {
                                 eprintln!("error in testing rdiratime recursive mounting: {e}");
                             }
                         }
                         "rnodiratime" => {
+                            let sub_dir = mount.destination().join("rnodiratime_subdir");
                             let rest = utils::test_dir_not_update_access_time(
-                                mount.destination().to_str().unwrap(),
+                                sub_dir.to_str().unwrap(),
                             );
                             if let Err(e) = rest {
                                 eprintln!("error in testing rnodiratime recursive mounting: {e}");
                             }
                         }
                         "rdev" => {
+                            let device_path = mount.destination().join("rdev_subdir/null");
                             let rest =
-                                utils::test_device_access(mount.destination().to_str().unwrap());
+                                utils::test_device_access(device_path.to_str().unwrap());
                             if let Err(e) = rest {
                                 eprintln!("error in testing rdev recursive mounting: {e}");
                             }
                         }
                         "rnodev" => {
                             let device_path = mount.destination().join("rnodev_subdir/null");
-                            let rest =
-                                utils::test_device_access(&device_path.to_str().unwrap());
+                            let rest = utils::test_device_access(&device_path.to_str().unwrap());
                             if rest.is_ok() {
                                 // because /rnodev/rnodev_subdir/null device not access,so rest is err
                                 eprintln!("error in testing rnodev recursive mounting");
@@ -273,9 +275,9 @@ pub fn validate_mounts_recursive(spec: &Spec) {
                         }
                         "rnoatime" => {
                             let subdir_path = mount.destination().join("rnoatime_subdir");
-                            if let Err(e) = utils::test_mount_rnoatime_option(
-                                subdir_path.to_str().unwrap(),
-                            ) {
+                            if let Err(e) =
+                                utils::test_mount_rnoatime_option(subdir_path.to_str().unwrap())
+                            {
                                 eprintln!(
                                     "path expected to be rnoatime, found not rnoatime, error: {e}"
                                 );
