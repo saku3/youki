@@ -173,6 +173,13 @@ pub fn test_device_access(path: &str) -> Result<(), std::io::Error> {
 // 2. cat a.txt, get two atime; check atime whether update, conditions are met atime less than or equal mtime or ctime
 // 3. cat a.txt, get three atime, check now two atime whether equal three atime
 pub fn test_mount_releatime_option(path: &str) -> Result<(), std::io::Error> {
+    let output = Command::new("cat")
+        .args([
+            "/proc/self/mountinfo",
+        ])
+        .output()?;
+    println!("{:?}", output.stdout);
+
     let test_file_path = PathBuf::from(path).join("test.txt");
     Command::new("touch")
         .arg(test_file_path.to_str().unwrap())
@@ -245,7 +252,7 @@ pub fn test_mount_norelatime_option(path: &str) -> Result<(), std::io::Error> {
         .expect("execute cat command error");
     let three_metadata = fs::metadata(test_file_path.clone())?;
 
-    if two_metadata.atime() != three_metadata.atime() {
+    if two_metadata.atime() == three_metadata.atime() {
         return Err(std::io::Error::other(format!(
             "update access time for file {:?}",
             test_file_path.to_str()

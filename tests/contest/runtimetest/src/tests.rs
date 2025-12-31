@@ -253,18 +253,20 @@ pub fn validate_mounts_recursive(spec: &Spec) {
                             }
                         }
                         "rrelatime" => {
-                            if let Err(e) = utils::test_mount_releatime_option(
-                                mount.destination().to_str().unwrap(),
-                            ) {
+                            let sub_path = mount.destination().join("rrelatime_subdir");
+                            if let Err(e) =
+                                utils::test_mount_releatime_option(sub_path.to_str().unwrap())
+                            {
                                 eprintln!(
                                     "path expected to be rrelatime, found not rrelatime, error: {e}"
                                 );
                             }
                         }
                         "rnorelatime" => {
-                            if let Err(e) = utils::test_mount_norelatime_option(
-                                mount.destination().to_str().unwrap(),
-                            ) {
+                            let sub_path = mount.destination().join("rnorelatime_subdir");
+                            if let Err(e) =
+                                utils::test_mount_norelatime_option(sub_path.to_str().unwrap())
+                            {
                                 eprintln!(
                                     "path expected to be rnorelatime, found not rnorelatime, error: {e}"
                                 );

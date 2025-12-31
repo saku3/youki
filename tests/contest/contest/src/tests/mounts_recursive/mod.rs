@@ -90,6 +90,12 @@ fn setup_mount(mount_dir: &Path, sub_mount_dir: &Path) {
         .unwrap();
 }
 
+fn setup_remount(mount_dir: &Path, sub_mount_dir: &Path, flag: MsFlags) {
+    mount::<Path, Path, str, str>(None, mount_dir, None, MsFlags::MS_REMOUNT | flag, None).unwrap();
+    mount::<Path, Path, str, str>(None, sub_mount_dir, None, MsFlags::MS_REMOUNT | flag, None)
+        .unwrap();
+}
+
 fn clean_mount(mount_dir: &Path, sub_mount_dir: &Path) {
     umount(sub_mount_dir).unwrap();
     umount(mount_dir).unwrap();
@@ -583,9 +589,8 @@ fn check_recursive_readwrite() -> TestResult {
 fn check_recursive_rrelatime() -> TestResult {
     let rrelatime_base_dir = TempDir::new().unwrap();
     let rrelatime_dir_path = rrelatime_base_dir.path().join("rrelatime_dir");
-    let rrelatime_suddir_path = rrelatime_dir_path.join("rrelatime_subdir");
-    let mount_dest_path = PathBuf::from_str("/rrelatime").unwrap();
-    fs::create_dir_all(rrelatime_suddir_path).unwrap();
+    let rrelatime_subdir_path = rrelatime_dir_path.join("rrelatime_subdir");
+    let mount_dest_path = PathBuf::from_str("/rrelatime_dir").unwrap();
 
     let mount_options = vec!["rbind".to_string(), "rrelatime".to_string()];
     let mut mount_spec = Mount::default();
@@ -598,7 +603,17 @@ fn check_recursive_rrelatime() -> TestResult {
         vec![mount_spec],
         vec!["runtimetest".to_string(), "mounts_recursive".to_string()],
     );
-    let result = test_inside_container(&spec, &CreateOptions::default(), &|_| Ok(()));
+
+    let result = test_inside_container(&spec, &CreateOptions::default(), &|_| {
+        setup_mount(&rrelatime_dir_path, &rrelatime_subdir_path);
+        setup_remount(
+            &rrelatime_dir_path,
+            &rrelatime_subdir_path,
+            MsFlags::MS_STRICTATIME,
+        );
+        Ok(())
+    });
+    clean_mount(&rrelatime_dir_path, &rrelatime_subdir_path);
     result
 }
 
@@ -606,8 +621,8 @@ fn check_recursive_rrelatime() -> TestResult {
 fn check_recursive_rnorelatime() -> TestResult {
     let rnorelatime_base_dir = TempDir::new().unwrap();
     let rnorelatime_dir_path = rnorelatime_base_dir.path().join("rnorelatime_dir");
-    let mount_dest_path = PathBuf::from_str("/rnorelatime").unwrap();
-    fs::create_dir(rnorelatime_dir_path.clone()).unwrap();
+    let rnorelatime_subdir_path = rnorelatime_dir_path.join("rnorelatime_subdir");
+    let mount_dest_path = PathBuf::from_str("/rnorelatime_dir").unwrap();
 
     let mount_options = vec!["rbind".to_string(), "rnorelatime".to_string()];
     let mut mount_spec = Mount::default();
@@ -621,7 +636,18 @@ fn check_recursive_rnorelatime() -> TestResult {
         vec!["runtimetest".to_string(), "mounts_recursive".to_string()],
     );
 
-    let result = test_inside_container(&spec, &CreateOptions::default(), &|_| Ok(()));
+    // The container implementation treats `norelatime` as clearing the `relatime` flag. 
+    // In this test, the mount is configured with `strictatime`, so once `relatime` is cleared, the mount ends up using `strictatime`.
+    let result = test_inside_container(&spec, &CreateOptions::default(), &|_| {
+        setup_mount(&rnorelatime_dir_path, &rnorelatime_subdir_path);
+        setup_remount(
+            &rnorelatime_dir_path,
+            &rnorelatime_subdir_path,
+            MsFlags::MS_STRICTATIME,
+        );
+        Ok(())
+    });
+    clean_mount(&rnorelatime_dir_path, &rnorelatime_subdir_path);
     result
 }
 
