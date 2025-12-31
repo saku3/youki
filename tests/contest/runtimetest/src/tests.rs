@@ -223,26 +223,23 @@ pub fn validate_mounts_recursive(spec: &Spec) {
                         }
                         "rdiratime" => {
                             let sub_dir = mount.destination().join("rdiratime_subdir");
-                            let rest = utils::test_dir_update_access_time(
-                                sub_dir.to_str().unwrap(),
-                            );
+                            let rest =
+                                utils::test_dir_update_access_time(sub_dir.to_str().unwrap());
                             if let Err(e) = rest {
                                 eprintln!("error in testing rdiratime recursive mounting: {e}");
                             }
                         }
                         "rnodiratime" => {
                             let sub_dir = mount.destination().join("rnodiratime_subdir");
-                            let rest = utils::test_dir_not_update_access_time(
-                                sub_dir.to_str().unwrap(),
-                            );
+                            let rest =
+                                utils::test_dir_not_update_access_time(sub_dir.to_str().unwrap());
                             if let Err(e) = rest {
                                 eprintln!("error in testing rnodiratime recursive mounting: {e}");
                             }
                         }
                         "rdev" => {
                             let device_path = mount.destination().join("rdev_subdir/null");
-                            let rest =
-                                utils::test_device_access(device_path.to_str().unwrap());
+                            let rest = utils::test_device_access(device_path.to_str().unwrap());
                             if let Err(e) = rest {
                                 eprintln!("error in testing rdev recursive mounting: {e}");
                             }
@@ -308,13 +305,6 @@ pub fn validate_mounts_recursive(spec: &Spec) {
                                 eprintln!(
                                     "path expected to be rsymfollow, found not rsymfollow, error: {e}"
                                 );
-                            }
-                        }
-                        "rsuid" => {
-                            if let Err(e) = utils::test_mount_rsuid_option(
-                                mount.destination().to_str().unwrap(),
-                            ) {
-                                eprintln!("path expected to be rsuid, found not rsuid, error: {e}");
                             }
                         }
                         _ => {}

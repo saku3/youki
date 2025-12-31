@@ -6,7 +6,7 @@ use std::os::unix::prelude::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
-use anyhow::Context;
+use anyhow::{Context, anyhow};
 use nix::libc;
 use nix::mount::{MsFlags, mount, umount};
 use nix::sys::stat::{Mode, SFlag, makedev, mknod};
@@ -225,35 +225,106 @@ fn check_recursive_nosuid() -> TestResult {
 }
 
 // rsuid_test
+// Mounting with 'rsuid' honors SUID bits on this mount (i.e., SUID can take effect).
+// Note: The bits remain set in the inode (e.g., ls -l still shows 's').
 fn check_recursive_rsuid() -> TestResult {
     let rsuid_base_dir_path = TempDir::new().unwrap();
     let rsuid_dir_path = rsuid_base_dir_path.path().join("rsuid_dir");
+    let rsuid_subdir_path = rsuid_dir_path.join("rsuid_subdir");
 
-    let mount_dest_path = PathBuf::from_str("/mnt/rsuid_dir").unwrap();
-    fs::create_dir_all(rsuid_dir_path.clone()).unwrap();
+    let mount_dest_path = PathBuf::from_str("/mnt").unwrap();
+    let executable_file_name = "whoami";
 
     let mount_options = vec!["rbind".to_string(), "rsuid".to_string()];
     let mut mount_spec = Mount::default();
     mount_spec
-        .set_destination(mount_dest_path)
+        .set_destination(mount_dest_path.clone())
         .set_typ(None)
         .set_source(Some(rsuid_dir_path.clone()))
         .set_options(Some(mount_options));
     let spec = get_spec(
         vec![mount_spec],
-        vec!["runtimetest".to_string(), "mounts_recursive".to_string()],
+        vec![
+            "sh".to_string(),
+            "-c".to_string(),
+            format!(
+                "{}; {}",
+                mount_dest_path.join(executable_file_name).to_str().unwrap(),
+                mount_dest_path
+                    .join("rsuid_subdir/whoami")
+                    .to_str()
+                    .unwrap()
+            ),
+        ],
     );
-    test_inside_container(&spec, &CreateOptions::default(), &|_| {
-        let original_file_path = rsuid_dir_path.join("file");
-        let file = File::create(original_file_path)?;
-        let mut permission = file.metadata()?.permissions();
-        // chmod +s /tmp/rsuid_dir/file && chmod +g /tmp/rsuid_dir/file
-        permission.set_mode(permission.mode() | libc::S_ISUID | libc::S_ISGID);
-        file.set_permissions(permission)
-            .with_context(|| "failed to set permission")?;
 
+    let result = test_inside_container(&spec, &CreateOptions::default(), &|bundle_path| {
+        setup_mount(&rsuid_dir_path, &rsuid_subdir_path);
+
+        let executable_file_path = bundle_path.join("bin").join(executable_file_name);
+        let in_container_executable_file_path = rsuid_dir_path.join(executable_file_name);
+        let in_container_executable_subdir_file_path = rsuid_subdir_path.join(executable_file_name);
+        fs::copy(&executable_file_path, &in_container_executable_file_path)?;
+        fs::copy(
+            &executable_file_path,
+            &in_container_executable_subdir_file_path,
+        )?;
+
+        let in_container_executable_file = fs::File::open(&in_container_executable_file_path)?;
+        let in_container_executable_subdir_file =
+            fs::File::open(&in_container_executable_subdir_file_path)?;
+        let mut in_container_executable_file_perm =
+            in_container_executable_file.metadata()?.permissions();
+        let mut in_container_executable_subdir_file_perm = in_container_executable_subdir_file
+            .metadata()?
+            .permissions();
+
+        // Change file user to nonexistent uid and set suid.
+        // if rsuid is applied, whoami command is executed as 1200 and make an error.
+        chown(
+            &in_container_executable_file_path,
+            Some(Uid::from_raw(1200)),
+            None,
+        )
+        .unwrap();
+        chown(
+            &in_container_executable_subdir_file_path,
+            Some(Uid::from_raw(1200)),
+            None,
+        )
+        .unwrap();
+        in_container_executable_file_perm
+            .set_mode(in_container_executable_file_perm.mode() | Mode::S_ISUID.bits());
+        in_container_executable_subdir_file_perm
+            .set_mode(in_container_executable_subdir_file_perm.mode() | Mode::S_ISUID.bits());
+
+        in_container_executable_file.set_permissions(in_container_executable_file_perm.clone())?;
+        in_container_executable_subdir_file
+            .set_permissions(in_container_executable_subdir_file_perm.clone())?;
         Ok(())
-    })
+    });
+
+    clean_mount(&rsuid_dir_path, &rsuid_subdir_path);
+
+    match result {
+        TestResult::Failed(e) => {
+            let msg = e.to_string();
+            // This error message may vary depending on the environment.
+            if msg.contains("whoami: unknown uid 1200") {
+                TestResult::Passed
+            } else {
+                TestResult::Failed(anyhow!(
+                    "whoami failed, but not with expected message. error: {}",
+                    msg
+                ))
+            }
+        }
+        // TestResult::Passed,
+        TestResult::Passed => TestResult::Failed(anyhow!(
+            "Expected execute a non-existent user to fail, but it succeeded"
+        )),
+        _ => TestResult::Failed(anyhow!("Unexpected test result")),
+    }
 }
 
 // rnoexec_test
@@ -362,11 +433,15 @@ fn check_recursive_rdiratime() -> TestResult {
 
     let result = test_inside_container(&spec, &CreateOptions::default(), &|_| {
         setup_mount(&rdiratime_dir, &rdiratime_subdir);
-        Ok(())});
+        Ok(())
+    });
+
+    clean_mount(&rdiratime_dir, &rdiratime_subdir);
+
     result
 }
 
-// rdiratime_test
+// rnodiratime_test
 // If set in attr_set, prevents updating access time for directories on this mount
 fn check_recursive_rnodiratime() -> TestResult {
     let rdiratime_base_dir = TempDir::new().unwrap();
@@ -390,6 +465,9 @@ fn check_recursive_rnodiratime() -> TestResult {
         setup_mount(&rnodiratime_dir, &rnodiratime_subdir);
         Ok(())
     });
+
+    clean_mount(&rnodiratime_dir, &rnodiratime_subdir);
+
     result
 }
 
@@ -570,6 +648,8 @@ fn check_recursive_rnoatime() -> TestResult {
         setup_mount(&rnoatime_dir_path, &rnoatime_subdir_path);
         Ok(())
     });
+
+    clean_mount(&rnoatime_dir_path, &rnoatime_subdir_path);
     result
 }
 

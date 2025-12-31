@@ -1,5 +1,5 @@
 use std::fs;
-use std::fs::{OpenOptions, metadata, symlink_metadata};
+use std::fs::{OpenOptions, symlink_metadata};
 use std::io::Read;
 use std::os::unix::prelude::MetadataExt;
 use std::path::{Path, PathBuf};
@@ -361,23 +361,4 @@ pub fn test_mount_rsymfollow_option(path: &str) -> Result<(), std::io::Error> {
             "get file symlink_metadata err {path:?}"
         )))
     }
-}
-
-pub fn test_mount_rsuid_option(path: &str) -> Result<(), std::io::Error> {
-    let path = PathBuf::from(path).join("file");
-
-    let metadata = match metadata(path.clone()) {
-        Ok(metadata) => metadata,
-        Err(e) => {
-            return Err(std::io::Error::other(e));
-        }
-    };
-    // check suid and sgid
-    let suid = metadata.mode() & 0o4000 == 0o4000;
-    let sgid = metadata.mode() & 0o2000 == 0o2000;
-
-    if suid && sgid {
-        return Ok(());
-    }
-    Err(std::io::Error::other(format!("rsuid error {path:?}")))
 }
