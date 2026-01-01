@@ -283,8 +283,9 @@ pub fn validate_mounts_recursive(spec: &Spec) {
                             }
                         }
                         "rstrictatime" => {
+                            let subdir_path = mount.destination().join("rstrictatime_subdir");
                             if let Err(e) = utils::test_mount_rstrictatime_option(
-                                mount.destination().to_str().unwrap(),
+                                subdir_path.to_str().unwrap(),
                             ) {
                                 eprintln!(
                                     "path expected to be rstrictatime, found not rstrictatime, error: {e}"

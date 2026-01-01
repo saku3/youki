@@ -636,7 +636,7 @@ fn check_recursive_rnorelatime() -> TestResult {
         vec!["runtimetest".to_string(), "mounts_recursive".to_string()],
     );
 
-    // The container implementation treats `norelatime` as clearing the `relatime` flag. 
+    // The container implementation treats `norelatime` as clearing the `relatime` flag.
     // In this test, the mount is configured with `strictatime`, so once `relatime` is cleared, the mount ends up using `strictatime`.
     let result = test_inside_container(&spec, &CreateOptions::default(), &|_| {
         setup_mount(&rnorelatime_dir_path, &rnorelatime_subdir_path);
@@ -683,8 +683,8 @@ fn check_recursive_rnoatime() -> TestResult {
 fn check_recursive_rstrictatime() -> TestResult {
     let rstrictatime_base_dir = TempDir::new().unwrap();
     let rstrictatime_dir_path = rstrictatime_base_dir.path().join("rstrictatime_dir");
+    let rstrictatime_subdir_path = rstrictatime_dir_path.join("rstrictatime_subdir");
     let mount_dest_path = PathBuf::from_str("/rstrictatime").unwrap();
-    fs::create_dir(rstrictatime_dir_path.clone()).unwrap();
 
     let mount_options = vec!["rbind".to_string(), "rstrictatime".to_string()];
     let mut mount_spec = Mount::default();
@@ -697,7 +697,12 @@ fn check_recursive_rstrictatime() -> TestResult {
         vec![mount_spec],
         vec!["runtimetest".to_string(), "mounts_recursive".to_string()],
     );
-    let result = test_inside_container(&spec, &CreateOptions::default(), &|_| Ok(()));
+    let result = test_inside_container(&spec, &CreateOptions::default(), &|_| {
+        setup_mount(&rstrictatime_dir_path, &rstrictatime_subdir_path);
+        Ok(())
+    });
+
+    clean_mount(&rstrictatime_dir_path, &rstrictatime_subdir_path);
     result
 }
 
@@ -705,8 +710,8 @@ fn check_recursive_rstrictatime() -> TestResult {
 fn check_recursive_rnosymfollow() -> TestResult {
     let rnosymfollow_base_path = TempDir::new().unwrap();
     let rnosymfollow_dir_path = rnosymfollow_base_path.path().join("rnosymfollow");
-    let mount_dest_path = PathBuf::from_str("/mnt/rnosymfollow").unwrap();
-    fs::create_dir_all(rnosymfollow_dir_path.clone()).unwrap();
+    let rnosymfollow_subdir_path = rnosymfollow_dir_path.join("rnosymfollow");
+    let mount_dest_path = PathBuf::from_str("/mnt").unwrap();
 
     let mount_options = vec![
         "rbind".to_string(),
@@ -724,6 +729,7 @@ fn check_recursive_rnosymfollow() -> TestResult {
         vec!["runtimetest".to_string(), "mounts_recursive".to_string()],
     );
     let result = test_inside_container(&spec, &CreateOptions::default(), &|_| {
+        setup_mount(&rnosymfollow_dir_path, &rnosymfollow_subdir_path);
         let original_file_path = format!("{}/{}", rnosymfollow_dir_path.to_str().unwrap(), "file");
         let file = File::create(&original_file_path)?;
         let link_file_path = format!("{}/{}", rnosymfollow_dir_path.to_str().unwrap(), "link");
@@ -735,6 +741,7 @@ fn check_recursive_rnosymfollow() -> TestResult {
         symlink(original_file_path, link_file_path)?;
         Ok(())
     });
+    clean_mount(&rnosymfollow_dir_path, &rnosymfollow_subdir_path);
     result
 }
 
@@ -742,8 +749,8 @@ fn check_recursive_rnosymfollow() -> TestResult {
 fn check_recursive_rsymfollow() -> TestResult {
     let rsymfollow_base_path = TempDir::new().unwrap();
     let rsymfollow_dir_path = rsymfollow_base_path.path().join("rsymfollow");
-    let mount_dest_path = PathBuf::from_str("/mnt/rsymfollow").unwrap();
-    fs::create_dir_all(rsymfollow_dir_path.clone()).unwrap();
+    let rsymfollow_subdir_path = rsymfollow_dir_path.join("rnosymfollow");
+    let mount_dest_path = PathBuf::from_str("/mnt").unwrap();
 
     let mount_options = vec![
         "rbind".to_string(),
@@ -761,6 +768,7 @@ fn check_recursive_rsymfollow() -> TestResult {
         vec!["runtimetest".to_string(), "mounts_recursive".to_string()],
     );
     let result = test_inside_container(&spec, &CreateOptions::default(), &|_| {
+        setup_mount(&rsymfollow_dir_path, &rsymfollow_subdir_path);
         let original_file_path = format!("{}/{}", rsymfollow_dir_path.to_str().unwrap(), "file");
         let file = File::create(&original_file_path)?;
         let link_file_path = format!("{}/{}", rsymfollow_dir_path.to_str().unwrap(), "link");
@@ -772,6 +780,7 @@ fn check_recursive_rsymfollow() -> TestResult {
         symlink(original_file_path, link_file_path)?;
         Ok(())
     });
+    clean_mount(&rsymfollow_dir_path, &rsymfollow_subdir_path);
     result
 }
 
