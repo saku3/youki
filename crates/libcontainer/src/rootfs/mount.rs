@@ -657,22 +657,15 @@ impl Mount {
             let mount_fd = mount_fd_owned.as_fd();
 
             // mount_setattr
+            // recattrを後で設定する
             let attr_set_from_flags = self.mount_flag_to_attr(&mount_option_config.flags);
-            let mut mount_attr = mount_option_config
-                .rec_attr
-                .clone()
-                .unwrap_or(linux::MountAttr {
-                    attr_set: 0,
-                    attr_clr: 0,
-                    propagation: 0,
-                    userns_fd: 0,
-                });
+            let mut mount_attr = linux::MountAttr {
+                attr_set: 0,
+                attr_clr: 0,
+                propagation: 0,
+                userns_fd: 0,
+            };
             mount_attr.attr_set |= attr_set_from_flags;
-
-            let mut at_flags = linux::AT_EMPTY_PATH;
-            if recursive {
-                at_flags |= linux::AT_RECURSIVE;
-            }
 
             self.apply_atime_from_msflags(
                 &mut mount_attr,
@@ -683,10 +676,20 @@ impl Mount {
             self.syscall.mount_setattr(
                 mount_fd,
                 Path::new(""),
-                at_flags,
+                linux::AT_EMPTY_PATH,
                 &mount_attr,
                 mem::size_of::<linux::MountAttr>(),
             )?;
+
+            if let Some(mount_attr) = &mount_option_config.rec_attr {
+                self.syscall.mount_setattr(
+                    mount_fd,
+                    Path::new(""),
+                    linux::AT_EMPTY_PATH | linux::AT_RECURSIVE,
+                    mount_attr,
+                    mem::size_of::<linux::MountAttr>(),
+                )?;
+            }
 
             // move_mount
             self.syscall.move_mount(

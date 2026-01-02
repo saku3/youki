@@ -1,0 +1,8 @@
+pre-start1 called
+pre-start2 called
+create-runtime1 called
+create-runtime2 called
+create-container1 called
+create-container2 called
+post-start1 called
+post-start2 called
