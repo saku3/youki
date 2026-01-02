@@ -768,6 +768,37 @@ fn check_recursive_rsymfollow() -> TestResult {
     result
 }
 
+fn check_rbind_ro_is_readonly_but_not_recursively() -> TestResult {
+    let rbind_ro_base_path = TempDir::new().unwrap();
+    let rbind_ro_dir_path = rbind_ro_base_path.path().join("rbind_ro_dir");
+    let rbind_ro_subdir_path = rbind_ro_dir_path.join("rbind_ro_subdir");
+    let mount_dest_path = PathBuf::from_str("/mnt").unwrap();
+
+    let mount_options = vec!["rbind".to_string(), "ro".to_string()];
+    let mut mount_spec = Mount::default();
+    mount_spec
+        .set_destination(mount_dest_path)
+        .set_typ(None)
+        .set_source(Some(rbind_ro_dir_path.clone()))
+        .set_options(Some(mount_options));
+    let spec = get_spec(
+        vec![mount_spec],
+        vec![
+            "runtimetest".to_string(),
+            "mounts_recursive_rbind_ro".to_string(),
+        ],
+    );
+    let result = test_inside_container(&spec, &CreateOptions::default(), &|_| {
+        setup_mount(&rbind_ro_dir_path, &rbind_ro_subdir_path);
+        std::fs::write(rbind_ro_dir_path.join("bar"), b"bar\n").unwrap();
+        std::fs::write(rbind_ro_subdir_path.join("bar"), b"bar\n").unwrap();
+        Ok(())
+    });
+
+    clean_mount(&rbind_ro_dir_path, &rbind_ro_subdir_path);
+    result
+}
+
 // this mount test how to work?
 // 1. Create mount_options based on the mount properties of the test
 // 2. Create OCI.Spec content, container one process is runtimetest,(runtimetest is cargo model, file path `tests/runtimetest/`)
@@ -790,6 +821,10 @@ pub fn get_mounts_recursive_test() -> TestGroup {
     let rstrictatime_test = Test::new("rstrictatime_test", Box::new(check_recursive_rstrictatime));
     let rnosymfollow_test = Test::new("rnosymfollow_test", Box::new(check_recursive_rnosymfollow));
     let rsymfollow_test = Test::new("rsymfollow_test", Box::new(check_recursive_rsymfollow));
+    let rbind_ro_test = Test::new(
+        "rbind_ro_test",
+        Box::new(check_rbind_ro_is_readonly_but_not_recursively),
+    );
 
     let mut tg = TestGroup::new("mounts_recursive");
     tg.add(vec![
@@ -809,6 +844,7 @@ pub fn get_mounts_recursive_test() -> TestGroup {
         Box::new(rstrictatime_test),
         Box::new(rnosymfollow_test),
         Box::new(rsymfollow_test),
+        Box::new(rbind_ro_test),
     ]);
 
     tg

@@ -320,6 +320,33 @@ pub fn validate_mounts_recursive(spec: &Spec) {
     }
 }
 
+pub fn validate_mounts_recursive_rbind_ro() {
+    let path = Path::new("/mnt").join("bar");
+    match test_write_access(path.to_str().unwrap()) {
+        Err(_) => {}
+        Ok(()) => {
+            eprintln!(
+                "in readonly paths, path expected to not be writable, found writable: {}",
+                path.display()
+            );
+            return;
+        }
+    }
+
+    let sub_path = Path::new("/mnt/rbind_ro_subdir").join("bar");
+    match test_write_access(sub_path.to_str().unwrap()) {
+        Ok(()) => {}
+        Err(e) => {
+            eprintln!(
+                "subpath expected to be writable, found read-only: {} err: {}",
+                sub_path.display(),
+                e
+            );
+            return;
+        }
+    }
+}
+
 pub fn validate_seccomp(spec: &Spec) {
     let linux = spec.linux().as_ref().unwrap();
     if linux.seccomp().is_some() {
