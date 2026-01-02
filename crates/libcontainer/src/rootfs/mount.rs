@@ -670,9 +670,9 @@ impl Mount {
             mount_attr.attr_set |= attr_set_from_flags;
 
             let mut at_flags = linux::AT_EMPTY_PATH;
-            // if recursive {
-            //     at_flags |= linux::AT_RECURSIVE;
-            // }
+            if recursive {
+                at_flags |= linux::AT_RECURSIVE;
+            }
 
             self.apply_atime_from_msflags(
                 &mut mount_attr,

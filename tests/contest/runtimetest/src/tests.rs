@@ -284,27 +284,29 @@ pub fn validate_mounts_recursive(spec: &Spec) {
                         }
                         "rstrictatime" => {
                             let subdir_path = mount.destination().join("rstrictatime_subdir");
-                            if let Err(e) = utils::test_mount_rstrictatime_option(
-                                subdir_path.to_str().unwrap(),
-                            ) {
+                            if let Err(e) =
+                                utils::test_mount_rstrictatime_option(subdir_path.to_str().unwrap())
+                            {
                                 eprintln!(
                                     "path expected to be rstrictatime, found not rstrictatime, error: {e}"
                                 );
                             }
                         }
                         "rnosymfollow" => {
-                            if let Err(e) = utils::test_mount_rnosymfollow_option(
-                                mount.destination().to_str().unwrap(),
-                            ) {
+                            let subdir_path = mount.destination().join("rnosymfollow_subdir");
+                            if let Err(e) =
+                                utils::test_mount_rnosymfollow_option(subdir_path.to_str().unwrap())
+                            {
                                 eprintln!(
                                     "path expected to be rnosymfollow, found not rnosymfollow, error: {e}"
                                 );
                             }
                         }
                         "rsymfollow" => {
-                            if let Err(e) = utils::test_mount_rsymfollow_option(
-                                mount.destination().to_str().unwrap(),
-                            ) {
+                            let subdir_path = mount.destination().join("rsymfollow_subdir");
+                            if let Err(e) =
+                                utils::test_mount_rsymfollow_option(subdir_path.to_str().unwrap())
+                            {
                                 eprintln!(
                                     "path expected to be rsymfollow, found not rsymfollow, error: {e}"
                                 );

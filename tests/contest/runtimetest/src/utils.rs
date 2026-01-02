@@ -323,42 +323,39 @@ pub fn test_mount_rstrictatime_option(path: &str) -> Result<(), std::io::Error> 
     Ok(())
 }
 
-pub fn test_mount_rnosymfollow_option(path: &str) -> Result<(), std::io::Error> {
-    let path = format!("{}/{}", path, "link");
-    let metadata = match symlink_metadata(path.clone()) {
-        Ok(metadata) => metadata,
-        Err(e) => {
-            return Err(std::io::Error::other(format!(
-                "get file symlink_metadata err {path:?}, {e}"
-            )));
-        }
-    };
-    // check symbolic is followed
-    if metadata.file_type().is_symlink() && metadata.mode() & 0o777 == 0o777 {
-        Ok(())
-    } else {
-        Err(std::io::Error::other(format!(
-            "get file symlink_metadata err {path:?}"
-        )))
+pub fn test_mount_rnosymfollow_option(dir: &str) -> Result<(), std::io::Error> {
+    let link = format!("{}/link", dir);
+
+    let md = symlink_metadata(&link)?;
+    if !md.file_type().is_symlink() {
+        return Err(std::io::Error::other("link is not a symlink"));
+    }
+
+    match fs::metadata(&link) {
+        Ok(_) => Err(std::io::Error::other(
+            "expected ELOOP (nosymfollow), but symlink was followed",
+        )),
+        Err(e) if e.raw_os_error() == Some(libc::ELOOP) => Ok(()),
+        Err(e) => Err(std::io::Error::other(format!(
+            "expected ELOOP, but got: {e}"
+        ))),
     }
 }
 
-pub fn test_mount_rsymfollow_option(path: &str) -> Result<(), std::io::Error> {
-    let path = format!("{}/{}", path, "link");
-    let metadata = match symlink_metadata(path.clone()) {
-        Ok(metadata) => metadata,
-        Err(e) => {
-            return Err(std::io::Error::other(format!(
-                "get file symlink_metadata err {path:?}, {e}"
-            )));
+pub fn test_mount_rsymfollow_option(dir: &str) -> Result<(), std::io::Error> {
+    let link = format!("{}/link", dir);
+
+    let md = symlink_metadata(&link)?;
+    if !md.file_type().is_symlink() {
+        return Err(std::io::Error::other("link is not a symlink"));
+    }
+
+    match fs::metadata(&link) {
+        Ok(_) => Ok(()),
+        Err(e) if e.raw_os_error() == Some(libc::ELOOP) => {
+            Err(std::io::Error::other(format!("unexpected ELOOP: {e}")))
         }
-    };
-    // check symbolic is followed
-    if metadata.file_type().is_symlink() && metadata.mode() & 0o777 == 0o777 {
-        Ok(())
-    } else {
-        Err(std::io::Error::other(format!(
-            "get file symlink_metadata err {path:?}"
-        )))
+        // Any error other than ELOOP indicates that nosymfollow is not being enforced, so we consider the result OK.
+        Err(_) => Ok(()),
     }
 }

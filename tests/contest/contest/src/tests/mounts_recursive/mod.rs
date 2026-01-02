@@ -6,8 +6,7 @@ use std::os::unix::prelude::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
 
-use anyhow::{Context, anyhow};
-use nix::libc;
+use anyhow::anyhow;
 use nix::mount::{MsFlags, mount, umount};
 use nix::sys::stat::{Mode, SFlag, makedev, mknod};
 use nix::unistd::{Uid, chown};
@@ -709,15 +708,11 @@ fn check_recursive_rstrictatime() -> TestResult {
 // rnosymfollow_test
 fn check_recursive_rnosymfollow() -> TestResult {
     let rnosymfollow_base_path = TempDir::new().unwrap();
-    let rnosymfollow_dir_path = rnosymfollow_base_path.path().join("rnosymfollow");
-    let rnosymfollow_subdir_path = rnosymfollow_dir_path.join("rnosymfollow");
+    let rnosymfollow_dir_path = rnosymfollow_base_path.path().join("rnosymfollow_dir");
+    let rnosymfollow_subdir_path = rnosymfollow_dir_path.join("rnosymfollow_subdir");
     let mount_dest_path = PathBuf::from_str("/mnt").unwrap();
 
-    let mount_options = vec![
-        "rbind".to_string(),
-        "rnosymfollow".to_string(),
-        "rsuid".to_string(),
-    ];
+    let mount_options = vec!["rbind".to_string(), "rnosymfollow".to_string()];
     let mut mount_spec = Mount::default();
     mount_spec
         .set_destination(mount_dest_path)
@@ -730,13 +725,10 @@ fn check_recursive_rnosymfollow() -> TestResult {
     );
     let result = test_inside_container(&spec, &CreateOptions::default(), &|_| {
         setup_mount(&rnosymfollow_dir_path, &rnosymfollow_subdir_path);
-        let original_file_path = format!("{}/{}", rnosymfollow_dir_path.to_str().unwrap(), "file");
-        let file = File::create(&original_file_path)?;
-        let link_file_path = format!("{}/{}", rnosymfollow_dir_path.to_str().unwrap(), "link");
-        let mut permission = file.metadata()?.permissions();
-        permission.set_mode(permission.mode() | libc::S_ISUID | libc::S_ISGID);
-        file.set_permissions(permission)
-            .with_context(|| "failed to set permission")?;
+        let original_file_path =
+            format!("{}/{}", rnosymfollow_subdir_path.to_str().unwrap(), "file");
+        let _ = File::create(&original_file_path)?;
+        let link_file_path = format!("{}/{}", rnosymfollow_subdir_path.to_str().unwrap(), "link");
 
         symlink(original_file_path, link_file_path)?;
         Ok(())
@@ -748,15 +740,11 @@ fn check_recursive_rnosymfollow() -> TestResult {
 // rsymfollow_test
 fn check_recursive_rsymfollow() -> TestResult {
     let rsymfollow_base_path = TempDir::new().unwrap();
-    let rsymfollow_dir_path = rsymfollow_base_path.path().join("rsymfollow");
-    let rsymfollow_subdir_path = rsymfollow_dir_path.join("rnosymfollow");
+    let rsymfollow_dir_path = rsymfollow_base_path.path().join("rsymfollow_dir");
+    let rsymfollow_subdir_path = rsymfollow_dir_path.join("rsymfollow_subdir");
     let mount_dest_path = PathBuf::from_str("/mnt").unwrap();
 
-    let mount_options = vec![
-        "rbind".to_string(),
-        "rsymfollow".to_string(),
-        "rsuid".to_string(),
-    ];
+    let mount_options = vec!["rbind".to_string(), "rsymfollow".to_string()];
     let mut mount_spec = Mount::default();
     mount_spec
         .set_destination(mount_dest_path)
@@ -769,13 +757,9 @@ fn check_recursive_rsymfollow() -> TestResult {
     );
     let result = test_inside_container(&spec, &CreateOptions::default(), &|_| {
         setup_mount(&rsymfollow_dir_path, &rsymfollow_subdir_path);
-        let original_file_path = format!("{}/{}", rsymfollow_dir_path.to_str().unwrap(), "file");
-        let file = File::create(&original_file_path)?;
-        let link_file_path = format!("{}/{}", rsymfollow_dir_path.to_str().unwrap(), "link");
-        let mut permission = file.metadata()?.permissions();
-        permission.set_mode(permission.mode() | libc::S_ISUID | libc::S_ISGID);
-        file.set_permissions(permission)
-            .with_context(|| "failed to set permission")?;
+        let original_file_path = format!("{}/{}", rsymfollow_subdir_path.to_str().unwrap(), "file");
+        let _ = File::create(&original_file_path)?;
+        let link_file_path = format!("{}/{}", rsymfollow_subdir_path.to_str().unwrap(), "link");
 
         symlink(original_file_path, link_file_path)?;
         Ok(())
