@@ -62,20 +62,18 @@ pub trait CloneBoxExecutor {
     fn clone_box(&self) -> Box<dyn Executor>;
 }
 
-pub trait Executor: CloneBoxExecutor {
-    /// Pre Executes the workload
-    fn pre_exec(&self, spec: Spec) -> Result<Spec, ExecutorError> {
+pub trait HostExecutor {
+    fn  modify_spec(&self, spec: Spec) -> Result<Spec, ExecutorError> {
         Ok(spec)
     }
-    /// Executes the workload
+}
+
+pub trait ContainerExecutor {
     fn exec(&self, spec: &Spec) -> Result<(), ExecutorError>;
-
-    /// Validate if the spec can be executed by the executor. This step runs
-    /// after the container init process is created, entered into the correct
-    /// namespace and cgroups, and pivot_root into the rootfs. But this step
-    /// runs before waiting for the container start signal.
     fn validate(&self, spec: &Spec) -> Result<(), ExecutorValidationError>;
+}
 
+pub trait Executor: HostExecutor + ContainerExecutor + CloneBoxExecutor {
     /// Set environment variables for the container process to be executed.
     /// This step runs after the container init process is created, entered
     /// into the correct namespace and cgroups, and pivot_root into the rootfs.

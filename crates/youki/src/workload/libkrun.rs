@@ -158,8 +158,8 @@ pub fn get_executor() -> LibkrunExecutor {
     }
 }
 
-impl Executor for LibkrunExecutor {
-    fn pre_exec(&self, spec: Spec) -> Result<Spec, ExecutorError> {
+impl HostExecutor for LibkrunExecutor {
+    fn modify_spec(&self, spec: Spec) -> Result<Spec, ExecutorError> {
         if !can_handle(&spec) {
             return Err(ExecutorError::CantHandle(EXECUTOR_NAME));
         }
@@ -173,6 +173,9 @@ impl Executor for LibkrunExecutor {
         self.set_ctx_id(ctx_id)?;
         Ok(spec)
     }
+}
+
+impl ContainerExecutor for LibkrunExecutor {
 
     fn exec(&self, spec: &Spec) -> Result<(), ExecutorError> {
         if !can_handle(spec) {
@@ -212,6 +215,22 @@ impl Executor for LibkrunExecutor {
         Ok(())
     }
 }
+
+impl Executor for DefaultExecutor {}
+
+    // match validate_dev_kvm() {
+    //     Ok(true) => {
+    //         return handler == "krun";
+    //     }
+    //     Ok(false) => {
+    //         eprintln!("no /dev/kvm");
+    //         return false;
+    //     }
+    //     Err(e) => {
+    //         eprintln!("validate_dev_kvm failed: {e}");
+    //         return false;
+    //     }
+    // }
 
 pub fn can_handle(spec: &Spec) -> bool {
     if let Some(annotations) = spec.annotations()
@@ -270,16 +289,16 @@ pub fn modify_spec_device(spec: &mut Spec) -> Result<(), KrunError> {
 // Add an allow rule for /dev/kvm to linux.resources.devices
 // if resources.devices is None or empty, it's effectively permissive, so skip.
 pub fn modify_spec_resource_device(spec: &mut Spec) -> Result<(), KrunError> {
-    let mut linux = match spec.linux() {
-        Some(l) => l.clone(),
+    let linux = match spec.linux_mut() {
+        Some(l) => l,
         None => return Ok(()),
     };
-    let mut res = match linux.resources() {
-        Some(r) => r.clone(),
+    let res = match linux.resources_mut() {
+        Some(r) => r,
         None => return Ok(()),
     };
     let mut device_cgroups: Vec<LinuxDeviceCgroup> = match res.devices() {
-        Some(v) if !v.is_empty() => v.clone(),
+        Some(v) if !v.is_empty() => v.to_vec(),
         _ => return Ok(()),
     };
 
@@ -296,11 +315,17 @@ pub fn modify_spec_resource_device(spec: &mut Spec) -> Result<(), KrunError> {
         true,
         "rwm",
     )?);
-    res.set_devices(Some(device_cgroups));
-    linux.set_resources(Some(res));
-    spec.set_linux(Some(linux));
 
+    res.set_devices(Some(device_cgroups));
     Ok(())
+}
+
+fn validate_dev_kvm() -> std::io::Result<bool> {
+    match stat(Path::new("/dev/kvm")) {
+        Ok(_) => Ok(true),
+        Err(Errno::ENOENT) => Ok(false),
+        Err(e) => Err(io::Error::other(e)),
+    }
 }
 
 fn stat_dev_numbers(path: &str) -> std::io::Result<(i64, i64)> {
