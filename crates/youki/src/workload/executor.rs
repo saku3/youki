@@ -1,5 +1,7 @@
 use libcontainer::oci_spec::runtime::Spec;
-use libcontainer::workload::{Executor, ExecutorError, ExecutorValidationError, HostExecutor, ContainerExecutor};
+use libcontainer::workload::{
+    ContainerExecutor, Executor, ExecutorError, ExecutorValidationError, HostExecutor,
+};
 
 #[derive(Clone)]
 pub struct DefaultExecutor {

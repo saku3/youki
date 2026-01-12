@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use nix::unistd;
 use oci_spec::runtime::Spec;
 
-use super::{Executor, ExecutorError, ExecutorValidationError, ContainerExecutor, HostExecutor};
+use super::{ContainerExecutor, Executor, ExecutorError, ExecutorValidationError, HostExecutor};
 
 #[derive(Clone)]
 pub struct DefaultExecutor {}

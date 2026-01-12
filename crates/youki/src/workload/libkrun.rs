@@ -176,7 +176,6 @@ impl HostExecutor for LibkrunExecutor {
 }
 
 impl ContainerExecutor for LibkrunExecutor {
-
     fn exec(&self, spec: &Spec) -> Result<(), ExecutorError> {
         if !can_handle(spec) {
             return Err(ExecutorError::CantHandle(EXECUTOR_NAME));
@@ -218,19 +217,19 @@ impl ContainerExecutor for LibkrunExecutor {
 
 impl Executor for DefaultExecutor {}
 
-    // match validate_dev_kvm() {
-    //     Ok(true) => {
-    //         return handler == "krun";
-    //     }
-    //     Ok(false) => {
-    //         eprintln!("no /dev/kvm");
-    //         return false;
-    //     }
-    //     Err(e) => {
-    //         eprintln!("validate_dev_kvm failed: {e}");
-    //         return false;
-    //     }
-    // }
+// match validate_dev_kvm() {
+//     Ok(true) => {
+//         return handler == "krun";
+//     }
+//     Ok(false) => {
+//         eprintln!("no /dev/kvm");
+//         return false;
+//     }
+//     Err(e) => {
+//         eprintln!("validate_dev_kvm failed: {e}");
+//         return false;
+//     }
+// }
 
 pub fn can_handle(spec: &Spec) -> bool {
     if let Some(annotations) = spec.annotations()

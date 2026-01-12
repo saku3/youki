@@ -63,7 +63,7 @@ pub trait CloneBoxExecutor {
 }
 
 pub trait HostExecutor {
-    fn  modify_spec(&self, spec: Spec) -> Result<Spec, ExecutorError> {
+    fn modify_spec(&self, spec: Spec) -> Result<Spec, ExecutorError> {
         Ok(spec)
     }
 }
