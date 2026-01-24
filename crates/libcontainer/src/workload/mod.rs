@@ -62,11 +62,13 @@ pub trait CloneBoxExecutor {
     fn clone_box(&self) -> Box<dyn Executor>;
 }
 
-pub trait Executor: CloneBoxExecutor {
-    /// Pre Executes the workload
-    fn pre_exec(&self, spec: Spec) -> Result<Spec, ExecutorError> {
+pub trait HostExecutor {
+    fn modify_spec(&self, spec: Spec) -> Result<Spec, ExecutorError> {
         Ok(spec)
     }
+}
+
+pub trait ContainerExecutor {
     /// Executes the workload
     fn exec(&self, spec: &Spec) -> Result<(), ExecutorError>;
 
@@ -94,6 +96,8 @@ pub trait Executor: CloneBoxExecutor {
         Ok(())
     }
 }
+
+pub trait Executor: HostExecutor + ContainerExecutor + CloneBoxExecutor {}
 
 impl<T> CloneBoxExecutor for T
 where

@@ -21,7 +21,7 @@ seccomp = ["libcontainer/libseccomp"]
 wasm-wasmer = ["wasmer", "wasmer-wasix"]
 wasm-wasmedge = ["wasmedge-sdk/standalone", "wasmedge-sdk/static"]
 wasm-wasmtime = ["wasmtime", "wasi-common"]
-libkrun = ["libloading", "thiserror"]
+libkrun = ["libloading", "thiserror", "pathrs"]
 
 [dependencies.clap]
 version = "4.5.13"
@@ -52,6 +52,7 @@ tracing-journald = "0.3.2"
 oci-spec = { version = "0.8.4", features = ["runtime"] }
 libloading = { version = "0.8",  optional = true }
 thiserror = { version = "2.0.16", optional = true }
+pathrs = { version = "0.2.2", optional = true }
 
 [dev-dependencies]
 serial_test = "3.3.1"
