@@ -1,3 +1,9 @@
 [toolchain]
 profile="default"
 channel="1.92.0"
+
+[preprocessor.mermaid]
+command = "mdbook-mermaid"
+
+[output.html]
+additional-js = ["mermaid.min.js", "mermaid-init.js"]
