@@ -487,7 +487,7 @@ fn check_recursive_rrelatime() -> TestResult {
         |_bundle_path: &std::path::Path,
          dir_path: &std::path::Path,
          subdir_path: &std::path::Path| {
-            setup_remount(&dir_path, &subdir_path, MsFlags::MS_STRICTATIME)
+            setup_remount(dir_path, subdir_path, MsFlags::MS_STRICTATIME)
                 .map_err(|e| anyhow!("setup_remount failed: {e:?}"))?;
             Ok(())
         },
@@ -505,7 +505,7 @@ fn check_recursive_rnorelatime() -> TestResult {
          subdir_path: &std::path::Path| {
             // The container implementation treats `norelatime` as clearing the `relatime` flag.
             // In this test, the mount is configured with `strictatime`, so once `relatime` is cleared, the mount ends up using `strictatime`.
-            setup_remount(&dir_path, &subdir_path, MsFlags::MS_STRICTATIME)
+            setup_remount(dir_path, subdir_path, MsFlags::MS_STRICTATIME)
                 .map_err(|e| anyhow!("setup_remount failed: {e:?}"))?;
             Ok(())
         },
