@@ -1,5 +1,7 @@
 # Changelog
 
+## [v0.0.2](https://github.com/saku3/youki/compare/v0.0.1...v0.0.2) - 2026-02-28
+
 ## [v0.6.0](https://github.com/youki-dev/youki/compare/v0.5.7...v0.6.0) - 2026-02-25
 ### 💪 Improvements
 - Add net device feature by @nayuta723 in https://github.com/youki-dev/youki/pull/3163
