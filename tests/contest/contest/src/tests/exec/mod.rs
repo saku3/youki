@@ -22,7 +22,7 @@ fn create_spec(process: Option<ProcessBuilder>) -> Result<Spec> {
 
 pub fn get_exec_test() -> TestGroup {
     let mut test_group = TestGroup::new("exec");
-    let _preserve_fds_test = Test::new(
+    let preserve_fds_test = Test::new(
         "preserve_fds_test",
         Box::new(preserve_fds_test::preserve_fds_test),
     );
@@ -53,7 +53,7 @@ pub fn get_exec_test() -> TestGroup {
     );
 
     test_group.add(vec![
-        // Box::new(preserve_fds_test),
+        Box::new(preserve_fds_test),
         Box::new(ignore_paused_test),
         Box::new(cgroup_test),
         Box::new(no_capabilities_test),

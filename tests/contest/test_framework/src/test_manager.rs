@@ -68,7 +68,8 @@ impl TestManager {
             .filter(|(_, tg)| tg.parallel())
             .collect();
 
-        let batch_size = num_cpus::get().max(1);
+        let batch_size = 1;
+        // num_cpus::get().max(1);
 
         for batch in parallel_groups.chunks(batch_size) {
             thread::scope(|s| {
