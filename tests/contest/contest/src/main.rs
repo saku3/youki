@@ -223,8 +223,8 @@ fn main() -> Result<()> {
     // tm.add_test_group(Box::new(personality));
     // tm.add_test_group(Box::new(prohibit_symlink));
     // tm.add_test_group(Box::new(io_priority_test));
-    // tm.add_cleanup(Box::new(cgroups::cleanup_v1));
-    // tm.add_cleanup(Box::new(cgroups::cleanup_v2));
+    tm.add_cleanup(Box::new(cgroups::cleanup_v1));
+    tm.add_cleanup(Box::new(cgroups::cleanup_v2));
 
     match opts.command {
         SubCommand::Run(args) => run(args, &tm).context("run tests")?,
