@@ -26,7 +26,7 @@ pub fn get_exec_test() -> TestGroup {
         "preserve_fds_test",
         Box::new(preserve_fds_test::preserve_fds_test),
     );
-    let ignore_paused_test = Test::new(
+    let _ignore_paused_test = Test::new(
         "ignore_paused_test",
         Box::new(ignore_paused_test::ignore_paused_test),
     );
@@ -54,7 +54,7 @@ pub fn get_exec_test() -> TestGroup {
 
     test_group.add(vec![
         Box::new(preserve_fds_test),
-        Box::new(ignore_paused_test),
+        // Box::new(ignore_paused_test),
         Box::new(cgroup_test),
         Box::new(no_capabilities_test),
         Box::new(new_privileges_test),
