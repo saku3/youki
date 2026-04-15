@@ -2,10 +2,15 @@ use std::borrow::Cow;
 use std::fs::OpenOptions;
 use std::path::PathBuf;
 use std::str::FromStr;
+#[cfg(feature = "otel")]
+use std::sync::OnceLock;
 
 use anyhow::{Context, Result, bail};
 use tracing::Level;
 use tracing_subscriber::prelude::*;
+
+#[cfg(feature = "otel")]
+static OTEL_PROVIDER: OnceLock<opentelemetry_sdk::trace::TracerProvider> = OnceLock::new();
 
 const LOG_FORMAT_TEXT: &str = "text";
 const LOG_FORMAT_JSON: &str = "json";
@@ -21,6 +26,79 @@ const DEFAULT_LOG_LEVEL: &str = "debug";
 /// If not in debug mode, default level is error to get important logs
 #[cfg(not(debug_assertions))]
 const DEFAULT_LOG_LEVEL: &str = "error";
+
+// OpenTelemetry / OTLP exporter setup.
+//
+// Feature-gated because pulling in opentelemetry + reqwest adds a nontrivial
+// amount of dependencies. Configured purely through OTel standard environment
+// variables (OTEL_EXPORTER_OTLP_ENDPOINT, OTEL_SERVICE_NAME, ...). Off unless
+// OTEL_EXPORTER_OTLP_ENDPOINT is set, so a default build with --features otel
+// stays silent until a collector endpoint is configured.
+#[cfg(feature = "otel")]
+fn init_otel_layer<S>()
+-> Result<Option<tracing_opentelemetry::OpenTelemetryLayer<S, opentelemetry_sdk::trace::Tracer>>>
+where
+    S: tracing::Subscriber + for<'a> tracing_subscriber::registry::LookupSpan<'a>,
+{
+    use opentelemetry::KeyValue;
+    use opentelemetry::trace::TracerProvider as _;
+    use opentelemetry_otlp::{Protocol, WithExportConfig};
+
+    if std::env::var_os("OTEL_EXPORTER_OTLP_ENDPOINT").is_none() {
+        return Ok(None);
+    }
+
+    // opentelemetry-otlp's HTTP exporter still routes the install through a
+    // tokio runtime even with the blocking client, so keep a dedicated
+    // current-thread runtime alive for the lifetime of the process.
+    let rt = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .context("failed to build tokio runtime for otel exporter")?;
+    let _guard = rt.enter();
+
+    let exporter = opentelemetry_otlp::SpanExporter::builder()
+        .with_http()
+        .with_protocol(Protocol::HttpBinary)
+        .build()
+        .context("failed to build otlp span exporter")?;
+
+    let service_name =
+        std::env::var("OTEL_SERVICE_NAME").unwrap_or_else(|_| "youki".to_string());
+    let resource = opentelemetry_sdk::Resource::new([KeyValue::new("service.name", service_name)]);
+
+    // SimpleSpanProcessor rather than Batch: youki is short-lived and forks
+    // heavily, and background batch threads don't survive fork().
+    let provider = opentelemetry_sdk::trace::TracerProvider::builder()
+        .with_simple_exporter(exporter)
+        .with_resource(resource)
+        .build();
+    let tracer = provider.tracer("youki");
+    opentelemetry::global::set_tracer_provider(provider.clone());
+    // Stash the provider so shutdown() can flush pending spans on exit.
+    let _ = OTEL_PROVIDER.set(provider);
+
+    // Leak the runtime so the blocking http client can keep using it for the
+    // rest of the process. youki is short-lived so the cost is negligible.
+    std::mem::forget(rt);
+
+    Ok(Some(tracing_opentelemetry::layer().with_tracer(tracer)))
+}
+
+/// Flush and shut down the OpenTelemetry exporter, if one was initialized.
+///
+/// Must be called before any `std::process::exit` path because exporters use
+/// the simple span processor and won't otherwise drain in-flight spans.
+pub fn shutdown() {
+    #[cfg(feature = "otel")]
+    if let Some(provider) = OTEL_PROVIDER.get() {
+        for result in provider.force_flush() {
+            if let Err(err) = result {
+                eprintln!("otel: failed to flush spans: {err:?}");
+            }
+        }
+    }
+}
 
 fn detect_log_format(log_format: Option<&str>) -> Result<LogFormat> {
     match log_format {
@@ -94,9 +172,15 @@ where
     } else {
         None
     };
+    #[cfg(feature = "otel")]
+    let otel_layer = init_otel_layer()?;
+    #[cfg(not(feature = "otel"))]
+    let otel_layer: Option<tracing_subscriber::layer::Identity> = None;
+
     let subscriber = tracing_subscriber::registry()
         .with(log_level_filter)
-        .with(systemd_journald);
+        .with(systemd_journald)
+        .with(otel_layer);
 
     // I really dislike how we have to specify individual branch for each
     // combination, but I can't find any better way to do this. The tracing

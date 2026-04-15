@@ -17,6 +17,13 @@ v2 = ["libcgroups/v2", "libcontainer/v2"]
 v1 = ["libcgroups/v1", "libcontainer/v1"]
 cgroupsv2_devices = ["libcgroups/cgroupsv2_devices", "libcontainer/cgroupsv2_devices"]
 seccomp = ["libcontainer/libseccomp"]
+otel = [
+    "dep:opentelemetry",
+    "dep:opentelemetry_sdk",
+    "dep:opentelemetry-otlp",
+    "dep:tracing-opentelemetry",
+    "dep:tokio",
+]
 
 wasm-wasmer = ["wasmer", "wasmer-wasix"]
 wasm-wasmedge = ["wasmedge-sdk/standalone", "wasmedge-sdk/static"]
@@ -50,6 +57,11 @@ tracing-subscriber = { version = "0.3.23", features = ["json", "env-filter"] }
 tracing-journald = "0.3.2"
 oci-spec = { version = "0.9.0", features = ["runtime"] }
 rust-criu = "0.5.0"
+opentelemetry = { version = "0.27", optional = true }
+opentelemetry_sdk = { version = "0.27", optional = true }
+opentelemetry-otlp = { version = "0.27", default-features = false, features = ["trace", "http-proto", "reqwest-blocking-client"], optional = true }
+tracing-opentelemetry = { version = "0.28", optional = true }
+tokio = { version = "1", default-features = false, features = ["rt"], optional = true }
 
 [dev-dependencies]
 serial_test = "3.4.0"

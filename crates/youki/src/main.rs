@@ -114,9 +114,13 @@ fn main() -> Result<()> {
             }
             CommonCmd::Events(events) => commands::events::events(events, root_path),
             CommonCmd::Exec(exec) => match commands::exec::exec(exec, root_path) {
-                Ok(exit_code) => std::process::exit(exit_code),
+                Ok(exit_code) => {
+                    observability::shutdown();
+                    std::process::exit(exit_code);
+                }
                 Err(e) => {
                     tracing::error!("error in executing command: {:?}", e);
+                    observability::shutdown();
                     std::process::exit(-1);
                 }
             },
@@ -126,9 +130,13 @@ fn main() -> Result<()> {
             CommonCmd::Ps(ps) => commands::ps::ps(ps, root_path),
             CommonCmd::Resume(resume) => commands::resume::resume(resume, root_path),
             CommonCmd::Run(run) => match commands::run::run(run, root_path, systemd_cgroup) {
-                Ok(exit_code) => std::process::exit(exit_code),
+                Ok(exit_code) => {
+                    observability::shutdown();
+                    std::process::exit(exit_code);
+                }
                 Err(e) => {
                     tracing::error!("error in executing command: {:?}", e);
+                    observability::shutdown();
                     std::process::exit(-1);
                 }
             },
@@ -148,5 +156,6 @@ fn main() -> Result<()> {
     if let Err(ref e) = cmd_result {
         tracing::error!("error in executing command: {:?}", e);
     }
+    observability::shutdown();
     cmd_result
 }
