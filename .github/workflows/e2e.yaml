@@ -115,6 +115,16 @@ jobs:
       - name: test/k8s/deploy
         run: just test-kind
 
+  k8s-deploy-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install just
+        uses: taiki-e/install-action@just
+      - name: tools/youki-deploy multi-node installer
+        run: just test-kind-deploy
+
   oci-validation-go:
     runs-on: ubuntu-24.04
     needs: [youki-build]

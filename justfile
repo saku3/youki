@@ -2,6 +2,8 @@ alias build := youki-release
 alias youki := youki-dev
 
 KIND_CLUSTER_NAME := 'youki'
+KIND_DEPLOY_CLUSTER_NAME := 'youki-deploy'
+YOUKI_INSTALLER_IMAGE := 'youki-installer:latest'
 
 cwd := justfile_directory()
 
@@ -114,6 +116,42 @@ bin-kind:
 # Clean kind test env
 clean-test-kind:
 	kind delete cluster --name {{ KIND_CLUSTER_NAME }}
+
+# multi-node installer
+
+[private]
+kind-cluster-multi: bin-kind
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    bin/kind create cluster \
+        --name {{ KIND_DEPLOY_CLUSTER_NAME }} \
+        --config tools/youki-deploy/kind-config.yaml
+
+[private]
+youki-installer-image:
+    docker buildx build \
+        -f tools/youki-deploy/Dockerfile \
+        -t {{ YOUKI_INSTALLER_IMAGE }} \
+        --load .
+
+# install youki on every node of a multi-node kind cluster
+test-kind-deploy: kind-cluster-multi youki-installer-image
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    CTX=kind-{{ KIND_DEPLOY_CLUSTER_NAME }}
+    bin/kind load docker-image {{ YOUKI_INSTALLER_IMAGE }} --name {{ KIND_DEPLOY_CLUSTER_NAME }}
+    kubectl --context=$CTX apply -f tools/youki-deploy/youki-deploy.yaml
+    kubectl --context=$CTX -n youki-system rollout status ds/youki-deploy --timeout=180s
+    kubectl --context=$CTX apply -f tests/k8s/deploy.yaml
+    kubectl --context=$CTX wait deployment nginx-deployment --for condition=Available=True --timeout=120s
+    kubectl --context=$CTX get pods -o wide
+    kubectl --context=$CTX delete -f tests/k8s/deploy.yaml
+
+# Clean kind cluster
+clean-test-kind-deploy:
+	kind delete cluster --name {{ KIND_DEPLOY_CLUSTER_NAME }}
 
 # misc
 
