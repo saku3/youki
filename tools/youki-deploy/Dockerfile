@@ -19,6 +19,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     util-linux \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=youki-build /youki/target/release/youki /opt/youki/bin/youki
-COPY tests/k8s/install-youki.sh /opt/youki/bin/install-youki.sh
+COPY tools/youki-deploy/install-youki.sh /opt/youki/bin/install-youki.sh
 RUN chmod +x /opt/youki/bin/install-youki.sh /opt/youki/bin/youki
 ENTRYPOINT ["/opt/youki/bin/install-youki.sh"]
