@@ -130,7 +130,7 @@ jobs:
           path: ~/.cache/lima
           key: lima-${{ steps.lima-setup.outputs.version }}-${{ env.LIMA_TEMPLATE }}
       - name: Start ${{ env.LIMA_TEMPLATE }} VM
-        run: limactl start --plain --name=default template://${{ env.LIMA_TEMPLATE }}
+        run: limactl start --plain --name=default ./${{ env.LIMA_TEMPLATE }}.yaml
       - name: Stage repo in VM
         run: limactl cp -r . default:/tmp/youki
       - name: Provision VM (Rust + just + ci-prepare deps + test user)

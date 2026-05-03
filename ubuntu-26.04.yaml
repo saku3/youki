@@ -1,0 +1,17 @@
+images:
+  - location: "https://cloud-images.ubuntu.com/releases/26.04/release/ubuntu-26.04-server-cloudimg-amd64.img"
+    arch: "x86_64"
+  - location: "https://cloud-images.ubuntu.com/releases/26.04/release/ubuntu-26.04-server-cloudimg-arm64.img"
+    arch: "aarch64"
+
+# ホームディレクトリをゲストから書き込み可能でマウント
+mounts:
+  - location: "~"
+    writable: true
+
+# Sized for CI workloads (containerd integration, OCI validation, k8s tests).
+# GitHub Actions ubuntu-24.04 runners give us 4 vCPU / 16 GiB host, so leave
+# some headroom for the runner itself.
+cpus: 4
+memory: "8GiB"
+disk: "30GiB"

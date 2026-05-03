@@ -59,7 +59,7 @@ jobs:
           path: ~/.cache/lima
           key: lima-${{ steps.lima-setup.outputs.version }}-${{ env.LIMA_TEMPLATE }}
       - name: Start ${{ env.LIMA_TEMPLATE }} VM
-        run: limactl start --plain --name=default template://${{ env.LIMA_TEMPLATE }}
+        run: limactl start --plain --name=default ./${{ env.LIMA_TEMPLATE }}.yaml
       - name: Provision VM (containerd build deps)
         run: |
           cat <<'EOS' | lima sudo bash -eux
@@ -71,27 +71,6 @@ jobs:
           add-apt-repository -y ppa:criu/ppa
           apt-get install -y criu
           EOS
-      - name: Build containerd in VM
-          repository: containerd/containerd
-          ref: v2.2.3
-      - uses: actions/setup-go@v5
-        with:
-          go-version: '1.24.3'
-          cache: true
-      - run: sudo apt-get -y update
-      - run: sudo apt-get install -y pkg-config libsystemd-dev libelf-dev libseccomp-dev btrfs-progs libbtrfs-dev gperf
-      - name: Install CRIU from source
-        run: |
-          sudo apt-get install -y \
-            libcap-dev libnet1-dev libnl-3-dev uuid-dev \
-            libprotobuf-c-dev libprotobuf-dev protobuf-c-compiler protobuf-compiler
-          git clone --depth 1 --branch criu-dev --single-branch \
-            https://github.com/checkpoint-restore/criu.git ~/criu
-          (cd ~/criu && sudo make -j $(nproc) install-criu)
-          rm -rf ~/criu
-          criu --version
-      - name: Setup libseccomp
-        run: sudo ./script/setup/install-seccomp
       - name: Build containerd
         run: |
           cat <<'EOS' | lima sudo bash -eux
@@ -151,7 +130,7 @@ jobs:
           path: ~/.cache/lima
           key: lima-${{ steps.lima-setup.outputs.version }}-${{ env.LIMA_TEMPLATE }}
       - name: Start ${{ env.LIMA_TEMPLATE }} VM
-        run: limactl start --plain --name=default template://${{ env.LIMA_TEMPLATE }}
+        run: limactl start --plain --name=default ./${{ env.LIMA_TEMPLATE }}.yaml
       - name: Provision VM (docker + just)
         run: |
           cat <<'EOS' | lima sudo bash -eux
@@ -214,7 +193,7 @@ jobs:
           path: ~/.cache/lima
           key: lima-${{ steps.lima-setup.outputs.version }}-${{ env.LIMA_TEMPLATE }}
       - name: Start ${{ env.LIMA_TEMPLATE }} VM
-        run: limactl start --plain --name=default template://${{ env.LIMA_TEMPLATE }}
+        run: limactl start --plain --name=default ./${{ env.LIMA_TEMPLATE }}.yaml
       - name: Provision VM (Go + just + libseccomp)
         run: |
           cat <<'EOS' | lima sudo bash -eux
@@ -257,7 +236,7 @@ jobs:
           path: ~/.cache/lima
           key: lima-${{ steps.lima-setup.outputs.version }}-${{ env.LIMA_TEMPLATE }}
       - name: Start ${{ env.LIMA_TEMPLATE }} VM
-        run: limactl start --plain --name=default template://${{ env.LIMA_TEMPLATE }}
+        run: limactl start --plain --name=default ./${{ env.LIMA_TEMPLATE }}.yaml
       - name: Provision VM (Rust + just + criu)
         run: |
           cat <<'EOS' | lima sudo bash -eux
@@ -307,7 +286,7 @@ jobs:
           path: ~/.cache/lima
           key: lima-${{ steps.lima-setup.outputs.version }}-${{ env.LIMA_TEMPLATE }}
       - name: Start ${{ env.LIMA_TEMPLATE }} VM
-        run: limactl start --plain --name=default template://${{ env.LIMA_TEMPLATE }}
+        run: limactl start --plain --name=default ./${{ env.LIMA_TEMPLATE }}.yaml
       - name: Provision VM (podman + Rust + criu)
         run: |
           cat <<'EOS' | lima sudo bash -eux
@@ -369,7 +348,7 @@ jobs:
           path: ~/.cache/lima
           key: lima-${{ steps.lima-setup.outputs.version }}-${{ env.LIMA_TEMPLATE }}
       - name: Start ${{ env.LIMA_TEMPLATE }} VM
-        run: limactl start --plain --name=default template://${{ env.LIMA_TEMPLATE }}
+        run: limactl start --plain --name=default ./${{ env.LIMA_TEMPLATE }}.yaml
       - name: Provision VM (docker + just)
         run: |
           cat <<'EOS' | lima sudo bash -eux
