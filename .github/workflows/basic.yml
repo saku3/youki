@@ -158,30 +158,42 @@ jobs:
           else
             just ci-prepare
           fi
-          # Install Rust toolchain
+          # Install Rust system-wide so the (non-root) test user can find the
+          # toolchain. /root/.rustup is mode 700 and unreadable by other users,
+          # so we place RUSTUP_HOME / CARGO_HOME under /usr/local instead.
+          export RUSTUP_HOME=/usr/local/rustup
+          export CARGO_HOME=/usr/local/cargo
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
-            | sh -s -- -y --default-toolchain stable --profile minimal
-          ln -sf /root/.cargo/bin/cargo  /usr/local/bin/cargo
-          ln -sf /root/.cargo/bin/rustc  /usr/local/bin/rustc
-          ln -sf /root/.cargo/bin/rustup /usr/local/bin/rustup
+            | sh -s -- -y --default-toolchain stable --profile minimal --no-modify-path
           rustup target add ${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}
+          # Make toolchain readable & traversable for everyone
+          chmod -R a+rX /usr/local/rustup /usr/local/cargo
+          ln -sf /usr/local/cargo/bin/cargo  /usr/local/bin/cargo
+          ln -sf /usr/local/cargo/bin/rustc  /usr/local/bin/rustc
+          ln -sf /usr/local/cargo/bin/rustup /usr/local/bin/rustup
           # Test user (some unit tests require a non-root UID via TEST_NON_ROOT_UID)
           useradd -m -d /tmp/testuser testuser
           # Best-effort: relax AppArmor user-ns restriction if the kernel exposes it
           echo 0 > /proc/sys/kernel/apparmor_restrict_unprivileged_userns 2>/dev/null || true
           EOS
+      # The test steps run as the (non-root) Lima default user. A bunch of
+      # unit tests assume non-root execution: rootless_required() returns
+      # false under root, which makes test_userns_spec_validation and
+      # test_determine_root_path_rootless deviate from their expectations.
       - name: Run test-basic
         run: |
-          cat <<'EOS' | lima sudo bash -eux
+          cat <<'EOS' | lima bash -eux
           cd /var/tmp/youki
+          export RUSTUP_HOME=/usr/local/rustup
           export TARGET=${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}
           export TEST_NON_ROOT_UID=$(id -u testuser)
           just test-basic
           EOS
       - name: Run test-features
         run: |
-          cat <<'EOS' | lima sudo bash -eux
+          cat <<'EOS' | lima bash -eux
           cd /var/tmp/youki
+          export RUSTUP_HOME=/usr/local/rustup
           export TARGET=${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}
           just test-features
           EOS
