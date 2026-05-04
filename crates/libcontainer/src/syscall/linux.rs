@@ -18,7 +18,7 @@ use nix::fcntl::{OFlag, open};
 use nix::mount::{MntFlags, MsFlags, mount, umount2};
 use nix::sched::{CloneFlags, unshare};
 use nix::sys::stat::{Mode, SFlag, mknod};
-use nix::unistd::{Gid, Uid, chown, chroot, close, fchdir, pivot_root, sethostname};
+use nix::unistd::{Gid, Uid, chown, chroot, close, fchdir, sethostname};
 use oci_spec::runtime::PosixRlimit;
 use pathrs::flags::OpenFlags;
 use pathrs::procfs::{ProcfsBase, ProcfsHandle};
@@ -31,6 +31,9 @@ use crate::config::PersonalityDomain;
 // see https://man7.org/linux/man-pages/man2/mount_setattr.2.html.
 pub const AT_RECURSIVE: u32 = 0x00008000; // Change the mount properties of the entire mount tree.
 pub const AT_EMPTY_PATH: u32 = 0x00001000;
+
+pub const OPEN_TREE_CLONE: u32 = 0x00000001;
+pub const OPEN_TREE_NAMESPACE: u32 = 0x00000002;
 #[allow(non_upper_case_globals)]
 pub const MOUNT_ATTR__ATIME: u64 = 0x00000070; // Setting on how atime should be updated.
 pub const MOUNT_ATTR_RDONLY: u64 = 0x00000001;
@@ -376,7 +379,13 @@ impl Syscall for LinuxSyscall {
         self
     }
 
-    /// Function to set given path as root path inside process
+    /// Experimental: uses `open_tree(OPEN_TREE_NAMESPACE | AT_RECURSIVE)` +
+    /// `setns(CLONE_NEWNS)` to collapse the traditional
+    /// `unshare + pivot_root + MS_SLAVE + umount2(MNT_DETACH)` sequence into
+    /// two syscalls. Requires Linux >= 6.20
+    /// see
+    /// https://lwn.net/Articles/1052262/
+    /// https://www.phoronix.com/news/Linux-Open-Tree-Namespace
     fn pivot_rootfs(&self, path: &Path) -> Result<()> {
         // open the path as directory and read only
         let newroot = open(
@@ -385,48 +394,43 @@ impl Syscall for LinuxSyscall {
             Mode::empty(),
         )
         .inspect_err(|errno| {
-            tracing::error!(?errno, ?path, "failed to open the new root for pivot root");
+            tracing::error!(?errno, ?path, "failed to open the new root");
         })?;
 
-        // make the given path as the root directory for the container
-        // see https://man7.org/linux/man-pages/man2/pivot_root.2.html, specially the notes
-        // pivot root usually changes the root directory to first argument, and then mounts the original root
-        // directory at second argument. Giving same path for both stacks mapping of the original root directory
-        // above the new directory at the same path, then the call to umount unmounts the original root directory from
-        // this path. This is done, as otherwise, we will need to create a separate temporary directory under the new root path
-        // so we can move the original root there, and then unmount that. This way saves the creation of the temporary
-        // directory to put original root directory.
-        pivot_root(path, path).inspect_err(|errno| {
-            tracing::error!(?errno, ?path, "failed to pivot root to");
-        })?;
+        let nsfd = unsafe {
+            libc::syscall(
+                libc::SYS_open_tree,
+                newroot,
+                c"".as_ptr(),
+                OPEN_TREE_NAMESPACE | AT_RECURSIVE | AT_EMPTY_PATH,
+            )
+        };
+        if nsfd < 0 {
+            let errno = nix::errno::Errno::last();
+            tracing::error!(?errno, ?path, "open_tree failed");
+            let _ = close(newroot);
+            return Err(errno.into());
+        }
 
-        // Make the original root directory rslave to avoid propagating unmount event to the host mount namespace.
-        // We should use MS_SLAVE not MS_PRIVATE according to https://github.com/opencontainers/runc/pull/1500.
-        mount(
-            None::<&str>,
-            "/",
-            None::<&str>,
-            MsFlags::MS_SLAVE | MsFlags::MS_REC,
-            None::<&str>,
-        )
-        .inspect_err(|errno| {
-            tracing::error!(?errno, "failed to make original root directory rslave");
-        })?;
+        let nsfd = unsafe { OwnedFd::from_raw_fd(nsfd as RawFd) };
 
-        // Unmount the original root directory which was stacked on top of new root directory
-        // MNT_DETACH makes the mount point unavailable to new accesses, but waits till the original mount point
-        // to be free of activity to actually unmount
-        // see https://man7.org/linux/man-pages/man2/umount2.2.html for more information
-        umount2("/", MntFlags::MNT_DETACH).inspect_err(|errno| {
-            tracing::error!(?errno, "failed to unmount old root directory");
-        })?;
-        // Change directory to the new root
+        // Enter the new mount namespace.
+        let ret = unsafe { libc::syscall(libc::SYS_setns, nsfd.as_raw_fd(), libc::CLONE_NEWNS) };
+        if ret != 0 {
+            let errno = nix::errno::Errno::last();
+            tracing::error!(?errno, "setns(CLONE_NEWNS) failed");
+            let _ = close(newroot);
+            return Err(errno.into());
+        }
+        drop(nsfd);
+
+        // Set cwd via the same fd; still no path resolution.
         fchdir(newroot).inspect_err(|errno| {
-            tracing::error!(?errno, ?newroot, "failed to change directory to new root");
+            tracing::error!(?errno, ?newroot, "failed to fchdir to new root");
         })?;
 
         close(newroot).inspect_err(|errno| {
-            tracing::error!(?errno, ?newroot, "failed to close new root directory");
+            tracing::error!(?errno, ?newroot, "failed to close new root fd");
         })?;
 
         Ok(())

@@ -9,6 +9,9 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  LIMA_TEMPLATE: ubuntu-26.04
+
 jobs:
   changes:
     runs-on: ubuntu-24.04
@@ -113,33 +116,89 @@ jobs:
     needs: [changes]
     if: needs.changes.outputs.any_modified == 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     strategy:
       matrix:
         arch: [ "x86_64" ]
         libc: [ "gnu", "musl" ]
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Rust toolchain and cache
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-      - name: Install just
-        uses: taiki-e/install-action@just
-      - name: Install cross-rs
-        run: RUSTFLAGS="" cargo install cross --git https://github.com/cross-rs/cross
-      - name: Create test user
-        # Create user and home directory for tests that require them
-        run: sudo useradd -m -d /tmp/testuser testuser
-      - name: Setup environment variables
+      - name: Free disk space (host)
         run: |
-          echo "CARGO=cross" >> ${GITHUB_ENV}
-          echo "TARGET=${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}" >> ${GITHUB_ENV}
-          echo "TEST_NON_ROOT_UID=$(id -u testuser)" >> ${GITHUB_ENV}
-      - name: Disable AppArmor restrictions
-        run: echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
-      - name: Run tests
-        run: just test-basic
-      - name: Run feature tests
-        run: just test-features
+          # Free ~30GB on the GitHub Actions runner so the Lima VM disk
+          # image has headroom for cargo target/ + Go build cache.
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android \
+                      /opt/ghc /opt/hostedtoolcache/CodeQL \
+                      /usr/local/share/boost /opt/microsoft /opt/google
+          sudo apt-get clean
+          df -h /
+      - uses: lima-vm/lima-actions/setup@v1
+        id: lima-setup
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/lima
+          key: lima-${{ steps.lima-setup.outputs.version }}-${{ env.LIMA_TEMPLATE }}
+      - name: Start ${{ env.LIMA_TEMPLATE }} VM
+        run: limactl start --plain --name=default ./${{ env.LIMA_TEMPLATE }}.yaml
+      - name: Stage repo in VM
+        run: limactl cp -r . default:/var/tmp/youki
+      - name: Provision VM (Rust + just + ci-prepare deps + test user)
+        run: |
+          cat <<'EOS' | lima sudo bash -eux
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            curl ca-certificates build-essential just pkg-config make git
+          # Install youki build deps via the justfile recipe (libsystemd-dev,
+          # libelf-dev, libseccomp-dev, libclang-dev, libssl-dev). For the musl
+          # matrix variant also pull in musl-dev / musl-tools via the dedicated
+          # recipe (which depends on ci-prepare).
+          cd /var/tmp/youki
+          if [ "${{ matrix.libc }}" = "musl" ]; then
+            just ci-musl-prepare
+          else
+            just ci-prepare
+          fi
+          # Install Rust system-wide so the (non-root) test user can find the
+          # toolchain. /root/.rustup is mode 700 and unreadable by other users,
+          # so we place RUSTUP_HOME / CARGO_HOME under /usr/local instead.
+          export RUSTUP_HOME=/usr/local/rustup
+          export CARGO_HOME=/usr/local/cargo
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+            | sh -s -- -y --default-toolchain stable --profile minimal --no-modify-path
+          # Symlink first so `rustup` etc. are on PATH for the rest of this script
+          ln -sf /usr/local/cargo/bin/cargo  /usr/local/bin/cargo
+          ln -sf /usr/local/cargo/bin/rustc  /usr/local/bin/rustc
+          ln -sf /usr/local/cargo/bin/rustup /usr/local/bin/rustup
+          rustup target add ${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}
+          # Make toolchain readable & traversable for everyone (after target add
+          # writes new files)
+          chmod -R a+rX /usr/local/rustup /usr/local/cargo
+          # Test user (some unit tests require a non-root UID via TEST_NON_ROOT_UID)
+          useradd -m -d /tmp/testuser testuser
+          # Best-effort: relax AppArmor user-ns restriction if the kernel exposes it
+          echo 0 > /proc/sys/kernel/apparmor_restrict_unprivileged_userns 2>/dev/null || true
+          EOS
+      # The test steps run as the (non-root) Lima default user. A bunch of
+      # unit tests assume non-root execution: rootless_required() returns
+      # false under root, which makes test_userns_spec_validation and
+      # test_determine_root_path_rootless deviate from their expectations.
+      - name: Run test-basic
+        run: |
+          cat <<'EOS' | lima bash -eux
+          cd /var/tmp/youki
+          export RUSTUP_HOME=/usr/local/rustup
+          export TARGET=${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}
+          export TEST_NON_ROOT_UID=$(id -u testuser)
+          just test-basic
+          EOS
+      - name: Run test-features
+        run: |
+          cat <<'EOS' | lima bash -eux
+          cd /var/tmp/youki
+          export RUSTUP_HOME=/usr/local/rustup
+          export TARGET=${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}
+          just test-features
+          EOS
 
   # We do not yet enforce some minimum coverage, and there were come codecov issues
   # so commenting this out for now. When we are ready to enforce coverage, uncomment 

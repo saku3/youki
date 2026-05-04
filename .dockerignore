@@ -1,0 +1,15 @@
+**/target
+/contest-target
+/bin
+.vagrant
+.git
+.idea
+.vscode
+*~
+tags
+tags.lock
+tags.temp
+/youki
+/runtimetest
+/contest
+tests/k8s/_out
