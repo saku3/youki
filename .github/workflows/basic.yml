@@ -123,6 +123,15 @@ jobs:
         libc: [ "gnu", "musl" ]
     steps:
       - uses: actions/checkout@v4
+      - name: Free disk space (host)
+        run: |
+          # Free ~30GB on the GitHub Actions runner so the Lima VM disk
+          # image has headroom for cargo target/ + Go build cache.
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android \
+                      /opt/ghc /opt/hostedtoolcache/CodeQL \
+                      /usr/local/share/boost /opt/microsoft /opt/google
+          sudo apt-get clean
+          df -h /
       - uses: lima-vm/lima-actions/setup@v1
         id: lima-setup
       - uses: actions/cache@v4
@@ -132,7 +141,7 @@ jobs:
       - name: Start ${{ env.LIMA_TEMPLATE }} VM
         run: limactl start --plain --name=default ./${{ env.LIMA_TEMPLATE }}.yaml
       - name: Stage repo in VM
-        run: limactl cp -r . default:/tmp/youki
+        run: limactl cp -r . default:/var/tmp/youki
       - name: Provision VM (Rust + just + ci-prepare deps + test user)
         run: |
           cat <<'EOS' | lima sudo bash -eux
@@ -143,7 +152,7 @@ jobs:
           # libelf-dev, libseccomp-dev, libclang-dev, libssl-dev). For the musl
           # matrix variant also pull in musl-dev / musl-tools via the dedicated
           # recipe (which depends on ci-prepare).
-          cd /tmp/youki
+          cd /var/tmp/youki
           if [ "${{ matrix.libc }}" = "musl" ]; then
             just ci-musl-prepare
           else
@@ -164,7 +173,7 @@ jobs:
       - name: Run test-basic
         run: |
           cat <<'EOS' | lima sudo bash -eux
-          cd /tmp/youki
+          cd /var/tmp/youki
           export TARGET=${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}
           export TEST_NON_ROOT_UID=$(id -u testuser)
           just test-basic
@@ -172,7 +181,7 @@ jobs:
       - name: Run test-features
         run: |
           cat <<'EOS' | lima sudo bash -eux
-          cd /tmp/youki
+          cd /var/tmp/youki
           export TARGET=${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}
           just test-features
           EOS

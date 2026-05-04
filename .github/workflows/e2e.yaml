@@ -52,6 +52,15 @@ jobs:
         libc: [ "gnu", "musl" ]
     steps:
       - uses: actions/checkout@v4
+      - name: Free disk space (host)
+        run: |
+          # Free ~30GB on the GitHub Actions runner so the Lima VM disk
+          # image has headroom for cargo target/ + Go build cache.
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android \
+                      /opt/ghc /opt/hostedtoolcache/CodeQL \
+                      /usr/local/share/boost /opt/microsoft /opt/google
+          sudo apt-get clean
+          df -h /
       - uses: lima-vm/lima-actions/setup@v1
         id: lima-setup
       - uses: actions/cache@v4
@@ -90,10 +99,10 @@ jobs:
       - name: Install youki as runc in VM
         run: |
           chmod +x ./youki
-          limactl cp youki default:/tmp/youki
+          limactl cp youki default:/var/tmp/youki
           cat <<'EOS' | lima sudo bash -eux
           rm -f /usr/bin/runc /usr/local/bin/runc /usr/sbin/runc
-          install -m 0755 /tmp/youki /usr/bin/runc
+          install -m 0755 /var/tmp/youki /usr/bin/runc
           runc --version
           EOS
       - name: Run containerd integration tests
@@ -123,6 +132,15 @@ jobs:
         libc: [ "gnu", "musl" ]
     steps:
       - uses: actions/checkout@v4
+      - name: Free disk space (host)
+        run: |
+          # Free ~30GB on the GitHub Actions runner so the Lima VM disk
+          # image has headroom for cargo target/ + Go build cache.
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android \
+                      /opt/ghc /opt/hostedtoolcache/CodeQL \
+                      /usr/local/share/boost /opt/microsoft /opt/google
+          sudo apt-get clean
+          df -h /
       - uses: lima-vm/lima-actions/setup@v1
         id: lima-setup
       - uses: actions/cache@v4
@@ -144,12 +162,12 @@ jobs:
       - name: Stage repo + youki in VM
         run: |
           chmod +x ./youki
-          limactl cp -r . default:/tmp/youki
-          limactl cp youki default:/tmp/youki/youki
+          limactl cp -r . default:/var/tmp/youki
+          limactl cp youki default:/var/tmp/youki/youki
       - name: Run kind tests in VM
         run: |
           cat <<'EOS' | lima sudo bash -eux
-          cd /tmp/youki
+          cd /var/tmp/youki
           chmod +x youki
           just test-kind
           EOS
@@ -186,6 +204,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      - name: Free disk space (host)
+        run: |
+          # Free ~30GB on the GitHub Actions runner so the Lima VM disk
+          # image has headroom for cargo target/ + Go build cache.
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android \
+                      /opt/ghc /opt/hostedtoolcache/CodeQL \
+                      /usr/local/share/boost /opt/microsoft /opt/google
+          sudo apt-get clean
+          df -h /
       - uses: lima-vm/lima-actions/setup@v1
         id: lima-setup
       - uses: actions/cache@v4
@@ -207,12 +234,12 @@ jobs:
       - name: Stage repo + youki in VM
         run: |
           chmod +x ./youki
-          limactl cp -r . default:/tmp/youki
-          limactl cp youki default:/tmp/youki/youki
+          limactl cp -r . default:/var/tmp/youki
+          limactl cp youki default:/var/tmp/youki/youki
       - name: Run OCI validation (Go)
         run: |
           cat <<'EOS' | lima sudo bash -eux
-          cd /tmp/youki
+          cd /var/tmp/youki
           chmod +x youki
           just test-oci
           EOS
@@ -229,6 +256,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      - name: Free disk space (host)
+        run: |
+          # Free ~30GB on the GitHub Actions runner so the Lima VM disk
+          # image has headroom for cargo target/ + Go build cache.
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android \
+                      /opt/ghc /opt/hostedtoolcache/CodeQL \
+                      /usr/local/share/boost /opt/microsoft /opt/google
+          sudo apt-get clean
+          df -h /
       - uses: lima-vm/lima-actions/setup@v1
         id: lima-setup
       - uses: actions/cache@v4
@@ -257,12 +293,12 @@ jobs:
       - name: Stage repo + youki in VM
         run: |
           chmod +x ./youki
-          limactl cp -r . default:/tmp/youki
-          limactl cp youki default:/tmp/youki/youki
+          limactl cp -r . default:/var/tmp/youki
+          limactl cp youki default:/var/tmp/youki/youki
       - name: Run OCI validation (Rust contest)
         run: |
           cat <<'EOS' | lima sudo bash -eux
-          cd /tmp/youki
+          cd /var/tmp/youki
           chmod +x youki
           just test-contest
           EOS
@@ -279,6 +315,15 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      - name: Free disk space (host)
+        run: |
+          # Free ~30GB on the GitHub Actions runner so the Lima VM disk
+          # image has headroom for cargo target/ + Go build cache.
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android \
+                      /opt/ghc /opt/hostedtoolcache/CodeQL \
+                      /usr/local/share/boost /opt/microsoft /opt/google
+          sudo apt-get clean
+          df -h /
       - uses: lima-vm/lima-actions/setup@v1
         id: lima-setup
       - uses: actions/cache@v4
@@ -325,12 +370,12 @@ jobs:
       - name: Stage repo + youki in VM
         run: |
           chmod +x ./youki
-          limactl cp -r . default:/tmp/youki
-          limactl cp youki default:/tmp/youki/youki
+          limactl cp -r . default:/var/tmp/youki
+          limactl cp youki default:/var/tmp/youki/youki
       - name: Run rootless podman test
         run: |
           cat <<'EOS' | lima sudo bash -eux
-          cd /tmp/youki
+          cd /var/tmp/youki
           chmod +x youki
           just test-rootless-podman
           EOS
@@ -341,6 +386,15 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+      - name: Free disk space (host)
+        run: |
+          # Free ~30GB on the GitHub Actions runner so the Lima VM disk
+          # image has headroom for cargo target/ + Go build cache.
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android \
+                      /opt/ghc /opt/hostedtoolcache/CodeQL \
+                      /usr/local/share/boost /opt/microsoft /opt/google
+          sudo apt-get clean
+          df -h /
       - uses: lima-vm/lima-actions/setup@v1
         id: lima-setup
       - uses: actions/cache@v4
@@ -362,12 +416,12 @@ jobs:
       - name: Stage repo + youki in VM
         run: |
           chmod +x ./youki
-          limactl cp -r . default:/tmp/youki
-          limactl cp youki default:/tmp/youki/youki
+          limactl cp -r . default:/var/tmp/youki
+          limactl cp youki default:/var/tmp/youki/youki
       - name: Run DinD test (cgroups-v2)
         run: |
           cat <<'EOS' | lima sudo bash -eux
-          cd /tmp/youki
+          cd /var/tmp/youki
           chmod +x youki
           just test-dind
           EOS
