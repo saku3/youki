@@ -165,12 +165,14 @@ jobs:
           export CARGO_HOME=/usr/local/cargo
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
             | sh -s -- -y --default-toolchain stable --profile minimal --no-modify-path
-          rustup target add ${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}
-          # Make toolchain readable & traversable for everyone
-          chmod -R a+rX /usr/local/rustup /usr/local/cargo
+          # Symlink first so `rustup` etc. are on PATH for the rest of this script
           ln -sf /usr/local/cargo/bin/cargo  /usr/local/bin/cargo
           ln -sf /usr/local/cargo/bin/rustc  /usr/local/bin/rustc
           ln -sf /usr/local/cargo/bin/rustup /usr/local/bin/rustup
+          rustup target add ${{ matrix.arch }}-unknown-linux-${{ matrix.libc }}
+          # Make toolchain readable & traversable for everyone (after target add
+          # writes new files)
+          chmod -R a+rX /usr/local/rustup /usr/local/cargo
           # Test user (some unit tests require a non-root UID via TEST_NON_ROOT_UID)
           useradd -m -d /tmp/testuser testuser
           # Best-effort: relax AppArmor user-ns restriction if the kernel exposes it
