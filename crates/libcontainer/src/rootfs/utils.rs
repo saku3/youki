@@ -18,6 +18,13 @@ pub struct MountOptionConfig {
 
     /// RecAttr represents mount properties to be applied recursively.
     pub rec_attr: Option<linux::MountAttr>,
+
+    /// Mount propagation type (MS_SHARED/MS_SLAVE/MS_PRIVATE/MS_UNBINDABLE, plus
+    /// MS_REC for the recursive `r*` variants). Tracked separately from `flags`
+    /// and applied with a classic mount(2) on the attached mount point after the
+    /// mount is created, because the kernel ignores propagation type changes that
+    /// are combined with other mount operations (e.g. MS_BIND).
+    pub propagation_flags: MsFlags,
 }
 
 pub fn default_devices() -> Vec<LinuxDevice> {
@@ -84,6 +91,7 @@ pub fn to_sflag(dev_type: LinuxDeviceType) -> SFlag {
 
 pub fn parse_mount(m: &Mount) -> std::result::Result<MountOptionConfig, MountError> {
     let mut flags = MsFlags::empty();
+    let mut propagation_flags = MsFlags::empty();
     let mut data = Vec::new();
     let mut mount_attr: Option<linux::MountAttr> = None;
 
@@ -154,14 +162,41 @@ pub fn parse_mount(m: &Mount) -> std::result::Result<MountOptionConfig, MountErr
                     MountOption::Nodiratime(is_clear, flag) => Some((is_clear, flag)),
                     MountOption::Bind(is_clear, flag) => Some((is_clear, flag)),
                     MountOption::Rbind(is_clear, flag) => Some((is_clear, flag)),
-                    MountOption::Unbindable(is_clear, flag) => Some((is_clear, flag)),
-                    MountOption::Runbindable(is_clear, flag) => Some((is_clear, flag)),
-                    MountOption::Private(is_clear, flag) => Some((is_clear, flag)),
-                    MountOption::Rprivate(is_clear, flag) => Some((is_clear, flag)),
-                    MountOption::Shared(is_clear, flag) => Some((is_clear, flag)),
-                    MountOption::Rshared(is_clear, flag) => Some((is_clear, flag)),
-                    MountOption::Slave(is_clear, flag) => Some((is_clear, flag)),
-                    MountOption::Rslave(is_clear, flag) => Some((is_clear, flag)),
+                    // Propagation options are tracked separately and applied via a
+                    // classic mount(2) after attach, not folded into `flags`. A mount
+                    // has a single propagation type, so the last one wins.
+                    MountOption::Unbindable(_, _) => {
+                        propagation_flags = MsFlags::MS_UNBINDABLE;
+                        continue;
+                    }
+                    MountOption::Runbindable(_, _) => {
+                        propagation_flags = MsFlags::MS_UNBINDABLE | MsFlags::MS_REC;
+                        continue;
+                    }
+                    MountOption::Private(_, _) => {
+                        propagation_flags = MsFlags::MS_PRIVATE;
+                        continue;
+                    }
+                    MountOption::Rprivate(_, _) => {
+                        propagation_flags = MsFlags::MS_PRIVATE | MsFlags::MS_REC;
+                        continue;
+                    }
+                    MountOption::Shared(_, _) => {
+                        propagation_flags = MsFlags::MS_SHARED;
+                        continue;
+                    }
+                    MountOption::Rshared(_, _) => {
+                        propagation_flags = MsFlags::MS_SHARED | MsFlags::MS_REC;
+                        continue;
+                    }
+                    MountOption::Slave(_, _) => {
+                        propagation_flags = MsFlags::MS_SLAVE;
+                        continue;
+                    }
+                    MountOption::Rslave(_, _) => {
+                        propagation_flags = MsFlags::MS_SLAVE | MsFlags::MS_REC;
+                        continue;
+                    }
                     MountOption::Relatime(is_clear, flag) => Some((is_clear, flag)),
                     MountOption::Norelatime(is_clear, flag) => Some((is_clear, flag)),
                     MountOption::Strictatime(is_clear, flag) => Some((is_clear, flag)),
@@ -189,6 +224,7 @@ pub fn parse_mount(m: &Mount) -> std::result::Result<MountOptionConfig, MountErr
         flags,
         data: data.join(","),
         rec_attr: mount_attr,
+        propagation_flags,
     })
 }
 
@@ -226,6 +262,7 @@ mod tests {
                 flags: MsFlags::empty(),
                 data: "".to_string(),
                 rec_attr: None,
+                propagation_flags: MsFlags::empty(),
             },
             mount_option_config
         );
@@ -248,6 +285,7 @@ mod tests {
                 flags: MsFlags::MS_NOSUID | MsFlags::MS_STRICTATIME,
                 data: "mode=755,size=65536k".to_string(),
                 rec_attr: None,
+                propagation_flags: MsFlags::empty(),
             },
             mount_option_config
         );
@@ -272,7 +310,8 @@ mod tests {
             MountOptionConfig {
                 flags: MsFlags::MS_NOSUID | MsFlags::MS_NOEXEC,
                 data: "newinstance,ptmxmode=0666,mode=0620,gid=5".to_string(),
-                rec_attr: None
+                rec_attr: None,
+                propagation_flags: MsFlags::empty(),
             },
             mount_option_config
         );
@@ -295,7 +334,8 @@ mod tests {
             MountOptionConfig {
                 flags: MsFlags::MS_NOSUID | MsFlags::MS_NOEXEC | MsFlags::MS_NODEV,
                 data: "mode=1777,size=65536k".to_string(),
-                rec_attr: None
+                rec_attr: None,
+                propagation_flags: MsFlags::empty(),
             },
             mount_option_config
         );
@@ -317,7 +357,8 @@ mod tests {
             MountOptionConfig {
                 flags: MsFlags::MS_NOSUID | MsFlags::MS_NOEXEC | MsFlags::MS_NODEV,
                 data: "".to_string(),
-                rec_attr: None
+                rec_attr: None,
+                propagation_flags: MsFlags::empty(),
             },
             mount_option_config
         );
@@ -343,6 +384,7 @@ mod tests {
                     | MsFlags::MS_RDONLY,
                 data: "".to_string(),
                 rec_attr: None,
+                propagation_flags: MsFlags::empty(),
             },
             mount_option_config
         );
@@ -369,7 +411,8 @@ mod tests {
                     | MsFlags::MS_RDONLY
                     | MsFlags::MS_RELATIME,
                 data: "".to_string(),
-                rec_attr: None
+                rec_attr: None,
+                propagation_flags: MsFlags::empty(),
             },
             mount_option_config,
         );
@@ -423,10 +466,12 @@ mod tests {
                     | MsFlags::MS_DIRSYNC
                     | MsFlags::MS_NOATIME
                     | MsFlags::MS_NODIRATIME
-                    | MsFlags::MS_BIND
-                    | MsFlags::MS_UNBINDABLE,
+                    | MsFlags::MS_BIND,
                 data: "".to_string(),
                 rec_attr: None,
+                // Propagation options now land in propagation_flags (last one wins),
+                // so the trailing `rslave` => MS_SLAVE | MS_REC.
+                propagation_flags: MsFlags::MS_SLAVE | MsFlags::MS_REC,
             },
             mount_option_config
         );
@@ -460,7 +505,8 @@ mod tests {
             MountOptionConfig {
                 flags: MsFlags::empty(),
                 data: "".to_string(),
-                rec_attr: Some(MountAttr::all())
+                rec_attr: Some(MountAttr::all()),
+                propagation_flags: MsFlags::empty(),
             },
             mount_option_config
         );

@@ -344,6 +344,7 @@ impl Mount {
             flags: MsFlags::MS_NOEXEC | MsFlags::MS_NOSUID | MsFlags::MS_NODEV,
             data: data.to_string(),
             rec_attr: None,
+            propagation_flags: MsFlags::empty(),
         };
 
         self.mount_into_container(
@@ -672,6 +673,25 @@ impl Mount {
                 mount_attr,
                 mem::size_of::<linux::MountAttr>(),
             )?;
+        }
+
+        // Apply mount propagation (shared/slave/private/unbindable, plus the
+        // recursive r* variants via MS_REC) as a separate classic mount(2) call.
+        // The kernel ignores propagation flags combined with the bind/mount above,
+        // so it must be applied after the mount has been attached.
+        let propagation = mount_option_config.propagation_flags
+            & (MsFlags::MS_SHARED
+                | MsFlags::MS_SLAVE
+                | MsFlags::MS_PRIVATE
+                | MsFlags::MS_UNBINDABLE
+                | MsFlags::MS_REC);
+        if !propagation.is_empty() {
+            self.syscall
+                .mount(None, dest, None, propagation, None)
+                .map_err(|err| {
+                    tracing::error!("failed to set mount propagation on {:?}: {}", dest, err);
+                    err
+                })?;
         }
 
         Ok(())
@@ -1285,6 +1305,7 @@ mod tests {
             flags,
             data: String::new(),
             rec_attr: None,
+            propagation_flags: MsFlags::empty(),
         };
         mounter
             .mount_cgroup_v2(&spec_cgroup_mount, &mount_opts, &mount_option_config)
