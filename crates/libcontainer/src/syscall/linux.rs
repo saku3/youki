@@ -18,7 +18,7 @@ use nix::fcntl::{OFlag, open};
 use nix::mount::{MntFlags, MsFlags, mount, umount2};
 use nix::sched::{CloneFlags, unshare};
 use nix::sys::stat::{Mode, SFlag, mknod};
-use nix::unistd::{Gid, Uid, chown, chroot, close, fchdir, pivot_root, sethostname};
+use nix::unistd::{Gid, Uid, chdir, chown, chroot, close, fchdir, pivot_root, sethostname};
 use oci_spec::runtime::PosixRlimit;
 use pathrs::flags::OpenFlags;
 use pathrs::procfs::{ProcfsBase, ProcfsHandle};
@@ -378,7 +378,15 @@ impl Syscall for LinuxSyscall {
 
     /// Function to set given path as root path inside process
     fn pivot_rootfs(&self, path: &Path) -> Result<()> {
-        // open the path as directory and read only
+        let oldroot = open(
+            "/",
+            OFlag::O_DIRECTORY | OFlag::O_RDONLY | OFlag::O_PATH | OFlag::O_CLOEXEC,
+            Mode::empty(),
+        )
+        .inspect_err(|errno| {
+            tracing::error!(?errno, "failed to open old root for pivot root");
+        })?;
+
         let newroot = open(
             path,
             OFlag::O_DIRECTORY | OFlag::O_RDONLY | OFlag::O_CLOEXEC,
@@ -388,43 +396,47 @@ impl Syscall for LinuxSyscall {
             tracing::error!(?errno, ?path, "failed to open the new root for pivot root");
         })?;
 
-        // make the given path as the root directory for the container
-        // see https://man7.org/linux/man-pages/man2/pivot_root.2.html, specially the notes
-        // pivot root usually changes the root directory to first argument, and then mounts the original root
-        // directory at second argument. Giving same path for both stacks mapping of the original root directory
-        // above the new directory at the same path, then the call to umount unmounts the original root directory from
-        // this path. This is done, as otherwise, we will need to create a separate temporary directory under the new root path
-        // so we can move the original root there, and then unmount that. This way saves the creation of the temporary
-        // directory to put original root directory.
-        pivot_root(path, path).inspect_err(|errno| {
+        fchdir(newroot).inspect_err(|errno| {
+            tracing::error!(?errno, ?newroot, "failed to fchdir to new root");
+        })?;
+        pivot_root(".", ".").inspect_err(|errno| {
             tracing::error!(?errno, ?path, "failed to pivot root to");
         })?;
 
-        // Make the original root directory rslave to avoid propagating unmount event to the host mount namespace.
-        // We should use MS_SLAVE not MS_PRIVATE according to https://github.com/opencontainers/runc/pull/1500.
+        // Switch to the old root to operate on it.
+        fchdir(oldroot).inspect_err(|errno| {
+            tracing::error!(?errno, ?oldroot, "failed to fchdir to old root");
+        })?;
+
+        // Make the old root rslave to avoid propagating unmount events to the host
+        // mount namespace. We use MS_SLAVE (not MS_PRIVATE) per
+        // https://github.com/opencontainers/runc/pull/1500.
         mount(
             None::<&str>,
-            "/",
+            ".",
             None::<&str>,
             MsFlags::MS_SLAVE | MsFlags::MS_REC,
             None::<&str>,
         )
         .inspect_err(|errno| {
-            tracing::error!(?errno, "failed to make original root directory rslave");
+            tracing::error!(?errno, "failed to make old root directory rslave");
         })?;
 
-        // Unmount the original root directory which was stacked on top of new root directory
-        // MNT_DETACH makes the mount point unavailable to new accesses, but waits till the original mount point
-        // to be free of activity to actually unmount
+        // Unmount the old root. MNT_DETACH makes the mount point unavailable to new
+        // accesses, but waits until it is free of activity to actually unmount.
         // see https://man7.org/linux/man-pages/man2/umount2.2.html for more information
-        umount2("/", MntFlags::MNT_DETACH).inspect_err(|errno| {
+        umount2(".", MntFlags::MNT_DETACH).inspect_err(|errno| {
             tracing::error!(?errno, "failed to unmount old root directory");
         })?;
-        // Change directory to the new root
-        fchdir(newroot).inspect_err(|errno| {
-            tracing::error!(?errno, ?newroot, "failed to change directory to new root");
+
+        // Switch back to the new root.
+        chdir("/").inspect_err(|errno| {
+            tracing::error!(?errno, "failed to chdir to new root");
         })?;
 
+        close(oldroot).inspect_err(|errno| {
+            tracing::error!(?errno, ?oldroot, "failed to close old root directory");
+        })?;
         close(newroot).inspect_err(|errno| {
             tracing::error!(?errno, ?newroot, "failed to close new root directory");
         })?;

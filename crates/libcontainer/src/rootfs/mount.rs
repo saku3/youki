@@ -391,6 +391,7 @@ impl Mount {
             flags: MsFlags::MS_NOEXEC | MsFlags::MS_NOSUID | MsFlags::MS_NODEV,
             data: vec![data.into_owned()],
             rec_attr: None,
+            propagation_flags: MsFlags::empty(),
         };
 
         self.mount_into_container(
@@ -805,6 +806,33 @@ impl Mount {
                 Err(e) => return Err(e.into()),
             }
         }
+
+        self.apply_mount_propagation(rootfs, container_dest, mount_option_config.propagation_flags)?;
+
+        Ok(())
+    }
+
+    fn apply_mount_propagation(
+        &self,
+        rootfs: &Path,
+        container_dest: &Path,
+        propagation_flags: MsFlags,
+    ) -> Result<()> {
+        let propagation = propagation_flags
+            & (MsFlags::MS_SHARED
+                | MsFlags::MS_SLAVE
+                | MsFlags::MS_PRIVATE
+                | MsFlags::MS_UNBINDABLE
+                | MsFlags::MS_REC);
+        if propagation.is_empty() {
+            return Ok(());
+        }
+
+        let target = rootfs
+            .join_safely(Path::new(container_dest).normalize())
+            .map_err(|e| MountError::Other(e.into()))?;
+
+        self.syscall.mount(None, &target, None, propagation, None)?;
 
         Ok(())
     }
@@ -1573,6 +1601,7 @@ mod tests {
             flags,
             data: vec![],
             rec_attr: None,
+            propagation_flags: MsFlags::empty(),
         };
         mounter
             .mount_cgroup_v2(&spec_cgroup_mount, &mount_opts, &mount_option_config)
