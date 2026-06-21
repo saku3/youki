@@ -27,6 +27,7 @@ use crate::tests::kill::get_kill_test;
 use crate::tests::kill_no_effect::get_kill_no_effect_test;
 use crate::tests::lifecycle::{ContainerCreate, ContainerLifecycle};
 use crate::tests::linux_masked_paths::get_linux_masked_paths_tests;
+use crate::tests::linux_mount_label::get_linux_mount_label_test;
 use crate::tests::linux_ns_itype::get_ns_itype_tests;
 use crate::tests::memory_policy::get_linux_memory_policy_tests;
 use crate::tests::misc_props::get_misc_props_test;
@@ -169,6 +170,7 @@ fn main() -> Result<()> {
     let kill = get_kill_test();
     let kill_no_effect = get_kill_no_effect_test();
     let masked_paths = get_linux_masked_paths_tests();
+    let linux_mount_label = get_linux_mount_label_test();
     let rootfs_propagation = get_rootfs_propagation_test();
     let process_capabilities_fail = get_process_capabilities_fail_test();
     let process_capabilities_bounding = get_process_capabilities_bounding_test();
@@ -223,6 +225,7 @@ fn main() -> Result<()> {
     tm.add_test_group(Box::new(process_rlimits_fail));
     tm.add_test_group(Box::new(no_pivot));
     tm.add_test_group(Box::new(masked_paths));
+    tm.add_test_group(Box::new(linux_mount_label));
     tm.add_test_group(Box::new(process_oom_score_adj));
     tm.add_test_group(Box::new(fd_control));
     tm.add_test_group(Box::new(kill));

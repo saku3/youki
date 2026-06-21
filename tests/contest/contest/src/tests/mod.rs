@@ -17,6 +17,7 @@ pub mod kill;
 pub mod kill_no_effect;
 pub mod lifecycle;
 pub mod linux_masked_paths;
+pub mod linux_mount_label;
 pub mod linux_ns_itype;
 pub mod memory_policy;
 pub mod misc_props;

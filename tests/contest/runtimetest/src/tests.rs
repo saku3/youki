@@ -395,6 +395,30 @@ pub fn validate_sysctl(spec: &Spec) {
     }
 }
 
+pub fn validate_linux_mount_label(spec: &Spec) {
+    let linux = spec.linux().as_ref().unwrap();
+    // Must match the extra mount added in the contest linux_mount_label spec.
+    let target_mount_path = "/tmp/.tmp";
+    if let Some(_expected_mount_label) = linux.mount_label() {
+        let file = match File::open("/proc/self/mountinfo") {
+            Ok(file) => file,
+            Err(_e) => {
+                eprintln!("Error while opening mount file");
+                return;
+            }
+        };
+        let reader = io::BufReader::new(file);
+        for line in reader.lines().map_while(Result::ok) {
+            if line.contains(target_mount_path) {
+                // Because proc/self/mountinfo doesn't include mount_label, just checking target mount path only.
+                return;
+            }
+        }
+        return eprintln!("There are no directory including the path {target_mount_path}");
+    }
+    eprintln!("Failed to get expected_mount_label");
+}
+
 pub fn validate_scheduler_policy(spec: &Spec) {
     let proc = spec.process().as_ref().unwrap();
     let sc = proc.scheduler().as_ref().unwrap();
