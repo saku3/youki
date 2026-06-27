@@ -78,6 +78,7 @@ pub struct ContainerData {
 pub struct CreateOptions<'a> {
     extra_args: &'a [&'a OsStr],
     no_pivot: bool,
+    use_systemd: bool,
 }
 
 impl<'a> CreateOptions<'a> {
@@ -90,6 +91,12 @@ impl<'a> CreateOptions<'a> {
         self.no_pivot = true;
         self
     }
+
+    /// Run the container with the systemd cgroup manager (`--systemd-cgroup`).
+    pub fn with_systemd(mut self) -> Self {
+        self.use_systemd = true;
+        self
+    }
 }
 
 fn create_container_command<P: AsRef<Path>>(id: &str, dir: P, options: &CreateOptions) -> Command {
@@ -98,7 +105,12 @@ fn create_container_command<P: AsRef<Path>>(id: &str, dir: P, options: &CreateOp
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .arg("--root")
-        .arg(dir.as_ref().join("runtime"))
+        .arg(dir.as_ref().join("runtime"));
+    // `--systemd-cgroup` is a global option, so it has to precede the `create` subcommand.
+    if options.use_systemd {
+        command.arg("--systemd-cgroup");
+    }
+    command
         .arg("create")
         .arg(id)
         .arg("--bundle")

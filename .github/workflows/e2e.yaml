@@ -242,3 +242,23 @@ jobs:
         run: chmod +x ./youki
       - name: Run tests (cgroups-v2)
         run: just test-dind
+
+  systemd-devices-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Setup Rust toolchain and cache
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Install just
+        uses: taiki-e/install-action@just
+      - name: Install requirements
+        run: sudo env PATH=$PATH just ci-prepare
+      - name: Build youki with cgroupsv2_devices
+        run: ./scripts/build.sh -o "$PWD" -r -c youki -f "v2 systemd cgroupsv2_devices"
+      - name: Build contest and runtimetest
+        run: just contest
+      - name: Run systemd device cgroup test
+        run: sudo ./scripts/contest.sh "$PWD/youki" cgroup_v2_devices_systemd

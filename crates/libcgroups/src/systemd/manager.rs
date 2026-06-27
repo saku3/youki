@@ -174,6 +174,9 @@ pub enum SystemdManagerError {
     Memory(#[from] super::memory::SystemdMemoryError),
     #[error("in pids controller: {0}")]
     Pids(Infallible),
+    #[cfg(feature = "cgroupsv2_devices")]
+    #[error("in devices controller: {0}")]
+    Devices(#[from] crate::v2::devices::controller::DevicesControllerError),
     #[error("in pids unified controller: {0}")]
     Unified(#[from] super::unified::SystemdUnifiedError),
     #[error(
@@ -450,6 +453,12 @@ impl CgroupManager for Manager {
             self.client
                 .set_unit_properties(&self.unit_name, &properties)?;
         }
+
+        #[cfg(feature = "cgroupsv2_devices")]
+        crate::v2::devices::Devices::apply_devices(
+            &self.full_path,
+            controller_opt.resources.devices(),
+        )?;
 
         Ok(())
     }

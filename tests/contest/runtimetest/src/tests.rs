@@ -454,6 +454,31 @@ pub fn validate_devices(spec: &Spec) {
     }
 }
 
+// Verifies that the device cgroup denies access to a device node that exists in
+// the container but is not covered by any allow rule. The node itself can be
+// created (the default rules permit mknod), but reading it must be rejected by
+// the eBPF device filter with EPERM. This is the in-container half of the
+// systemd-cgroup device test (see tests/cgroups/devices.rs).
+pub fn validate_device_cgroup_denied(_spec: &Spec) {
+    let path = "/dev/denied-access";
+    match test_read_access(path) {
+        Ok(_) => eprintln!(
+            "device cgroup test: expected read access to {path} to be denied, but it succeeded"
+        ),
+        Err(e) => {
+            let errno = e.raw_os_error().map(Errno::from_raw);
+            // EPERM means the device cgroup correctly rejected the access (expected).
+            // Any other error (e.g. ENXIO when no filter is attached) indicates the
+            // rule was not enforced.
+            if errno != Some(Errno::EPERM) {
+                eprintln!(
+                    "device cgroup test: expected EPERM when reading {path}, but got {e} ({errno:?})"
+                );
+            }
+        }
+    }
+}
+
 fn validate_device(device: &LinuxDevice, description: &str) {
     let file_data = match fs::metadata(device.path()) {
         Ok(data) => data,
