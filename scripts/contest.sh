@@ -46,5 +46,3 @@ fi
 
 echo "Validation successful for runtime $RUNTIME"
 exit 0
-
-
