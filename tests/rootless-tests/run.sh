@@ -19,7 +19,7 @@ echo $log | grep $rand
 
 podman kill exec-test || true # ignore failure for killing
 podman rm --force --ignore exec-test
-podman run -d --runtime $runtime --name exec-test busybox sleep 10m
+podman --cgroup-manager systemd run -d --runtime $runtime --name exec-test busybox sleep 10m
 
 rand=$(head -c 10 /dev/random | base64)
 
