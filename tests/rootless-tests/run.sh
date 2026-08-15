@@ -5,6 +5,10 @@ set -ex
 
 runtime=$1
 
+# log the podman version and cgroup manager, as the tests below depend on them
+podman --version
+podman info --format '{{.Host.CgroupManager}}'
+
 podman rm --force --ignore create-test # remove if existing
 
 podman create --runtime $runtime --name create-test hello-world
