@@ -31,6 +31,7 @@ use crate::tests::linux_masked_paths::get_linux_masked_paths_tests;
 use crate::tests::linux_ns_itype::get_ns_itype_tests;
 use crate::tests::memory_policy::get_linux_memory_policy_tests;
 use crate::tests::misc_props::get_misc_props_test;
+use crate::tests::mount_propagation::get_mount_propagation_test;
 use crate::tests::mounts_recursive::get_mounts_recursive_test;
 use crate::tests::net_devices::get_net_devices_test;
 use crate::tests::no_pivot::get_no_pivot_test;
@@ -142,19 +143,14 @@ fn main() -> Result<()> {
     let prestart = get_prestart_tests();
     let create_runtime = get_create_runtime_tests();
     let prestart_fail = get_prestart_fail_tests();
-    let cgroup_v1_pids = cgroups::pids::get_test_group();
-    let cgroup_v1_cpu = cgroups::cpu::v1::get_test_group();
     let cgroup_v2_cpu = cgroups::cpu::v2::get_test_group();
-    let cgroup_v1_memory = cgroups::memory::get_test_group();
-    let cgroup_v1_blkio = cgroups::blkio::get_test_group();
-    let cgroup_v1_absolute_network = cgroups::network::absolute_network::get_test_group();
-    let cgroup_v1_relative_network = cgroups::network::relative_network::get_test_group();
     let seccomp = get_seccomp_test();
     let seccomp_notify = get_seccomp_notify_test();
     let state = get_state_test();
     let ro_paths = get_ro_paths_test();
     let hostname = get_hostname_test();
     let misc_props = get_misc_props_test();
+    let mount_propagation = get_mount_propagation_test();
     let mounts_recursive = get_mounts_recursive_test();
     let domainname = get_domainname_tests();
     let intel_rdt = get_intel_rdt_test();
@@ -206,19 +202,14 @@ fn main() -> Result<()> {
     tm.add_test_group(Box::new(prestart));
     tm.add_test_group(Box::new(create_runtime));
     tm.add_test_group(Box::new(prestart_fail));
-    tm.add_test_group(Box::new(cgroup_v1_pids));
-    tm.add_test_group(Box::new(cgroup_v1_cpu));
     tm.add_test_group(Box::new(cgroup_v2_cpu));
-    tm.add_test_group(Box::new(cgroup_v1_memory));
-    tm.add_test_group(Box::new(cgroup_v1_absolute_network));
-    tm.add_test_group(Box::new(cgroup_v1_blkio));
-    tm.add_test_group(Box::new(cgroup_v1_relative_network));
     tm.add_test_group(Box::new(seccomp));
     tm.add_test_group(Box::new(seccomp_notify));
     tm.add_test_group(Box::new(state));
     tm.add_test_group(Box::new(ro_paths));
     tm.add_test_group(Box::new(hostname));
     tm.add_test_group(Box::new(misc_props));
+    tm.add_test_group(Box::new(mount_propagation));
     tm.add_test_group(Box::new(mounts_recursive));
     tm.add_test_group(Box::new(domainname));
     tm.add_test_group(Box::new(intel_rdt));
@@ -255,7 +246,6 @@ fn main() -> Result<()> {
     tm.add_test_group(Box::new(checkpoint_restore));
     tm.add_test_group(Box::new(update));
     tm.add_test_group(Box::new(time_ns));
-    tm.add_cleanup(Box::new(cgroups::cleanup_v1));
     tm.add_cleanup(Box::new(cgroups::cleanup_v2));
 
     match opts.command {

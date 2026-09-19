@@ -8,7 +8,6 @@ use user_ns::UserNamespaceConfig;
 
 use super::builder::ContainerBuilder;
 use super::builder_impl::ContainerBuilderImpl;
-use super::mount_validation::validate_idmapped_mounts;
 use super::{Container, ContainerStatus};
 use crate::config::YoukiConfig;
 use crate::error::{ErrInvalidSpec, LibcontainerError, MissingSpecError};
@@ -189,7 +188,11 @@ impl InitContainerBuilder {
             Err(ErrInvalidSpec::UnsupportedVersion)?;
         }
 
-        Validator::validate_spec(spec)?;
+        let syscall = create_syscall();
+        let is_rootless =
+            utils::rootless_required(&*syscall).map_err(LibcontainerError::OtherIO)?;
+
+        Validator::validate_spec(spec, is_rootless)?;
 
         if let Some(process) = spec.process() {
             if let Some(profile) = process.apparmor_profile() {
@@ -206,17 +209,6 @@ impl InitContainerBuilder {
                 }
             }
         }
-
-        let syscall = create_syscall();
-
-        if let Some(mounts) = spec.mounts() {
-            utils::validate_mount_options(mounts)?;
-            validate_idmapped_mounts(mounts, spec.linux().as_ref(), &*syscall)?;
-        }
-
-        utils::validate_spec_for_new_user_ns(spec, &*syscall)?;
-        utils::validate_spec_for_net_devices(spec, &*syscall)
-            .map_err(LibcontainerError::NetDevicesError)?;
 
         Ok(())
     }
