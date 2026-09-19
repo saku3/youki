@@ -11,7 +11,6 @@ use std::time::Duration;
 use nix::sys::stat::{Mode, fstat};
 use nix::sys::statfs::{Statfs, fstatfs};
 use nix::unistd::{Uid, User};
-use oci_spec::runtime::{LinuxNamespaceType, Spec};
 use procfs::process::Process;
 
 use crate::syscall::syscall::Syscall;
