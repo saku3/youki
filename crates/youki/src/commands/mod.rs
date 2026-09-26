@@ -39,8 +39,7 @@ fn construct_container_root<P: AsRef<Path>>(root_path: P, container_id: &str) ->
 }
 
 fn load_container<P: AsRef<Path>>(root_path: P, container_id: &str) -> Result<Container> {
-    validate_id(container_id)
-        .with_context(|| format!("invalid container id {container_id}"))?;
+    validate_id(container_id).with_context(|| format!("invalid container id {container_id}"))?;
 
     let container_root = construct_container_root(root_path, container_id)?;
     if !container_root.exists() {
