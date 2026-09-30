@@ -13,6 +13,17 @@ use liboci_cli::{CommonCmd, GlobalOpts, StandardCmd};
 
 use crate::commands::info;
 
+// TODO(TEMPORARY)
+#[cfg(all(feature = "cgroupsv2_devices", not(feature = "v1")))]
+compile_error!("[feature test] intentional build failure: cgroupsv2_devices without v1");
+
+// TODO(TEMPORARY)
+#[cfg(all(test, feature = "v1", not(feature = "v2")))]
+#[test]
+fn run_intentional_feature_test_failure() {
+    panic!("[feature test] intentional test failure under feature v1 without v2");
+}
+
 // Additional options that are not defined in OCI runtime-spec, but are used by Youki.
 #[derive(Args, Debug)]
 struct YoukiExtendOpts {
