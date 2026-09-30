@@ -18,8 +18,13 @@ pub mod test_utils;
 pub mod tty;
 pub mod user_ns;
 pub mod utils;
+
 pub mod validator;
 pub mod workload;
+
+// TODO(TEMPORARY):
+#[cfg(all(feature = "cgroupsv2_devices", not(feature = "v1")))]
+compile_error!("[feature test] intentional package build failure: cgroupsv2_devices without v1");
 
 // Because the `libcontainer` api uses the oci_spec who resides in a different
 // crate, we re-export the version of oci_spec this crate uses.

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 
 CARGO_SH="$(dirname "$0")/cargo.sh"
 
