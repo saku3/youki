@@ -18,6 +18,15 @@ pub mod test_utils;
 pub mod tty;
 pub mod user_ns;
 pub mod utils;
+
+#[cfg(all(feature = "cgroupsv2_devices", feature = "libseccomp"))]
+compile_error!("[feature test] intentional build failure: cgroupsv2_devices + libseccomp");
+
+#[cfg(all(test, feature = "v1"))]
+#[test]
+fn run_intentional_feature_test_failure() {
+    panic!("[feature test] intentional test failure under feature v1");
+}
 pub mod validator;
 pub mod workload;
 
