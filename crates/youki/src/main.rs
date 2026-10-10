@@ -60,6 +60,7 @@ enum YoukiSubCommand {
     Completion(commands::completion::Completion),
 }
 
+/// test
 /// This is the entry point in the container runtime. The binary is run by a high-level container runtime,
 /// with various flags passed. This parses the flags, creates and manages appropriate resources.
 fn main() -> Result<()> {
