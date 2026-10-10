@@ -30,7 +30,7 @@ jobs:
       
       - name: Install skopeo and podman requirements
         run: |
-          sudo apt-get install -y pkg-config libsystemd-dev libelf-dev libseccomp-dev libgpgme-dev libassuan-dev libbtrfs-dev libdevmapper-dev bats socat protobuf-compiler jq conmon
+          sudo apt-get install -y pkg-config libsystemd-dev libelf-dev libseccomp-dev libgpgme-dev libassuan-dev libbtrfs-dev libdevmapper-dev bats parallel socat protobuf-compiler jq conmon
           cargo install netavark aardvark-dns --locked
       
       - name: Copy binaries
@@ -77,18 +77,44 @@ jobs:
         run: make install.tools
 
       # run tests
-      - name: Run podman test
-        shell: bash # enables pipefail so that a failure of make is not hidden by tee
-        run: sudo make localsystem 2>&1 | tee build.log
+      # These steps expand `make localsystem`, which stops after the sequential pass
+      # fails and never runs the ci:parallel pass. Run both passes and fail at the end.
+      - name: Clean podman state
+        run: sudo rm -rf /root/.local/share/containers /root/.config/containers
+      - name: Run podman test (sequential)
+        id: sequential
+        continue-on-error: true
+        shell: bash # enables pipefail so that a failure of bats is not hidden by tee
+        run: |
+          sudo env PODMAN=$PWD/bin/podman QUADLET=$PWD/bin/quadlet \
+            bats -T --filter-tags '!ci:parallel' test/system/ 2>&1 | tee sequential.log
+      - name: Run podman test (parallel)
+        id: parallel
+        continue-on-error: true
+        shell: bash
+        run: |
+          sudo env PODMAN=$PWD/bin/podman QUADLET=$PWD/bin/quadlet \
+            bats -T --filter-tags ci:parallel -j $(nproc) test/system/ 2>&1 | tee parallel.log
       - name: Adding Summary
         if: always()
         run: |
-          awk '
-            /^1\.\.[0-9]+$/ { sub(/^1\.\./, ""); planned += $0 }
-            /^ok / { if (/# skip/) skipped++; else passed++ }
-            /^not ok / { failed++ }
-            END {
-              printf "Planned: %d, Passed: %d, Failed: %d, Skipped: %d, Not run: %d\n",
-                planned, passed, failed, skipped, planned - passed - failed - skipped
-            }
-          ' build.log >> $GITHUB_STEP_SUMMARY
+          for log in sequential.log parallel.log; do
+            [ -f "$log" ] || continue
+            awk -v pass="${log%.log}" '
+              /^1\.\.[0-9]+$/ { sub(/^1\.\./, ""); planned += $0 }
+              /^ok / { if (/# skip/) skipped++; else passed++ }
+              /^not ok / { failed++ }
+              END {
+                printf "%s: Planned: %d, Passed: %d, Failed: %d, Skipped: %d, Not run: %d\n\n",
+                  pass, planned, passed, failed, skipped, planned - passed - failed - skipped
+              }
+            ' "$log"
+            echo '```'
+            grep '^not ok ' "$log" || echo "(no failures)"
+            echo '```'
+          done >> $GITHUB_STEP_SUMMARY
+      - name: Check test results
+        if: steps.sequential.outcome != 'success' || steps.parallel.outcome != 'success'
+        run: |
+          echo "sequential: ${{ steps.sequential.outcome }}, parallel: ${{ steps.parallel.outcome }}"
+          exit 1
