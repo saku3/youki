@@ -213,6 +213,7 @@ fn resolve_cgroup_path(
 
     match current_cgroup {
         Some(current) => current
+            .normalize()
             .parent()
             .unwrap_or_else(|| Path::new("/"))
             .join(container_id),
@@ -423,6 +424,23 @@ mod tests {
         assert_eq!(
             resolve_cgroup_path(&None, "container-id", false, None),
             PathBuf::from("container-id")
+        );
+    }
+
+    #[test]
+    fn test_resolve_default_cgroupfs_path_outside_cgroupns_root() {
+        assert_eq!(
+            resolve_cgroup_path(
+                &None,
+                "container-id",
+                false,
+                Some(Path::new("/../../../../xx/yy"))
+            ),
+            PathBuf::from("/xx/container-id")
+        );
+        assert_eq!(
+            resolve_cgroup_path(&None, "container-id", false, Some(Path::new("/../.."))),
+            PathBuf::from("/container-id")
         );
     }
 
