@@ -642,6 +642,27 @@ impl Mount {
         let dest: OwnedFd = root.resolve(container_dest)?.into();
         let dest_fd = dest.as_fd();
 
+        let procfs = ProcfsHandle::new()?;
+        let real_path = |fd: BorrowedFd| {
+            procfs.readlink(ProcfsBase::ProcThreadSelf, format!("fd/{}", fd.as_raw_fd()))
+        };
+        let real_rootfs = real_path(root.as_fd())?;
+        let real_dest = real_path(dest_fd)?;
+        if !real_dest.starts_with(&real_rootfs) {
+            return Err(MountError::Custom(format!(
+                "mountpoint {real_dest:?} is outside of rootfs {real_rootfs:?}"
+            )));
+        }
+        self.check_proc_mount_path(&real_rootfs, &real_dest, m)
+            .inspect_err(|err| {
+                tracing::error!(
+                    ?err,
+                    destination = ?container_dest,
+                    resolved = ?real_dest,
+                    "proc-safety check failed"
+                );
+            })?;
+
         // fd-based mount flow:
         // - bind: open_tree -> mount_setattr -> move_mount
         // - nonbind: fsopen -> fsconfig -> fsmount -> mount_setattr -> move_mount
@@ -976,6 +997,25 @@ impl Mount {
     /// assert!(mounter.check_proc_mount(rootfs.as_path(), &mount).is_err());
     /// ```
     pub fn check_proc_mount(&self, rootfs: &Path, mount: &SpecMount) -> Result<()> {
+        let dest = mount.destination();
+        let dest_path = rootfs.join_safely(dest).map_err(|err| {
+            tracing::error!(
+                "could not join rootfs path with mount destination {:?}: {}",
+                dest,
+                err
+            );
+            MountError::Other(err.into())
+        })?;
+
+        self.check_proc_mount_path(rootfs, &dest_path, mount)
+    }
+
+    fn check_proc_mount_path(
+        &self,
+        rootfs: &Path,
+        dest_path: &Path,
+        mount: &SpecMount,
+    ) -> Result<()> {
         const PROC_ROOT_INO: u64 = 1;
         const VALID_PROC_MOUNTS: &[&str] = &[
             "/proc/cpuinfo",
@@ -991,16 +1031,7 @@ impl Mount {
         ];
 
         let dest = mount.destination();
-
         let container_proc_path = rootfs.join("proc");
-        let dest_path = rootfs.join_safely(dest).map_err(|err| {
-            tracing::error!(
-                "could not join rootfs path with mount destination {:?}: {}",
-                dest,
-                err
-            );
-            MountError::Other(err.into())
-        })?;
 
         // If path is Ok, it means dest_path is under /proc.
         // - Ok(p) with p.is_empty(): mount target is exactly /proc.
@@ -1780,6 +1811,108 @@ mod tests {
         assert!(res.is_err());
         let err = format!("{:?}", res.err().unwrap());
         assert!(err.contains("must be mounted on ordinary directory"));
+
+        Ok(())
+    }
+
+    #[test]
+    fn setup_mount_bind_fails_if_destination_resolves_to_proc() -> Result<()> {
+        let tmp = tempfile::tempdir()?;
+        let rootfs = tmp.path();
+        let src = tempfile::tempdir()?;
+
+        fs::create_dir_all(rootfs.join("proc"))?;
+        symlink("proc", rootfs.join("data"))?;
+
+        let mount = SpecMountBuilder::default()
+            .destination(PathBuf::from("/data"))
+            .typ("bind")
+            .source(src.path())
+            .options(vec!["bind".to_string()])
+            .build()?;
+
+        let options = MountOptions {
+            root: rootfs,
+            label: None,
+            cgroup_ns: true,
+        };
+
+        let m = Mount::new();
+        let res = m.setup_mount(&mount, &options);
+
+        // /data resolves to /proc, so it must be checked like a mount on /proc
+        assert!(res.is_err());
+        let err = format!("{:?}", res.err().unwrap());
+        assert!(err.contains("cannot be mounted because it is not type proc"));
+        assert!(helper_syscall(&m).get_move_mount_args().is_empty());
+
+        Ok(())
+    }
+
+    #[test]
+    fn setup_mount_bind_fails_if_destination_resolves_under_proc() -> Result<()> {
+        let tmp = tempfile::tempdir()?;
+        let rootfs = tmp.path();
+        let src = tempfile::tempdir()?;
+
+        fs::create_dir_all(rootfs.join("proc/sys"))?;
+        symlink("proc/sys", rootfs.join("data"))?;
+
+        let mount = SpecMountBuilder::default()
+            .destination(PathBuf::from("/data"))
+            .typ("bind")
+            .source(src.path())
+            .options(vec!["bind".to_string()])
+            .build()?;
+
+        let options = MountOptions {
+            root: rootfs,
+            label: None,
+            cgroup_ns: true,
+        };
+
+        let m = Mount::new();
+        let res = m.setup_mount(&mount, &options);
+
+        assert!(res.is_err());
+        let err = format!("{:?}", res.err().unwrap());
+        assert!(err.contains("is not a valid mount under /proc"));
+        assert!(helper_syscall(&m).get_move_mount_args().is_empty());
+
+        Ok(())
+    }
+
+    #[test]
+    fn setup_mount_bind_to_symlink_outside_proc_is_allowed() -> Result<()> {
+        let tmp = tempfile::tempdir()?;
+        let rootfs = tmp.path();
+        let src = tempfile::tempdir()?;
+
+        fs::create_dir_all(rootfs.join("real"))?;
+        symlink("real", rootfs.join("data"))?;
+
+        let mount = SpecMountBuilder::default()
+            .destination(PathBuf::from("/data"))
+            .typ("bind")
+            .source(src.path())
+            .options(vec!["bind".to_string()])
+            .build()?;
+
+        let options = MountOptions {
+            root: rootfs,
+            label: None,
+            cgroup_ns: true,
+        };
+
+        let m = Mount::new();
+        m.setup_mount(&mount, &options)?;
+
+        let mv = helper_syscall(&m).get_move_mount_args();
+        assert_eq!(mv.len(), 1);
+        assert_eq!(
+            mv[0].to_dirfd_path.as_deref(),
+            Some(fs::canonicalize(rootfs.join("real"))?.as_path())
+        );
 
         Ok(())
     }
