@@ -1,9 +1,12 @@
 name: 🧪 Test for podman
 
 on:
-  schedule:
-  - cron: "0 0 * * *"
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   podman-tests:
@@ -61,14 +64,31 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: containers/podman
+      # gen-cert-pair in the system test helpers uses `openssl req -quiet`, which the
+      # OpenSSL on ubuntu-24.04 does not support, so setup_suite fails before any test runs.
+      # The option only silences progress output, so drop it.
+      - name: Patch podman system test helpers
+        run: |
+          sed -i '/^[[:space:]]*-quiet \\$/d' test/system/helpers.bash
+          if grep -n -- '-quiet' test/system/helpers.bash; then exit 1; fi
       - name: Build podman
         run: make binaries
       - name: Install tools
         run: make install.tools
-      
+
       # run tests
       - name: Run podman test
-        run: BATS_TEST_TMPDIR=$(mktemp -d --tmpdir=${BATS_TMPDIR:-/tmp} podman_bats.XXXXXX) && PODMAN_TMPDIR=$BATS_TEST_TMPDIR && OCI_RUNTIME=/usr/local/bin/youki sudo make localsystem 2>&1 | tee build.log 
+        shell: bash # enables pipefail so that a failure of make is not hidden by tee
+        run: sudo make localsystem 2>&1 | tee build.log
       - name: Adding Summary
+        if: always()
         run: |
-          echo "Total tests: 600+ Failed tests: $(cat build.log | grep " ok " | wc -l)" >> $GITHUB_STEP_SUMMARY
+          awk '
+            /^1\.\.[0-9]+$/ { sub(/^1\.\./, ""); planned += $0 }
+            /^ok / { if (/# skip/) skipped++; else passed++ }
+            /^not ok / { failed++ }
+            END {
+              printf "Planned: %d, Passed: %d, Failed: %d, Skipped: %d, Not run: %d\n",
+                planned, passed, failed, skipped, planned - passed - failed - skipped
+            }
+          ' build.log >> $GITHUB_STEP_SUMMARY
