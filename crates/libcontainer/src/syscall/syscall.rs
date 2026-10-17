@@ -35,6 +35,7 @@ pub trait Syscall {
     fn set_domainname(&self, domainname: &str) -> Result<()>;
     fn set_rlimit(&self, rlimit: &PosixRlimit) -> Result<()>;
     fn get_pwuid(&self, uid: u32) -> Option<Arc<OsStr>>;
+    // test
     fn mount(
         &self,
         source: Option<&Path>,
