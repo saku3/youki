@@ -49,7 +49,7 @@ ENV WASMEDGE_DEP_STDCXX_LIB_PATH="${CROSS_SYSROOT}/lib"
 
 # GCC >= 10 emits calls to libgcc's __aarch64_* atomic helpers by default,
 # but libgcc is not linked into the musl binary, so inline the atomics instead.
-ENV CFLAGS_aarch64_unknown_linux_musl="-mno-outline-atomics"
+# ENV CFLAGS_aarch64_unknown_linux_musl="-mno-outline-atomics"
 
 COPY --chmod=755 hack/busctl.sh /bin/busctl
 
