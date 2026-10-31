@@ -12,7 +12,7 @@ use caps::{CapSet, CapsHashSet};
 use nix::mount::{MntFlags, MsFlags};
 use nix::sched::CloneFlags;
 use nix::sys::stat::{Mode, SFlag};
-use nix::unistd::{Gid, Uid};
+use nix::unistd::{Gid, Pid, Uid};
 use oci_spec::runtime::PosixRlimit;
 
 use super::super::config::PersonalityDomain;
@@ -146,6 +146,7 @@ pub enum ArgName {
     Fsmount,
     OpenTree,
     MountSetattr,
+    Rlimit,
 }
 
 impl ArgName {
@@ -170,6 +171,7 @@ impl ArgName {
             ArgName::Fsmount,
             ArgName::OpenTree,
             ArgName::MountSetattr,
+            ArgName::Rlimit,
         ]
         .iter()
         .copied()
@@ -293,8 +295,8 @@ impl Syscall for TestHelperSyscall {
             .act(ArgName::Domainname, Box::new(domainname.to_owned()))
     }
 
-    fn set_rlimit(&self, _rlimit: &PosixRlimit) -> Result<()> {
-        todo!()
+    fn set_rlimit(&self, pid: Pid, rlimit: &PosixRlimit) -> Result<()> {
+        self.mocks.act(ArgName::Rlimit, Box::new((pid, *rlimit)))
     }
 
     fn get_pwuid(&self, _: u32) -> Option<Arc<OsStr>> {
@@ -689,6 +691,15 @@ impl TestHelperSyscall {
             .iter()
             .map(|x| x.downcast_ref::<String>().unwrap().clone())
             .collect::<Vec<String>>()
+    }
+
+    pub fn get_rlimit_args(&self) -> Vec<(Pid, PosixRlimit)> {
+        self.mocks
+            .fetch(ArgName::Rlimit)
+            .values
+            .iter()
+            .map(|x| *x.downcast_ref::<(Pid, PosixRlimit)>().unwrap())
+            .collect()
     }
 
     pub fn get_domainname_args(&self) -> Vec<String> {

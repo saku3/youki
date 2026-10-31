@@ -123,17 +123,6 @@ pub fn container_intermediate_process(
         command.set_id(Uid::from_raw(0), Gid::from_raw(0))?;
     }
 
-    // set limits and namespaces to the process
-    let proc = spec.process().as_ref().ok_or(MissingSpecError::Process)?;
-    if let Some(rlimits) = proc.rlimits() {
-        for rlimit in rlimits {
-            command.set_rlimit(rlimit).map_err(|err| {
-                tracing::error!(?err, ?rlimit, "failed to set rlimit");
-                err
-            })?;
-        }
-    }
-
     if let Some(time_namespace) = namespaces.get(LinuxNamespaceType::Time)? {
         namespaces.unshare_or_setns(time_namespace)?;
         if time_namespace.path().is_none()

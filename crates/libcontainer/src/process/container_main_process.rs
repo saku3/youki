@@ -15,7 +15,7 @@ use crate::process::args::{ContainerArgs, ContainerType};
 use crate::process::fork::{self, CloneCb};
 use crate::process::message::{Message, format_error_chain};
 use crate::process::{channel, container_intermediate_process};
-use crate::syscall::SyscallError;
+use crate::syscall::{Syscall, SyscallError};
 use crate::user_ns::UserNamespaceConfig;
 
 #[derive(Debug, thiserror::Error)]
@@ -175,7 +175,11 @@ pub fn container_main_process(container_args: &ContainerArgs) -> Result<(Pid, Op
     let foreground_pty_fd = loop {
         let (msg, fd) = init_main_receiver.recv_init_message()?;
         match sequence.accept(&msg)? {
-            InitRequest::Ready => break fd,
+            InitRequest::Ready => {
+                let syscall = container_args.syscall.create_syscall();
+                setup_rlimits(syscall.as_ref(), &container_args.spec, init_pid)?;
+                break fd;
+            }
             InitRequest::Hooks => {
                 let hooks = container_args
                     .spec
@@ -589,6 +593,20 @@ fn handle_setup_network_device(
     Ok(())
 }
 
+fn setup_rlimits(syscall: &dyn Syscall, spec: &Spec, pid: Pid) -> Result<()> {
+    let rlimits = spec
+        .process()
+        .as_ref()
+        .and_then(|process| process.rlimits().as_ref());
+    for rlimit in rlimits.into_iter().flatten() {
+        syscall.set_rlimit(pid, rlimit).map_err(|err| {
+            tracing::error!(?err, ?rlimit, ?pid, "failed to set rlimit");
+            ProcessError::SyscallOther(err)
+        })?;
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use std::fs;
@@ -601,7 +619,64 @@ mod tests {
 
     use super::*;
     use crate::process::channel::{intermediate_channel, main_channel};
+    use crate::syscall::syscall::SyscallType;
     use crate::user_ns::UserNamespaceIDMapper;
+
+    #[test]
+    fn setup_rlimits_applies_every_rlimit_to_the_given_pid() -> Result<()> {
+        use oci_spec::runtime::{PosixRlimitBuilder, PosixRlimitType, ProcessBuilder, SpecBuilder};
+
+        let rlimits = vec![
+            PosixRlimitBuilder::default()
+                .typ(PosixRlimitType::RlimitNofile)
+                .hard(1048576u64)
+                .soft(1024u64)
+                .build()?,
+            PosixRlimitBuilder::default()
+                .typ(PosixRlimitType::RlimitNproc)
+                .hard(1u64)
+                .soft(1u64)
+                .build()?,
+        ];
+        let spec = SpecBuilder::default()
+            .process(ProcessBuilder::default().rlimits(rlimits.clone()).build()?)
+            .build()?;
+        let syscall = SyscallType::Test.create_syscall();
+        let pid = Pid::from_raw(4242);
+
+        setup_rlimits(syscall.as_ref(), &spec, pid)?;
+
+        let got = syscall
+            .as_any()
+            .downcast_ref::<crate::syscall::test::TestHelperSyscall>()
+            .unwrap()
+            .get_rlimit_args();
+        assert_eq!(
+            got,
+            rlimits.into_iter().map(|r| (pid, r)).collect::<Vec<_>>()
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn setup_rlimits_without_rlimits_does_nothing() -> Result<()> {
+        use oci_spec::runtime::{ProcessBuilder, SpecBuilder};
+
+        let mut process = ProcessBuilder::default().build()?;
+        process.set_rlimits(None);
+        let spec = SpecBuilder::default().process(process).build()?;
+        let syscall = SyscallType::Test.create_syscall();
+
+        setup_rlimits(syscall.as_ref(), &spec, Pid::from_raw(4242))?;
+
+        let got = syscall
+            .as_any()
+            .downcast_ref::<crate::syscall::test::TestHelperSyscall>()
+            .unwrap()
+            .get_rlimit_args();
+        assert!(got.is_empty());
+        Ok(())
+    }
 
     #[test]
     fn init_request_sequence_accepts_requests_in_order() {

@@ -13,7 +13,7 @@ use libc;
 use nix::mount::{MntFlags, MsFlags};
 use nix::sched::CloneFlags;
 use nix::sys::stat::{Mode, SFlag};
-use nix::unistd::{Gid, Uid};
+use nix::unistd::{Gid, Pid, Uid};
 use oci_spec::runtime::PosixRlimit;
 
 use crate::config::PersonalityDomain;
@@ -33,7 +33,7 @@ pub trait Syscall {
     fn set_capability(&self, cset: CapSet, value: &CapsHashSet) -> Result<()>;
     fn set_hostname(&self, hostname: &str) -> Result<()>;
     fn set_domainname(&self, domainname: &str) -> Result<()>;
-    fn set_rlimit(&self, rlimit: &PosixRlimit) -> Result<()>;
+    fn set_rlimit(&self, pid: Pid, rlimit: &PosixRlimit) -> Result<()>;
     fn get_pwuid(&self, uid: u32) -> Option<Arc<OsStr>>;
     fn mount(
         &self,

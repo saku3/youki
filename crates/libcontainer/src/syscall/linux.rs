@@ -18,7 +18,7 @@ use nix::fcntl::{OFlag, open};
 use nix::mount::{MntFlags, MsFlags, mount, umount2};
 use nix::sched::{CloneFlags, unshare};
 use nix::sys::stat::{Mode, SFlag, mknod};
-use nix::unistd::{Gid, Uid, chdir, chown, chroot, fchdir, pivot_root, sethostname};
+use nix::unistd::{Gid, Pid, Uid, chdir, chown, chroot, fchdir, pivot_root, sethostname};
 use oci_spec::runtime::PosixRlimit;
 use pathrs::flags::OpenFlags;
 use pathrs::procfs::{ProcfsBase, ProcfsHandle};
@@ -572,7 +572,7 @@ impl Syscall for LinuxSyscall {
     }
 
     /// Sets resource limit for process
-    fn set_rlimit(&self, rlimit: &PosixRlimit) -> Result<()> {
+    fn set_rlimit(&self, pid: Pid, rlimit: &PosixRlimit) -> Result<()> {
         let rlim = &libc::rlimit {
             rlim_cur: rlimit.soft(),
             rlim_max: rlimit.hard(),
@@ -580,9 +580,10 @@ impl Syscall for LinuxSyscall {
 
         // Change for musl libc based on seccomp needs
         #[cfg(not(target_env = "musl"))]
-        let res = unsafe { libc::setrlimit(rlimit.typ() as u32, rlim) };
+        let resource = rlimit.typ() as u32;
         #[cfg(target_env = "musl")]
-        let res = unsafe { libc::setrlimit(rlimit.typ() as i32, rlim) };
+        let resource = rlimit.typ() as i32;
+        let res = unsafe { libc::prlimit(pid.as_raw(), resource, rlim, std::ptr::null_mut()) };
 
         match res {
             0 => Ok(()),
