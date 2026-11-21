@@ -1,6 +1,6 @@
 ARG MUSL_BASE_IMAGE
 
-FROM alpine:3.24 AS apk-anywhere
+FROM alpine:3.20 AS apk-anywhere
 RUN mkdir -p /alpine/lib /alpine/sbin /alpine/etc/apk && \
     cp /sbin/apk                /alpine/sbin/apk && \
     cp /lib/libcrypto.so.3      /alpine/lib/ && \
