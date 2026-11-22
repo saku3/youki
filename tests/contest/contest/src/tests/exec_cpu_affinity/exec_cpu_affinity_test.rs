@@ -190,6 +190,8 @@ pub fn get_exec_cpu_affinity_test() -> TestGroup {
     exec_cpu_affinity_test_group
 }
 
+test_framework::register_test_group!(get_exec_cpu_affinity_test);
+
 pub fn create_process(
     cpu_affinity_initial: Option<&str>,
     cpu_affinity_final: Option<&str>,
